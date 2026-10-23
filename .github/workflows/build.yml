@@ -25,7 +25,7 @@ jobs:
         run: node gen-icon.js
 
       - name: 打包（只打包，不发布）
-        run: npx electron-builder --win nsis --publish never
+        run: npx electron-builder --win nsis portable zip --publish never
 
       - name: 读取版本号
         id: ver
@@ -34,15 +34,17 @@ jobs:
           $v = (Get-Content package.json -Raw | ConvertFrom-Json).version
           echo "version=$v" >> $env:GITHUB_OUTPUT
 
-      - name: 发布 Release（一次一个，挂全部文件）
+      - name: 发布 Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ steps.ver.outputs.version }}
           name: v${{ steps.ver.outputs.version }}
-          draft: true
+          draft: false
           files: |
-            dist/*-Setup.exe
-            dist/*-Setup.exe.blockmap
+            dist/DungeonDuelist-*-Setup.exe
+            dist/DungeonDuelist-*-Setup.exe.blockmap
+            dist/DungeonDuelist-*-Portable.exe
+            dist/DungeonDuelist-*-*.zip
             dist/latest.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
