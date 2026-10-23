@@ -4,7 +4,7 @@ const path = require('path');
 
 (async () => {
   // 确保你的图标文件路径正确
-  const src = path.join(__dirname, '图标', '桌面图标.jpg.'); 
+  const src = path.join(__dirname, '图标', '桌面图标.jpg'); 
   if (!fs.existsSync(src)) {
       console.log('⚠️ 未找到图标源文件: 图标/桌面图标.jpg，跳过图标生成，使用默认图标');
       return;
