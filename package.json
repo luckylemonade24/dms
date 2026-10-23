@@ -3,12 +3,12 @@
   "version": "0.0.9",
   "description": "地牢决斗师：踏上征途",
   "main": "main.js",
-  "author": "下元咕",
+  "author": "",
   "license": "UNLICENSED",
   "build": {
     "appId": "com.ddm.jn",
     "productName": "地牢决斗师",
-    "artifactName": "地牢决斗师-${version}-Setup.${ext}",
+    "artifactName": "DungeonDuelist-${version}-Setup.${ext}",
     "directories": { "output": "dist" },
     "files": [
       "**/*",
