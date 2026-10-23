@@ -1,1 +1,35 @@
+name: Build Windows EXE
 
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: 安装依赖
+        run: npm install
+
+      - name: 生成桌面图标
+        run: node gen-icon.js
+
+      - name: 打包 Electron 应用
+        run: npx electron-builder --win nsis
+
+      - name: 上传打包产物 (EXE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: 地牢决斗师-Windows
+          path: dist/*.exe
