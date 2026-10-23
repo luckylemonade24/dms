@@ -8,7 +8,8 @@
   "build": {
     "appId": "com.ddm.jn",
     "productName": "地牢决斗师",
-    "artifactName": "DungeonDuelist-${version}-Setup.${ext}",
+    "electronLanguages": ["zh-CN", "en-US"],
+    "artifactName": "DungeonDuelist-${version}-${ext}",
     "directories": { "output": "dist" },
     "files": [
       "**/*",
@@ -18,7 +19,7 @@
       "!dist/**"
     ],
     "win": {
-      "target": "nsis",
+      "target": ["nsis", "portable", "zip"],
       "icon": "app.ico"
     },
     "nsis": {
@@ -27,7 +28,13 @@
       "allowToChangeInstallationDirectory": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "地牢决斗师"
+      "shortcutName": "地牢决斗师",
+      "installerIcon": "app.ico",
+      "uninstallerIcon": "app.ico",
+      "artifactName": "DungeonDuelist-${version}-Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "DungeonDuelist-${version}-Portable.${ext}"
     },
     "asar": true,
     "compression": "maximum"
