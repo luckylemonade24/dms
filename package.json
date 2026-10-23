@@ -1,0 +1,39 @@
+{
+  "name": "dungeon-duelist",
+  "version": "0.0.9",
+  "description": "地牢决斗师：踏上征途",
+  "main": "main.js",
+  "author": "",
+  "license": "UNLICENSED",
+  "build": {
+    "appId": "com.ddm.jn",
+    "productName": "地牢决斗师",
+    "directories": { "output": "dist" },
+    "files": [
+      "**/*",
+      "!**/*.log",
+      "!**/.github/**",
+      "!**/build-exe.ps1"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "app.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "地牢决斗师",
+      "artifactName": "地牢决斗师-Setup.exe"
+    },
+    "asar": true,
+    "compression": "maximum"
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest",
+    "sharp": "latest"
+  }
+}

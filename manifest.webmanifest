@@ -1,0 +1,16 @@
+{
+  "name": "地牢决斗师-踏上征途",
+  "short_name": "地牢决斗师",
+  "description": "1v1 回合制怪物卡牌对战",
+  "lang": "zh-CN",
+  "start_url": "index.html",
+  "scope": ".",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    { "src": "图标/应用图标192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "图标/应用图标512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

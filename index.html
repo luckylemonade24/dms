@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<!-- 手机端：允许「添加到主屏幕」后以全屏启动（无地址栏 → 舞台能放大更多） -->
+<meta name="theme-color" content="#0a0a0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="地牢决斗师">
+<link rel="manifest" href="manifest.webmanifest">
+<title>地牢决斗师：踏上征途</title>
+<!-- 网页图标（浏览器标签页 / 收藏夹）：不写这行，浏览器会去要 /favicon.ico 而报 404 -->
+<link rel="icon" type="image/png" href="图标/网页图标.png">
+<!-- CSS 带版本号（?v=）：样式改动后同步改这里，浏览器/预览服务就不会继续用缓存的旧样式 -->
+<link rel="stylesheet" href="css/style.css?v=v77">
+<link rel="stylesheet" href="css/battle.css?v=v77">
+<link rel="stylesheet" href="css/deck.css?v=v77">
+<link rel="stylesheet" href="css/run.css?v=v77">
+<link rel="stylesheet" href="css/tooltip.css?v=v77">
+<link rel="stylesheet" href="css/tour.css?v=v77">
+<link rel="stylesheet" href="css/master.css?v=v77">
+<link rel="stylesheet" href="css/academy.css?v=v77">
+<link rel="stylesheet" href="css/tutorial.css?v=v77">
+<link rel="stylesheet" href="css/profile.css?v=v77">
+<link rel="stylesheet" href="css/community.css?v=v77">
+<link rel="stylesheet" href="css/mobile.css?v=v771">
+<script>window.__NET_HOST = 'dms.spldream.com';</script>
+<meta name="google-site-verification" content="C5YsEfCjLftGuq4EOIOIvsMBAf471HGpOXP24wXtJug" />
+</head>
+<body>
+
+<!-- ================= 主菜单 ================= -->
+<div id="menu">
+  <!-- 全屏开关（只在首页显示；放在 #menu 内部，菜单隐藏时它也跟着隐藏） -->
+  <button id="btnFull" class="fsbtn" title="全屏 / 退出全屏">⛶</button>
+  <!-- 社区：公告 / 卡组社区 / 加入官群（内容见 js/community_data.js，界面见 js/community.js） -->
+  <button id="btnCommunity" class="fsbtn cm" title="社区：公告 · 玩家卡组 · 官方群">💬</button>
+  <!-- 添加到主屏幕：装好后点桌面图标打开 = 系统级全屏横屏（默认隐藏，由 ui.js 按能力显示） -->
+  <button id="btnA2HS" class="fsbtn a2hs hidden" title="添加到主屏幕（装好后打开即全屏横屏）">📲</button>
+  <!-- 版本号：首页左上角的一串显示字符（当前 0-0-7）。
+       它和 ?v= 资源版本、Rules.BUILD 都无关，没有明确指示不要改动。 -->
+  <div id="verTag">0-0-9</div>
+  <!-- 备案号：首页左下角（工信部要求展示；点击跳工信部备案管理系统）。样式见 css/style.css 的 #icpTag -->
+  <a id="icpTag" href="https://dms.spldream.com/" target="_blank" rel="noopener noreferrer">此网站非官方部署，官方网站点此打开</a>
+  <!-- 人物系统：头像 + 名称 + 称号（由 profile_ui.js 填充，固定在右上角） -->
+  <div id="menuProfile" class="hidden"></div>
+  <div class="inner">
+    <h1>地牢决斗师：踏上征途</h1>
+    <div class="sub">DUNGEON DUELIST: ONWARD JOURNEY · 1v1 回合制怪物卡牌对战</div>
+    <div class="sub deckinfo" id="menuDeck"></div>
+    <button class="mbtn primary" id="btnRun">踏上征途</button>
+    <button class="mbtn" id="btnDeck">组卡器</button>
+    <button class="mbtn" id="btnTutorial">入学手册</button>
+    <button class="mbtn" id="btnTour">魔绫大赛</button>
+    <button class="mbtn" id="btnAcademy">学院考核</button>
+    <button class="mbtn" id="btnBoss">晋升之路</button>
+    <button class="mbtn" id="btnSettings">设置</button>
+    <button class="mbtn" id="btnContinue">继续存档</button>
+  </div>
+</div>
+
+<!-- ================= 组卡器 ================= -->
+<div id="deck" class="hidden">
+  <div class="dk-top">
+    <span class="dk-title">组卡器</span>
+    <!-- 点这个卡组名 → 弹出「改名 / 切换卡组」面板（手机端顶栏收在最左一栏，标签挤着难点到） -->
+    <button id="dkName" class="dk-namebtn" type="button" title="点击改名 / 切换到别的卡组">
+      <span id="dkNameTxt">卡组名</span><span class="dk-ncaret">▾</span>
+    </button>
+    <span id="dkCount" class="dk-count"></span>
+    <span id="dkMsg" class="dk-msg"></span>
+    <span class="dk-spacer"></span>
+    <button id="dkSave" class="pxbtn">保存</button>
+    <button id="dkNew" class="pxbtn ghost">新建</button>
+    <button id="dkDelete" class="pxbtn ghost">删除</button>
+    <button id="dkUse" class="pxbtn">使用此卡组</button>
+    <button id="dkClose" class="pxbtn ghost">返回</button>
+  </div>
+  <div class="dk-tabs" id="dkTabs"></div>
+  <div class="dk-body">
+    <div class="dk-left">
+      <div class="dk-filters">
+        <select id="dkType" class="dk-select">
+          <option value="all">全部类型</option>
+          <option value="monster">怪物</option>
+          <option value="treasure">宝藏</option>
+          <option value="throw">投掷物</option>
+          <option value="food">食物</option>
+          <option value="potion">药水</option>
+          <option value="wand">法杖</option>
+          <option value="trap">陷阱</option>
+          <option value="ring">戒指</option>
+          <option value="artifact">神器</option>
+          <option value="weapon">武器</option>
+          <option value="armor">防具</option>
+          <option value="scroll">卷轴</option>
+        </select>
+        <input id="dkSearch" class="dk-search" placeholder="搜索卡名">
+        <span class="dim dk-hint">点击左侧卡牌加入，点击右侧移除</span>
+      </div>
+      <div class="dk-pool" id="dkPool"></div>
+    </div>
+    <div class="dk-right">
+      <div class="dk-righthead">
+        <span>我的卡组</span><span id="dkDeckCount" class="dim"></span>
+        <span class="dk-spacer"></span>
+        <button id="dkClear" class="pxbtn ghost small">清空</button>
+      </div>
+      <div class="dk-list" id="dkDeck"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 跑图地图 ================= -->
+<div id="map" class="hidden">
+  <div class="map-top">
+    <span class="map-title">跑图</span>
+    <span id="mapAct" class="map-stat"></span>
+    <span id="mapHp" class="map-stat hp"></span>
+    <span id="mapGold" class="map-stat gold"></span>
+    <span id="mapDeckInfo" class="map-stat"></span>
+    <span id="mapSeed" class="map-stat seed"></span>
+    <span class="map-spacer"></span>
+    <span class="relicBar" id="mapRelics"></span>
+    <button id="mapHome" class="pxbtn ghost small">返回主页</button>
+    <button id="mapQuit" class="pxbtn ghost small">放弃跑图</button>
+  </div>
+  <div class="map-wrap"><div class="map-canvas" id="mapCanvas"></div></div>
+  <div class="map-bottom" id="mapHint"></div>
+</div>
+
+<!-- 节点面板：商店 / 休息 / 事件 / 战后奖励 -->
+<div id="runpanel" class="hidden"></div>
+
+<!-- ================= 魔绫大赛（联盟赛） ================= -->
+<div id="tour" class="hidden"></div>
+
+<!-- ================= 大师赛（联机） ================= -->
+<div id="master" class="hidden"></div>
+
+<!-- ================= 学院考核 ================= -->
+<div id="academy" class="hidden"></div>
+
+<!-- ================= 晋升之路 ================= -->
+<div id="boss" class="hidden"></div>
+
+<!-- ================= 对战界面 ================= -->
+<div id="battle" class="hidden">
+  <!-- 观战遮罩：观战者进入对局时显示，挡住所有可交互区域（服务端也会拒绝操作，这里是双保险） -->
+  <div id="specMask" class="hidden">观战中 · 只能观看，不能操作</div>
+  <div id="stage">
+    <!-- 联机延迟：对局右上角（只在连上服务器且在对局中显示，由 ui.js 的 renderPing 控制） -->
+    <div id="netPing" class="hidden"><span id="netPingVal">--</span> ms</div>
+    <!-- 排位赛回合计时（只在排位房显示；好友房/PvE 一律隐藏，由 ui.js 的 renderRankTimer 控制） -->
+    <div id="rankTimer" class="hidden">⏱ --</div>
+    <!-- 顶部遗物栏 -->
+    <div class="topbar">
+      <span class="tb-title">遗物栏</span>
+      <div class="relicBar" id="relicBar"></div>
+      <span class="tb-spacer"></span>
+      <span class="tb-seed" id="seedInfo"></span>
+      <!-- 自动战斗（仅「踏上征途」对局内显示，位于设置按钮左侧） -->
+      <button id="battleAutoBtn" class="pxbtn small ghost hidden">自动战斗</button>
+      <!-- 全屏（仅触屏设备显示）：手机横屏缩放受屏幕高度限制，全屏可再放大 ~20% -->
+      <button id="battleFsBtn" class="pxbtn ghost small hidden">全屏</button>
+      <button id="battleSetBtn" class="pxbtn ghost small">设置</button>
+    </div>
+
+    <div class="main">
+      <!-- 战斗列 -->
+      <div class="battlecol">
+        <!-- 对手信息 -->
+        <div class="inforow" id="oppInfo">
+          <span class="nm" id="oppName">对手</span>
+          <div class="hpwrap"><div class="hpbar" id="oppHPBar"></div><div class="hptxt" id="oppHP"></div></div>
+          <span class="stat link" id="oppDeck" title="点击查看对手牌库（不含顺序）"></span>
+          <span class="stat" id="oppHandCount"></span>
+          <span class="stat link" id="oppDiscard" title="点击查看对手弃牌堆（含顺序）"></span>
+          <span class="statusbar" id="oppStatus"></span>
+        </div>
+        <!-- 对手手牌（卡背） -->
+        <div class="handrow hand-opp" id="oppHand"></div>
+        <!-- 对手怪物区 -->
+        <div class="board foe" id="oppBoard"></div>
+        <!-- 中央交互带 -->
+        <div class="center-zone" id="centerZone" data-drop="use">
+          <div class="banner prep" id="phaseBanner">准备阶段</div>
+          <div class="globalchips" id="globalChips"></div>
+          <button id="endBtn">结束准备</button>
+        </div>
+        <!-- 己方怪物区 -->
+        <div class="board" id="myBoard"></div>
+        <!-- 己方信息 -->
+        <div class="inforow" id="myInfo">
+          <span class="nm" id="myName">我方</span>
+          <div class="hpwrap"><div class="hpbar" id="myHPBar"></div><div class="hptxt" id="myHP"></div></div>
+          <span class="stat link" id="myDeck" title="点击查看我的牌库（不含顺序）"></span>
+          <span class="stat" id="myHandCount"></span>
+          <span class="stat link" id="myDiscard" title="点击查看我的弃牌堆（含顺序）"></span>
+          <span class="statusbar" id="myStatus"></span>
+          <div class="wandwrap"><div id="wandSlot" data-drop="wand"><span class="dim">法杖栏</span></div></div>
+          <span class="stat" id="castInfo"></span>
+          <span class="stat" id="summonInfo"></span>
+        </div>
+        <!-- 己方手牌 -->
+        <div class="handrow" id="myHand"></div>
+      </div>
+
+      <!-- 右侧数据栏 -->
+      <div class="sidebar">
+        <div id="preview"><div class="dim">悬停卡牌查看详情</div></div>
+        <div id="viewer" class="hidden"></div>
+        <div class="logbox" id="logbox"></div>
+      </div>
+    </div>
+
+    <!-- 表现层：出牌横幅 / 攻击连线画布（坐标与舞台一致） -->
+    <div id="fxLayer"></div>
+    <div id="playFeed"></div>
+    <!-- 回合提示：每回合开始在屏幕中央淡入淡出（ui.js showTurnBanner + battle.css #turnBanner） -->
+    <div id="turnBanner"></div>
+  </div>
+
+  <!-- 对战交互浮层（仅对战界面使用） -->
+  <div id="floatLayer"></div>
+  <div id="dragLayer"></div>
+</div>
+
+<!-- 全局浮层：独立于 #battle，保证主菜单 / 地图 / 组卡器也能显示 -->
+<div id="toast"></div>
+<div id="modal" class="hidden"></div>
+
+<!-- 竖屏提示：仅触屏设备竖着拿时显示（见 style.css 与 ui.js 的 updateRotateHint）。
+     只留一个按钮 = 进入全屏：浏览器进全屏后自带转向（这就是不再需要「手动转 90°」的原因）。 -->
+<div id="rotateHint" class="hidden">
+  <div class="rh-ico">📱</div>
+  <div>请把手机横过来游玩</div>
+  <div class="rh-tip">本作按 16:9 横屏设计（1280×720），竖屏会被缩得过小</div>
+  <div class="rh-btns">
+    <button id="rhFull" class="pxbtn">进入全屏（自动横屏）</button>
+  </div>
+  <div class="rh-tip">点上面按钮进全屏后，浏览器会自动把画面转成横屏</div>
+</div>
+
+<!-- ================= 脚本（顺序不可乱） ================= -->
+<script src="js/rules.js?v=v77"></script>
+<script src="js/cards.js?v=v77"></script>
+<script src="js/tooltip.js?v=v77"></script>
+<script src="js/anim.js?v=v77"></script>
+<script src="js/audio.js?v=v77"></script>
+<script src="js/awaken_data.js?v=v77"></script>
+<script src="js/perks_data.js?v=v77"></script>
+  <script src="js/engine.js?v=v77"></script>
+<script src="js/card_play.js?v=v77"></script>
+<script src="js/ai.js?v=v77"></script>
+<script src="js/storage.js?v=v77"></script>
+<script src="js/achievements.js?v=v77"></script>
+<script src="js/run.js?v=v77"></script>
+<script src="js/deckbuilder.js?v=v77"></script>
+<script src="js/runui.js?v=v77"></script>
+<script src="js/tournament_data.js?v=v77"></script>
+<script src="js/tournament.js?v=v77"></script>
+<script src="js/tournament_ui.js?v=v77"></script>
+<script src="js/polling.js?v=v771"></script> 
+<script src="js/net_failover.js?v=v775"></script>
+<script src="js/net.js?v=v77"></script>
+<script src="js/master_ui.js?v=v77"></script>
+<script src="js/academy_data.js?v=v77"></script>
+<script src="js/academy.js?v=v77"></script>
+<script src="js/academy_ui.js?v=v77"></script>
+<script src="js/boss_data.js?v=v77"></script>
+<script src="js/boss.js?v=v77"></script>
+<script src="js/boss_ui.js?v=v77"></script>
+<script src="js/tutorial_data.js?v=v77"></script>
+<script src="js/tutorial.js?v=v77"></script>
+<script src="js/tutorial_ui.js?v=v77"></script>
+<script src="js/profile_ui.js?v=v77"></script>
+<script src="js/ui.js?v=v77"></script>
+<!-- 社区：数据（服务器可直接替换 community_data.js）+ 界面逻辑（放在 ui.js 之后，用到 UI.toast） -->
+<script src="js/community_data.js?v=v77"></script>
+<script src="js/community.js?v=v77"></script>
+<script src="preload-list.js"></script>
+<script src="preload.js"></script>
+<script src="js/mobile.js?v=v771"></script>
+</body>
+</html>

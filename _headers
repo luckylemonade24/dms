@@ -1,0 +1,22 @@
+# 1. 必须实时的入口文件（覆盖全局缓存）
+/index.html
+  Cache-Control: no-cache
+
+# 2. 极其重要：Service Worker 本身绝对不能缓存，否则永远发不了版
+/sw.js
+  Cache-Control: no-cache
+
+# 3. 你原来的全局配置（放在最后兜底，保留你写的所有安全头）
+/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=86400
+  Access-Control-Allow-Origin: https://dms-gu.pages.dev
+  Cross-Origin-Resource-Policy: same-origin
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: unsafe-none
+  X-Download-Options: noopen
+  X-Permitted-Cross-Domain-Policies: none
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=86400; includeSubDomains; preload
