@@ -4,9 +4,9 @@ const path = require('path');
 
 (async () => {
   // 确保你的图标文件路径正确
-  const src = path.join(__dirname, '图标', 'icon.png'); 
+  const src = path.join(__dirname, '图标', 'icon.jng'); 
   if (!fs.existsSync(src)) {
-      console.log('⚠️ 未找到图标源文件: 图标/icon.png，跳过图标生成，使用默认图标');
+      console.log('⚠️ 未找到图标源文件: 图标/icon.jng，跳过图标生成，使用默认图标');
       return;
   }
   const sizes = [16, 32, 48, 64, 128, 256];
