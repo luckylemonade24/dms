@@ -1,15 +1,13 @@
 name: Build and Release Windows EXE
 
 on:
-  push:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: write # 允许发布 Release
+      contents: write
 
     steps:
       - name: 检出代码
@@ -26,7 +24,25 @@ jobs:
       - name: 生成桌面图标
         run: node gen-icon.js
 
-      - name: 打包并发布 Electron 应用
-        run: npx electron-builder --win nsis --publish always
+      - name: 打包（只打包，不发布）
+        run: npx electron-builder --win nsis --publish never
+
+      - name: 读取版本号
+        id: ver
+        shell: pwsh
+        run: |
+          $v = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          echo "version=$v" >> $env:GITHUB_OUTPUT
+
+      - name: 发布 Release（一次一个，挂全部文件）
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: v${{ steps.ver.outputs.version }}
+          draft: true
+          files: |
+            dist/*-Setup.exe
+            dist/*-Setup.exe.blockmap
+            dist/latest.yml
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
