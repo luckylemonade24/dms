@@ -19,7 +19,7 @@
       "!dist/**"
     ],
     "win": {
-      "target": ["nsis", "portable", "zip"],
+      "target": ["nsis", "portable"],
       "icon": "app.ico"
     },
     "nsis": {
