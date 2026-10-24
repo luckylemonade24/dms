@@ -37,8 +37,8 @@ jobs:
         shell: pwsh
         run: |
           cd electron-src/src
-          # 生成 GN 配置
-          gn gen out/Release --args='target_os="win" is_debug=false'
+          # 生成 GN 配置 (用反引号转义双引号，防止被 PowerShell 吞掉)
+          gn gen out/Release --args="target_os=`"win`" is_debug=false"
           # 导出全量参数到文件
           gn args out/Release --list > ..\FULL_GN_ARGS.txt
           Write-Host "参数导出成功，行数: $((Get-Content ..\FULL_GN_ARGS.txt).Count)"
