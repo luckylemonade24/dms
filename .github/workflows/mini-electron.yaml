@@ -31,6 +31,13 @@ jobs:
           gclient sync --no-history --with_branch_heads --with_tags -v
         timeout-minutes: 120
 
+      - name: 强行生成 packed-refs
+        shell: pwsh
+        run: |
+          cd electron-src/src/electron
+          git pack-refs --all
+          Write-Host "✅ 成功生成 packed-refs"
+
       - name: 写入裁剪后的 args.gn
         shell: pwsh
         run: |
