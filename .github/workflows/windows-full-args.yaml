@@ -1,0 +1,54 @@
+name: Dump Full GN Args (Windows)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dump-args:
+    runs-on: windows-latest
+    
+    steps:
+      - name: 查看初始磁盘 (D盘是工作区)
+        shell: pwsh
+        run: Get-PSDrive -PSProvider FileSystem | Select-Object Name, @{n='FreeGB';e={[math]::Round($_.Free/1GB,2)}}
+
+      - name: 安装 depot_tools
+        shell: pwsh
+        run: |
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git C:\depot_tools
+          echo "C:\depot_tools" >> $env:GITHUB_PATH
+
+      - name: 拉取源码 (极限精简版，尝试防爆盘)
+        shell: pwsh
+        run: |
+          mkdir C:\electron-src
+          cd C:\electron-src
+          # 注意：只用 Win 平台配置，避免拉 Mac/Linux 依赖
+          $env:GYP_DEFINES="target_os=win"
+          gclient config --name src/electron --unmanaged https://github.com/electron/electron.git
+          # --no-history 和 --shallow 尽量减小体积
+          gclient sync --no-history --shallow --with_branch_heads --with_tags -v
+        timeout-minutes: 90
+
+      - name: 查看 sync 后磁盘
+        if: always()
+        shell: pwsh
+        run: Get-PSDrive -PSProvider FileSystem | Select-Object Name, @{n='FreeGB';e={[math]::Round($_.Free/1GB,2)}}
+
+      - name: 生成 GN 配置并导出全量参数
+        shell: pwsh
+        run: |
+          cd C:\electron-src\src
+          # 生成基础配置 (目标只盯 Windows)
+          gn gen out/Release --args="target_os=""win"" is_debug=false"
+          # 导出所有参数到文件
+          gn args out/Release --list > C:\electron-src\FULL_GN_ARGS.txt
+          (Get-Content C:\electron-src\FULL_GN_ARGS.txt).Count
+
+      - name: 上传全量参数文件
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-gn-args-windows
+          path: C:\electron-src\FULL_GN_ARGS.txt
+          if-no-files-found: warn
