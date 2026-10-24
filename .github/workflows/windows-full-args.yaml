@@ -10,6 +10,12 @@ jobs:
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
 
     steps:
+      - name: 用 winget 安装指定版本的 Windows SDK
+        shell: pwsh
+        run: |
+          # 用 winget 安装，--accept 参数避免卡在交互提示
+          winget install Microsoft.WindowsSDK.10.0.28000 --accept-source-agreements --accept-package-agreements
+          
       - name: 安装 depot_tools
         shell: pwsh
         run: |
@@ -21,6 +27,7 @@ jobs:
         run: |
           mkdir electron-src
           cd electron-src
+          
           gclient config --name src/electron --unmanaged https://github.com/electron/electron.git
           gclient sync --no-history --shallow --with_branch_heads --with_tags -v
         timeout-minutes: 90
@@ -33,10 +40,15 @@ jobs:
           # 1. 创建 out 目录
           New-Item -ItemType Directory -Force -Path out/Release | Out-Null
           
-          # 2. 把官方配置原封不动地写进 args.gn 文件（使用双引号，绝对不转义）
-          Set-Content -Path out/Release/args.gn -Value 'import("//electron/build/args/release.gn")'
+          # 2. 把官方配置和指定的 SDK 版本写进 args.gn 文件
+          # 如果 winget 装完路径有变，这一句能强制 GN 去找这个版本
+          $argsContent = @(
+            'import("//electron/build/args/release.gn")',
+            'windows_sdk_version = "10.0.28000.2270"'
+          )
+          Set-Content -Path out/Release/args.gn -Value $argsContent
           
-          # 3. 直接执行生成，GN 会自动读取上面的文件
+          # 3. 直接执行生成
           gn gen out/Release
           
           # 4. 导出全量参数
