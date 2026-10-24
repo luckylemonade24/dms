@@ -8,38 +8,34 @@ jobs:
     runs-on: windows-latest
     
     steps:
-      - name: 查看初始磁盘
-        shell: pwsh
-        run: Get-PSDrive -PSProvider FileSystem | Select-Object Name, @{n='FreeGB';e={[math]::Round($_.Free/1GB,2)}}
-
       - name: 安装 depot_tools
         shell: pwsh
         run: |
-          # 直接装在工作区
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git .\depot_tools
           echo "${{ github.workspace }}\depot_tools" >> $env:GITHUB_PATH
 
       - name: 拉取源码
         shell: pwsh
         run: |
+          # 写入全局环境变量，后续所有步骤都能读到！彻底解决 401 报错
+          echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" >> $env:GITHUB_ENV
+          
           mkdir electron-src
           cd electron-src
-          $env:GYP_DEFINES="target_os=win"
-          # 强制使用本地 VS 工具链，避免 401 报错
-          $env:DEPOT_TOOLS_WIN_TOOLCHAIN="0"
           
           gclient config --name src/electron --unmanaged https://github.com/electron/electron.git
-          # --nohooks：跳过下载无用文件
-          gclient sync --no-history --shallow --with_branch_heads --with_tags --nohooks -v
+          # 绝对不能加 --nohooks，必须生成工具链
+          gclient sync --no-history --shallow --with_branch_heads --with_tags -v
         timeout-minutes: 90
 
-      - name: 生成并导出参数
+      - name: 生成并导出官方参数
         shell: pwsh
         run: |
           cd electron-src/src
           
-          # 真正的正常办法：系统本身是 Windows，默认 target_os 就是 win。不需要传带双引号的 target_os
-          gn gen out/Release --args="is_debug=false"
+          # 用变量避免 PowerShell 吞引号，导入官方 release.gn
+          $gn_args = 'import("//electron/build/args/release.gn")'
+          gn gen out/Release "--args=$gn_args"
           
           # 导出全量参数到文件
           gn args out/Release --list > ..\FULL_GN_ARGS.txt
