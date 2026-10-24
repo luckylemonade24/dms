@@ -6,7 +6,6 @@ on:
 jobs:
   dump-args:
     runs-on: windows-latest
-    # 【终极修复】把环境变量加在整个任务的最顶层
     env:
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
 
@@ -22,7 +21,6 @@ jobs:
         run: |
           mkdir electron-src
           cd electron-src
-          
           gclient config --name src/electron --unmanaged https://github.com/electron/electron.git
           gclient sync --no-history --shallow --with_branch_heads --with_tags -v
         timeout-minutes: 90
@@ -32,8 +30,16 @@ jobs:
         run: |
           cd electron-src/src
           
-          gn gen out/Release --args="import('//electron/build/args/release.gn')"
+          # 1. 创建 out 目录
+          New-Item -ItemType Directory -Force -Path out/Release | Out-Null
           
+          # 2. 把官方配置原封不动地写进 args.gn 文件（使用双引号，绝对不转义）
+          Set-Content -Path out/Release/args.gn -Value 'import("//electron/build/args/release.gn")'
+          
+          # 3. 直接执行生成，GN 会自动读取上面的文件
+          gn gen out/Release
+          
+          # 4. 导出全量参数
           gn args out/Release --list > ..\FULL_GN_ARGS.txt
           Write-Host "参数导出成功，行数: $((Get-Content ..\FULL_GN_ARGS.txt).Count)"
 
