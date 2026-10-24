@@ -25,11 +25,11 @@ jobs:
           mkdir electron-src
           cd electron-src
           $env:GYP_DEFINES="target_os=win"
-          # 【新增】强制使用本地 VS 工具链，避免 401 报错
+          # 强制使用本地 VS 工具链，避免 401 报错
           $env:DEPOT_TOOLS_WIN_TOOLCHAIN="0"
           
           gclient config --name src/electron --unmanaged https://github.com/electron/electron.git
-          # 【新增】--nohooks：跳过下载 376MB 的 PGO 文件和各种测试依赖，我们只看参数，不需要这些
+          # --nohooks：跳过下载无用文件
           gclient sync --no-history --shallow --with_branch_heads --with_tags --nohooks -v
         timeout-minutes: 90
 
@@ -37,8 +37,10 @@ jobs:
         shell: pwsh
         run: |
           cd electron-src/src
-          # 生成 GN 配置 (用反引号转义双引号，防止被 PowerShell 吞掉)
-          gn gen out/Release --args="target_os=`"win`" is_debug=false"
+          
+          # 真正的正常办法：系统本身是 Windows，默认 target_os 就是 win。不需要传带双引号的 target_os
+          gn gen out/Release --args="is_debug=false"
+          
           # 导出全量参数到文件
           gn args out/Release --list > ..\FULL_GN_ARGS.txt
           Write-Host "参数导出成功，行数: $((Get-Content ..\FULL_GN_ARGS.txt).Count)"
