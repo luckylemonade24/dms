@@ -29,7 +29,7 @@ jobs:
           cd electron-src
           
           gclient config --name src/electron --unmanaged https://github.com/electron/electron.git
-          gclient sync --no-history --shallow --with_branch_heads --with_tags -v
+          gclient sync --no-history --with_branch_heads --with_tags -v
         timeout-minutes: 90
 
       - name: 生成并导出官方参数
