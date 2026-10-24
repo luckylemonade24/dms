@@ -124,7 +124,6 @@ jobs:
             'enable_screen_ai_browsertests = false',
             'enable_screen_ai_service = false',
             'enable_speech_service = false',
-            'enable_supervised_users = false',
             'enable_ttc_webui = false',
             'enable_webui_bookmarks = false',
             'enable_webui_certificate_viewer = false',
@@ -337,7 +336,7 @@ jobs:
 
       - name: 上传运行时压缩包
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: electron-runtime-win32-x64
           path: electron-runtime-win32-x64.zip
