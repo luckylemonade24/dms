@@ -6,7 +6,10 @@ on:
 jobs:
   dump-args:
     runs-on: windows-latest
-    
+    # 【终极修复】把环境变量加在整个任务的最顶层
+    env:
+      DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+
     steps:
       - name: 安装 depot_tools
         shell: pwsh
@@ -17,8 +20,6 @@ jobs:
       - name: 拉取源码
         shell: pwsh
         run: |
-          echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" >> $env:GITHUB_ENV
-          
           mkdir electron-src
           cd electron-src
           
