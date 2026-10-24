@@ -220,13 +220,16 @@ jobs:
             'win_enable_cfg_guards = false'
           )
           Set-Content -Path out/Release/args.gn -Value $argsContent -Encoding UTF8
+          Copy-Item out/Release/args.gn "$env:GITHUB_WORKSPACE\args_written.txt"
+          Write-Host "✅ args.gn 已写入，备份为 args_written.txt"
 
       - name: 生成构建配置
         shell: pwsh
         run: |
           cd electron-src/src
           gn gen out/Release
-          Write-Host "✅ gn gen 成功"
+          gn args out/Release --list > "$env:GITHUB_WORKSPACE\args_effective.txt"
+          Write-Host "✅ gn gen 成功，实际生效参数已导出"
 
       - name: 编译 electron
         shell: pwsh
@@ -235,15 +238,107 @@ jobs:
           autoninja -C out/Release electron
           Write-Host "✅ 编译完成"
 
-      - name: 列出产物
+      - name: 记录 out/Release 实际内容
+        if: always()
         shell: pwsh
         run: |
-          Get-ChildItem electron-src/src/out/Release | Select-Object Name, Length
+          $root = "electron-src/src/out/Release"
+          $out = "$env:GITHUB_WORKSPACE\build_output_list.txt"
 
-      - name: 上传产物
+          "===== out/Release 顶层内容 =====" | Out-File $out -Encoding UTF8
+          Get-ChildItem $root | ForEach-Object {
+            $type = if ($_.PSIsContainer) { "[DIR]" } else { "[FILE]" }
+            $sizeMB = if (-not $_.PSIsContainer) { [math]::Round($_.Length / 1MB, 2) } else { "" }
+            "$type`t$($_.Name)`t$sizeMB MB" | Out-File $out -Append -Encoding UTF8
+          }
+
+          "" | Out-File $out -Append -Encoding UTF8
+          "===== out/Release 总大小 =====" | Out-File $out -Append -Encoding UTF8
+          $total = (Get-ChildItem $root -Recurse | Measure-Object -Property Length -Sum).Sum / 1GB
+          "总计: $([math]::Round($total, 2)) GB" | Out-File $out -Append -Encoding UTF8
+
+          "" | Out-File $out -Append -Encoding UTF8
+          "===== 顶层文件大小明细 =====" | Out-File $out -Append -Encoding UTF8
+          Get-ChildItem $root -File | Sort-Object Length -Descending | ForEach-Object {
+            "$([math]::Round($_.Length / 1MB, 2)) MB`t$($_.Name)" | Out-File $out -Append -Encoding UTF8
+          }
+
+          "" | Out-File $out -Append -Encoding UTF8
+          "===== 各子目录大小 =====" | Out-File $out -Append -Encoding UTF8
+          Get-ChildItem $root -Directory | ForEach-Object {
+            $sum = (Get-ChildItem $_.FullName -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
+            "$([math]::Round($sum / 1MB, 2)) MB`t$($_.Name)/" | Out-File $out -Append -Encoding UTF8
+          }
+
+          Write-Host "✅ 产物清单已记录"
+          Get-Content $out
+
+      - name: 上传记录文件
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: electron-release-windows
-          path: electron-src/src/out/Release
+          name: build-records
+          path: |
+            args_written.txt
+            args_effective.txt
+            build_output_list.txt
+          if-no-files-found: warn
+
+      - name: 提取运行时文件
+        if: success()
+        shell: pwsh
+        run: |
+          $src = "electron-src/src/out/Release"
+          $dst = "electron-runtime-win32-x64"
+          New-Item -ItemType Directory -Force -Path $dst | Out-Null
+
+          $files = @(
+            "electron.exe",
+            "version",
+            "LICENSES.chromium.html",
+            "ffmpeg.dll",
+            "libEGL.dll",
+            "libGLESv2.dll",
+            "d3dcompiler_47.dll",
+            "vulkan-1.dll",
+            "vk_swiftshader.dll",
+            "icudtl.dat",
+            "resources.pak",
+            "snapshot_blob.bin",
+            "v8_context_snapshot.bin"
+          )
+          foreach ($f in $files) {
+            if (Test-Path "$src\$f") {
+              Copy-Item "$src\$f" "$dst\"
+              Write-Host "复制 $f"
+            } else {
+              Write-Host "跳过 $f（不存在）"
+            }
+          }
+
+          if (Test-Path "$src\locales") {
+            Copy-Item "$src\locales" "$dst\" -Recurse
+            Write-Host "复制 locales/"
+          }
+          if (Test-Path "$src\resources") {
+            Copy-Item "$src\resources" "$dst\" -Recurse
+            Write-Host "复制 resources/"
+          }
+
+          Write-Host "✅ 运行时文件提取完成"
+
+      - name: 压缩运行时
+        if: success()
+        shell: pwsh
+        run: |
+          Compress-Archive -Path electron-runtime-win32-x64\* -DestinationPath electron-runtime-win32-x64.zip -Force
+          $size = (Get-Item electron-runtime-win32-x64.zip).Length / 1MB
+          Write-Host "✅ 压缩完成，大小: $([math]::Round($size, 2)) MB"
+
+      - name: 上传运行时压缩包
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-runtime-win32-x64
+          path: electron-runtime-win32-x64.zip
           if-no-files-found: warn
