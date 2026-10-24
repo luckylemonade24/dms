@@ -89,7 +89,6 @@ jobs:
             'enable_extractors = false',
             'enable_freetype = false',
             'enable_glic_internal_resources = false',
-            'enable_guest_contents = false',
             'enable_guest_view = false',
             'enable_gwp_asan = false',
             'enable_gwp_asan_malloc = false',
