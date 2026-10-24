@@ -13,7 +13,6 @@ jobs:
       - name: 用 winget 安装指定版本的 Windows SDK
         shell: pwsh
         run: |
-          # 用 winget 安装，--accept 参数避免卡在交互提示
           winget install Microsoft.WindowsSDK.10.0.28000 --accept-source-agreements --accept-package-agreements
           
       - name: 安装 depot_tools
@@ -32,26 +31,32 @@ jobs:
           gclient sync --no-history --with_branch_heads --with_tags -v
         timeout-minutes: 90
 
-      - name: 生成并导出官方参数
+      - name: 强行生成 packed-refs 并导出参数
         shell: pwsh
         run: |
-          cd electron-src/src
+          # 1. 进入 electron 源码目录，强行打包 Git 引用
+          cd electron-src/src/electron
+          git pack-refs --all
+          Write-Host "✅ 成功生成 packed-refs"
           
-          # 1. 创建 out 目录
+          # 2. 回到 src 目录生成配置
+          cd ..
+          
+          # 清理残留
+          Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path out/Release | Out-Null
           
-          # 2. 把官方配置和指定的 SDK 版本写进 args.gn 文件
-          # 如果 winget 装完路径有变，这一句能强制 GN 去找这个版本
+          # 3. 保留你写死的 SDK 版本
           $argsContent = @(
             'import("//electron/build/args/release.gn")',
             'windows_sdk_version = "10.0.28000.2270"'
           )
           Set-Content -Path out/Release/args.gn -Value $argsContent
           
-          # 3. 直接执行生成
+          # 4. 执行生成
           gn gen out/Release
           
-          # 4. 导出全量参数
+          # 5. 导出全量参数
           gn args out/Release --list > ..\FULL_GN_ARGS.txt
           Write-Host "参数导出成功，行数: $((Get-Content ..\FULL_GN_ARGS.txt).Count)"
 
