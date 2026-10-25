@@ -31,13 +31,6 @@ jobs:
           gclient sync --no-history --with_branch_heads --with_tags -v
         timeout-minutes: 120
 
-      - name: 强行生成 packed-refs
-        shell: pwsh
-        run: |
-          cd electron-src/src/electron
-          git pack-refs --all
-          Write-Host "✅ 成功生成 packed-refs"
-
       - name: 写入裁剪后的 args.gn
         shell: pwsh
         run: |
@@ -89,6 +82,7 @@ jobs:
             'enable_extractors = false',
             'enable_freetype = false',
             'enable_glic_internal_resources = false',
+            'enable_guest_contents = false',
             'enable_guest_view = false',
             'enable_gwp_asan = false',
             'enable_gwp_asan_malloc = false',
@@ -130,6 +124,7 @@ jobs:
             'enable_screen_ai_browsertests = false',
             'enable_screen_ai_service = false',
             'enable_speech_service = false',
+            'enable_supervised_users = false',
             'enable_ttc_webui = false',
             'enable_webui_bookmarks = false',
             'enable_webui_certificate_viewer = false',
@@ -232,7 +227,7 @@ jobs:
         shell: pwsh
         run: |
           cd electron-src/src
-          gn gen out/Release
+          gn gen out/Release --root-target=//electron
           gn args out/Release --list > "$env:GITHUB_WORKSPACE\args_effective.txt"
           Write-Host "✅ gn gen 成功，实际生效参数已导出"
 
