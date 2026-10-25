@@ -43,69 +43,185 @@ jobs:
           cd electron-src/src
 
           $activeArgs = @(
-            'absl_build_tests = false', 'angle_build_tests = false', 'angle_enable_commit_id = false',
-            'angle_enable_perfetto = false', 'angle_has_frame_capture = false', 'angle_has_histograms = false',
-            'angle_has_rapidjson = false', 'blink_symbol_level = 0', 'can_test_gcpw_signin_startup = false',
-            'choice_screen_in_chrome = false', 'chrome_root_store_cert_management_ui = false', 'cluster_size = 100',
-            'dawn_dxc_enable_asserts_in_ndebug = false', 'dawn_enable_d3d11 = false', 'dawn_enable_d3d12 = false',
-            'dawn_enable_null = false', 'dawn_enable_opengles = false', 'dawn_enable_perfetto = false',
-            'dawn_enable_spirv_validation = false', 'dawn_enable_vulkan = false', 'dawn_use_built_dxc = false',
-            'dawn_use_swiftshader = false', 'disable_fieldtrial_testing_config = true', 'enable_background_contents = false',
-            'enable_background_mode = false', 'enable_basic_print_dialog = false', 'enable_browser_speech_service = false',
-            'enable_builtin_spellchecker = false', 'enable_captive_portal_detection = false', 'enable_chrome_notifications = false',
-            'enable_compose = false', 'enable_compute_pressure = false', 'enable_constraints = false',
-            'enable_downgrade_processing = false', 'enable_electron_extensions = false', 'enable_extensions = false',
-            'enable_extensions_core = false', 'enable_extractors = false', 'enable_freetype = false',
-            'enable_glic_internal_resources = false', 'enable_guest_contents = false', 'enable_guest_view = false',
-            'enable_gwp_asan = false', 'enable_gwp_asan_malloc = false', 'enable_gwp_asan_partitionalloc = false',
-            'enable_hevc_parser_and_hw_decoder = false', 'enable_hls_demuxer = false', 'enable_hosted_apps = false',
-            'enable_jxl_decoder = false', 'enable_lens_desktop = false', 'enable_lens_overlay_backend = false',
-            'enable_library_cdms = false', 'enable_media_remoting = false', 'enable_media_remoting_redirection = false',
-            'enable_media_remoting_rpc = false', 'enable_message_center = false', 'enable_mse_mpeg2ts_stream_parser = false',
-            'enable_on_device_translation = false', 'enable_oop_basic_print_dialog = false', 'enable_oop_printing = false',
-            'enable_paint_preview = false', 'enable_pdf = false', 'enable_pdf_ink2 = false',
-            'enable_pdf_translation = false', 'enable_pdf_viewer = false', 'enable_perfetto_trace_processor = false',
-            'enable_perfetto_trace_processor_json = false', 'enable_perfetto_trace_processor_sqlite = false', 'enable_perfetto_zlib = false',
-            'enable_platform_apps = false', 'enable_platform_dolby_vision = false', 'enable_platform_encrypted_dolby_vision = false',
-            'enable_platform_hevc = false', 'enable_plugins = false', 'enable_print_preview = false',
-            'enable_printing = false', 'enable_prompt_api = false', 'enable_remoting = false',
-            'enable_reporting = false', 'enable_screen_ai_browsertests = false', 'enable_screen_ai_service = false',
-            'enable_speech_service = false', 'enable_supervised_users = false', 'enable_ttc_webui = false',
-            'enable_webui_bookmarks = false', 'enable_webui_certificate_viewer = false', 'enable_webui_contextual_tasks_composebox = false',
-            'enable_webui_history = false', 'enable_webui_ntp = false', 'enable_widevine = false',
-            'enterprise_cache_encryption = false', 'enterprise_cloud_content_analysis = false', 'enterprise_content_analysis = false',
-            'enterprise_data_controls = false', 'enterprise_local_content_analysis = false', 'enterprise_proxy = false',
-            'enterprise_screenshot_protection = false', 'enterprise_watermark = false', 'ffmpeg_branding = "Chromium"',
-            'glslang_enable_hlsl = false', 'headless_enable_commands = false', 'ignore_missing_widevine_signing_cert = true',
-            'init_stack_vars = false', 'is_official_build = true', 'is_p2p_enabled = false',
-            'media_use_iamf_tools = false', 'media_use_libvpx = false', 'media_use_openh264 = false',
-            'media_use_symphonia = false', 'media_use_symphonia_decoder = false', 'node_enable_inspector = false',
-            'node_use_amaro = false', 'node_use_perfetto_sdk = false', 'node_use_sqlite = false',
-            'optimize_for_size = false', 'optional_trace_events_enabled = false', 'os_level_geolocation_permission_supported = false',
-            'pdf_enable_brotli = false', 'pdf_enable_freetype = false', 'pdf_enable_rust_png = false',
-            'pdf_enable_v8 = false', 'pdf_enable_xfa = false', 'pdf_use_agg = false',
-            'pdf_use_libyuv = false', 'pdf_use_partition_alloc = false', 'pdf_use_skia = false',
-            'platform_has_optional_hevc_decode_support = false', 'platform_has_optional_hevc_encode_support = false', 'proprietary_codecs = false',
-            'rtc_build_dcsctp = false', 'rtc_build_json = false', 'rtc_build_libsrtp = false',
-            'rtc_build_libvpx = false', 'rtc_build_opus = false', 'rtc_enable_protobuf = false',
-            'rtc_enable_sctp = false', 'rtc_enable_win_wgc = false', 'rtc_exclude_audio_processing_module = true',
-            'rtc_include_builtin_audio_codecs = false', 'rtc_include_opus = false', 'rtc_libvpx_build_vp9 = false',
-            'rtc_use_h264 = false', 'rtc_use_h265 = false', 'rtc_video_psnr = false',
-            'safe_browsing_use_unrar = false', 'skia_use_dawn = false', 'structured_metrics_debug_enabled = false',
-            'structured_metrics_enabled = false', 'symbol_level = 0', 'sync_user_agent_product = "Chromium"',
-            'tint_build_benchmarks = false', 'tint_build_glsl_validator = false', 'tint_build_glsl_writer = false',
-            'tint_build_msl_writer = false', 'tint_build_null_writer = false', 'tint_build_unittests = false',
-            'translate_genders = false', 'treat_warnings_as_errors = false', 'use_crash_key_stubs = true',
-            'use_dawn = false', 'use_icf = true', 'use_kerberos = false',
-            'use_mlkit_for_aicore = false', 'use_on_device_model_service = false', 'use_perfetto_trace_processor = false',
-            'use_rust_rtp_parser = false', 'use_wuffs_gif_parser = false', 'v8_enable_etw_stack_walking = false',
-            'v8_enable_i18n_support = false', 'v8_enable_temporal_support = false', 'v8_enable_webassembly = false',
-            'v8_symbol_level = 0', 'v8_win64_unwind_info = false', 'webnn_use_litert = false',
-            'webnn_use_tflite = false', 'win_enable_cfg_guards = false'
+            'absl_build_tests = false'
+            'angle_build_tests = false'
+            'angle_enable_commit_id = false'
+            'angle_enable_perfetto = false'
+            'angle_has_frame_capture = false'
+            'angle_has_histograms = false'
+            'angle_has_rapidjson = false'
+            'blink_symbol_level = 0'
+            'can_test_gcpw_signin_startup = false'
+            'choice_screen_in_chrome = false'
+            'chrome_root_store_cert_management_ui = false'
+            'cluster_size = 100'
+            'dawn_dxc_enable_asserts_in_ndebug = false'
+            'dawn_enable_d3d11 = false'
+            'dawn_enable_d3d12 = false'
+            'dawn_enable_null = false'
+            'dawn_enable_opengles = false'
+            'dawn_enable_perfetto = false'
+            'dawn_enable_spirv_validation = false'
+            'dawn_enable_vulkan = false'
+            'dawn_use_built_dxc = false'
+            'dawn_use_swiftshader = false'
+            'disable_fieldtrial_testing_config = true'
+            'enable_background_contents = false'
+            'enable_background_mode = false'
+            'enable_basic_print_dialog = false'
+            'enable_browser_speech_service = false'
+            'enable_builtin_spellchecker = false'
+            'enable_captive_portal_detection = false'
+            'enable_chrome_notifications = false'
+            'enable_compose = false'
+            'enable_compute_pressure = false'
+            'enable_constraints = false'
+            'enable_downgrade_processing = false'
+            'enable_electron_extensions = false'
+            'enable_extensions = false'
+            'enable_extensions_core = false'
+            'enable_extractors = false'
+            'enable_freetype = false'
+            'enable_glic_internal_resources = false'
+            'enable_guest_contents = false'
+            'enable_guest_view = false'
+            'enable_gwp_asan = false'
+            'enable_gwp_asan_malloc = false'
+            'enable_gwp_asan_partitionalloc = false'
+            'enable_hevc_parser_and_hw_decoder = false'
+            'enable_hls_demuxer = false'
+            'enable_hosted_apps = false'
+            'enable_jxl_decoder = false'
+            'enable_lens_desktop = false'
+            'enable_lens_overlay_backend = false'
+            'enable_library_cdms = false'
+            'enable_media_remoting = false'
+            'enable_media_remoting_redirection = false'
+            'enable_media_remoting_rpc = false'
+            'enable_message_center = false'
+            'enable_mse_mpeg2ts_stream_parser = false'
+            'enable_on_device_translation = false'
+            'enable_oop_basic_print_dialog = false'
+            'enable_oop_printing = false'
+            'enable_paint_preview = false'
+            'enable_pdf = false'
+            'enable_pdf_ink2 = false'
+            'enable_pdf_translation = false'
+            'enable_pdf_viewer = false'
+            'enable_perfetto_trace_processor = false'
+            'enable_perfetto_trace_processor_json = false'
+            'enable_perfetto_trace_processor_sqlite = false'
+            'enable_perfetto_zlib = false'
+            'enable_platform_apps = false'
+            'enable_platform_dolby_vision = false'
+            'enable_platform_encrypted_dolby_vision = false'
+            'enable_platform_hevc = false'
+            'enable_plugins = false'
+            'enable_print_preview = false'
+            'enable_printing = false'
+            'enable_prompt_api = false'
+            'enable_remoting = false'
+            'enable_reporting = false'
+            'enable_screen_ai_browsertests = false'
+            'enable_screen_ai_service = false'
+            'enable_speech_service = false'
+            'enable_supervised_users = false'
+            'enable_ttc_webui = false'
+            'enable_webui_bookmarks = false'
+            'enable_webui_certificate_viewer = false'
+            'enable_webui_contextual_tasks_composebox = false'
+            'enable_webui_history = false'
+            'enable_webui_ntp = false'
+            'enable_widevine = false'
+            'enterprise_cache_encryption = false'
+            'enterprise_cloud_content_analysis = false'
+            'enterprise_content_analysis = false'
+            'enterprise_data_controls = false'
+            'enterprise_local_content_analysis = false'
+            'enterprise_proxy = false'
+            'enterprise_screenshot_protection = false'
+            'enterprise_watermark = false'
+            'ffmpeg_branding = "Chromium"'
+            'glslang_enable_hlsl = false'
+            'headless_enable_commands = false'
+            'ignore_missing_widevine_signing_cert = true'
+            'init_stack_vars = false'
+            'is_official_build = true'
+            'is_p2p_enabled = false'
+            'media_use_iamf_tools = false'
+            'media_use_libvpx = false'
+            'media_use_openh264 = false'
+            'media_use_symphonia = false'
+            'media_use_symphonia_decoder = false'
+            'node_enable_inspector = false'
+            'node_use_amaro = false'
+            'node_use_perfetto_sdk = false'
+            'node_use_sqlite = false'
+            'optimize_for_size = false'
+            'optional_trace_events_enabled = false'
+            'os_level_geolocation_permission_supported = false'
+            'pdf_enable_brotli = false'
+            'pdf_enable_freetype = false'
+            'pdf_enable_rust_png = false'
+            'pdf_enable_v8 = false'
+            'pdf_enable_xfa = false'
+            'pdf_use_agg = false'
+            'pdf_use_libyuv = false'
+            'pdf_use_partition_alloc = false'
+            'platform_has_optional_hevc_decode_support = false'
+            'platform_has_optional_hevc_encode_support = false'
+            'proprietary_codecs = false'
+            'rtc_build_dcsctp = false'
+            'rtc_build_json = false'
+            'rtc_build_libsrtp = false'
+            'rtc_build_libvpx = false'
+            'rtc_build_opus = false'
+            'rtc_enable_protobuf = false'
+            'rtc_enable_sctp = false'
+            'rtc_enable_win_wgc = false'
+            'rtc_exclude_audio_processing_module = true'
+            'rtc_include_builtin_audio_codecs = false'
+            'rtc_include_opus = false'
+            'rtc_libvpx_build_vp9 = false'
+            'rtc_use_h264 = false'
+            'rtc_use_h265 = false'
+            'rtc_video_psnr = false'
+            'safe_browsing_use_unrar = false'
+            'skia_use_dawn = false'
+            'structured_metrics_debug_enabled = false'
+            'structured_metrics_enabled = false'
+            'symbol_level = 0'
+            'sync_user_agent_product = "Chromium"'
+            'tint_build_benchmarks = false'
+            'tint_build_glsl_validator = false'
+            'tint_build_glsl_writer = false'
+            'tint_build_msl_writer = false'
+            'tint_build_null_writer = false'
+            'tint_build_unittests = false'
+            'translate_genders = false'
+            'treat_warnings_as_errors = false'
+            'use_crash_key_stubs = true'
+            'use_dawn = false'
+            'use_icf = true'
+            'use_kerberos = false'
+            'use_mlkit_for_aicore = false'
+            'use_on_device_model_service = false'
+            'use_perfetto_trace_processor = false'
+            'use_rust_rtp_parser = false'
+            'use_wuffs_gif_parser = false'
+            'v8_enable_etw_stack_walking = false'
+            'v8_enable_i18n_support = false'
+            'v8_enable_temporal_support = false'
+            'v8_enable_webassembly = false'
+            'v8_symbol_level = 0'
+            'v8_win64_unwind_info = false'
+            'webnn_use_litert = false'
+            'webnn_use_tflite = false'
+            'win_enable_cfg_guards = false'
           )
 
           $removedArgs = @()
-          $forcedTrueArgs = @() # 新增：强制开启名单
+          $forcedTrueArgs = @()
           $loopCount = 0
           $fullLogPath = "$env:GITHUB_WORKSPACE\test_full_log.txt"
 
@@ -120,7 +236,6 @@ jobs:
             Remove-Item -Recurse -Force out/Test -ErrorAction SilentlyContinue
             New-Item -ItemType Directory -Force -Path out/Test | Out-Null
 
-            # 拼接顺序：基础配置 + 测试列表 + 强制开启列表（放最后保证最高优先级）
             $testArgs = @('import("//electron/build/args/release.gn")', 'windows_sdk_version = "10.0.28000.2270"', '') + $activeArgs + $forcedTrueArgs
             Set-Content -Path out/Test/args.gn -Value $testArgs -Encoding UTF8
 
@@ -138,7 +253,8 @@ jobs:
             $errorText | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
             " " | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
 
-            $match = [regex]::Match($errorText, 'assert\((.*?)\)')
+            # 抓取跨行或逗号结尾的断言
+            $match = [regex]::Match($errorText, 'assert\(([^\)\n]+)')
             
             if ($match.Success) {
               $assertContent = $match.Groups[1].Value
@@ -152,29 +268,30 @@ jobs:
               foreach ($paramName in $foundParams) {
                 if ($paramName -in @('true', 'false', 'is_win', 'is_android', 'is_ios', 'is_linux', 'is_mac', 'is_chromeos', 'is_fuchsia')) { continue }
 
-                # 1. 从测试列表里剔除
+                # 检查这个参数是否在你的测试列表里
                 $paramToRemove = $activeArgs | Where-Object { $_ -match "^\s*$paramName\s*=" }
+                
+                # 只有当参数确实存在于列表中时，才进行剔除和强制开启
                 if ($paramToRemove) {
                   $activeArgs = $activeArgs | Where-Object { $_ -notmatch "^\s*$paramName\s*=" }
                   $removedArgs += $paramToRemove
                   $logMsg = "  -> 发现关联，已剔除: $paramToRemove"
                   Write-Host $logMsg -ForegroundColor Yellow
                   $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
-                }
 
-                # 2. 塞进强制开启名单
-                if (-not ($forcedTrueArgs -match "^\s*$paramName\s*=")) {
-                  $forcedTrueArgs += "$paramName = true"
-                  $logMsg = "  -> 已加入强制开启名单: $paramName = true"
-                  Write-Host $logMsg -ForegroundColor Magenta
-                  $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
+                  if (-not ($forcedTrueArgs -match "^\s*$paramName\s*=")) {
+                    $forcedTrueArgs += "$paramName = true"
+                    $logMsg = "  -> 已加入强制开启名单: $paramName = true"
+                    Write-Host $logMsg -ForegroundColor Magenta
+                    $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
+                  }
+                  
+                  $hasProcessed = $true
                 }
-                
-                $hasProcessed = $true
               }
 
               if (-not $hasProcessed) {
-                $logMsg = "  -> 报错中的参数无法识别，中止测试。"
+                $logMsg = "  -> 报错中的参数不在你的列表里，中止测试。"
                 Write-Host $logMsg -ForegroundColor Red
                 $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
                 break
@@ -190,7 +307,6 @@ jobs:
           "`n================ 最终可用的安全参数 ================" | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
           Write-Host "`n================ 最终可用的安全参数 ================" -ForegroundColor Cyan
           
-          # 最终保存的内容包含 原本存活的参数 + 强制开启的参数
           $finalContent = @('import("//electron/build/args/release.gn")', 'windows_sdk_version = "10.0.28000.2270"', '') + $activeArgs + $forcedTrueArgs
           $finalContent | ForEach-Object { 
             Write-Host $_ -ForegroundColor Green 
@@ -207,7 +323,6 @@ jobs:
           $finalContent | Out-File -FilePath "$env:GITHUB_WORKSPACE\safe_args.gn" -Encoding UTF8
           $removedArgs | Out-File -FilePath "$env:GITHUB_WORKSPACE\removed_args.txt" -Encoding UTF8
           
-          # 关键一步：无论排雷是否成功，都不要让 Action 标红退出
           exit 0
 
       - name: 上传测试结果
