@@ -220,108 +220,73 @@ jobs:
             'win_enable_cfg_guards = false'
           )
 
-          $removedArgs = @()
-          $forcedTrueArgs = @()
           $loopCount = 0
-          $fullLogPath = "$env:GITHUB_WORKSPACE\test_full_log.txt"
-
-          "=== Auto Test Start ===" | Out-File -FilePath $fullLogPath -Encoding UTF8
 
           while ($true) {
             $loopCount++
-            $logMsg = "--- 第 $loopCount 轮全量测试，当前测试参数: $($activeArgs.Count) 个，强制开启: $($forcedTrueArgs.Count) 个 ---"
-            Write-Host $logMsg -ForegroundColor Cyan
-            $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
+            Write-Host "--- 第 $loopCount 轮全量测试，当前测试参数: $($activeArgs.Count) 个 ---" -ForegroundColor Cyan
 
             Remove-Item -Recurse -Force out/Test -ErrorAction SilentlyContinue
             New-Item -ItemType Directory -Force -Path out/Test | Out-Null
 
-            $testArgs = @('import("//electron/build/args/release.gn")', 'windows_sdk_version = "10.0.28000.2270"', '') + $activeArgs + $forcedTrueArgs
+            $testArgs = @('import("//electron/build/args/release.gn")', 'windows_sdk_version = "10.0.28000.2270"', '') + $activeArgs
             Set-Content -Path out/Test/args.gn -Value $testArgs -Encoding UTF8
 
             $output = gn gen out/Test --root-target=//electron 2>&1
             $errorText = $output -join "`n"
 
             if ($LASTEXITCODE -eq 0) {
-              $logMsg = "✅ 全量组合跑通了！"
-              Write-Host $logMsg -ForegroundColor Green
-              $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
+              Write-Host "✅ 全量组合跑通了！" -ForegroundColor Green
               break
             }
 
-            "❌ gn gen 报错内容如下：" | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
-            $errorText | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
-            " " | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
+            Write-Host "❌ gn gen 报错！完整信息如下：" -ForegroundColor Red
+            Write-Host $errorText -ForegroundColor DarkGray
 
-            # 抓取跨行或逗号结尾的断言
-            $match = [regex]::Match($errorText, 'assert\(([^\)\n]+)')
+            # 压平换行，解决跨行断言
+            $flatErrorText = $errorText -replace "\r?\n", " "
+            # 纯正则提取 assert(...) 里的所有内容
+            $match = [regex]::Match($flatErrorText, 'assert\s*\(([^\)]+)')
             
             if ($match.Success) {
               $assertContent = $match.Groups[1].Value
-              $logMsg = "❌ 触发断言: assert($assertContent)"
-              Write-Host $logMsg -ForegroundColor Red
-              $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
+              Write-Host "🔍 解析出断言: assert($assertContent)" -ForegroundColor Yellow
 
               $foundParams = [regex]::Matches($assertContent, '[a-zA-Z0-9_]+') | ForEach-Object { $_.Value } | Select-Object -Unique
               
               $hasProcessed = $false
               foreach ($paramName in $foundParams) {
-                if ($paramName -in @('true', 'false', 'is_win', 'is_android', 'is_ios', 'is_linux', 'is_mac', 'is_chromeos', 'is_fuchsia')) { continue }
-
-                # 检查这个参数是否在你的测试列表里
-                $paramToRemove = $activeArgs | Where-Object { $_ -match "^\s*$paramName\s*=" }
+                # 直接去列表里查，没有就跳过，不写任何白名单
+                $paramLine = $activeArgs | Where-Object { $_ -match "^\s*$paramName\s*=" }
                 
-                # 只有当参数确实存在于列表中时，才进行剔除和强制开启
-                if ($paramToRemove) {
-                  $activeArgs = $activeArgs | Where-Object { $_ -notmatch "^\s*$paramName\s*=" }
-                  $removedArgs += $paramToRemove
-                  $logMsg = "  -> 发现关联，已剔除: $paramToRemove"
-                  Write-Host $logMsg -ForegroundColor Yellow
-                  $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
-
-                  if (-not ($forcedTrueArgs -match "^\s*$paramName\s*=")) {
-                    $forcedTrueArgs += "$paramName = true"
-                    $logMsg = "  -> 已加入强制开启名单: $paramName = true"
-                    Write-Host $logMsg -ForegroundColor Magenta
-                    $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
+                if ($paramLine) {
+                  # 如果列表里有这个参数，直接原地改成 true
+                  $activeArgs = $activeArgs | ForEach-Object {
+                    if ($_ -match "^\s*$paramName\s*=") {
+                      return "$paramName = true"
+                    }
+                    return $_
                   }
-                  
+                  Write-Host "  -> 发现关联，已改为 true: $paramName" -ForegroundColor Yellow
                   $hasProcessed = $true
                 }
               }
 
               if (-not $hasProcessed) {
-                $logMsg = "  -> 报错中的参数不在你的列表里，中止测试。"
-                Write-Host $logMsg -ForegroundColor Red
-                $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
-                break
+                Write-Host "❌ 中止：正则解析出的参数不在你当前列表中！" -ForegroundColor Red
+                exit 1
               }
             } else {
-              $logMsg = "❌ 遇到了非断言错误，中止测试。"
-              Write-Host $logMsg -ForegroundColor Red
-              $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
-              break
+              Write-Host "❌ 中止：遇到了非断言错误，无法解析参数。" -ForegroundColor Red
+              exit 1
             }
           }
 
-          "`n================ 最终可用的安全参数 ================" | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
           Write-Host "`n================ 最终可用的安全参数 ================" -ForegroundColor Cyan
-          
-          $finalContent = @('import("//electron/build/args/release.gn")', 'windows_sdk_version = "10.0.28000.2270"', '') + $activeArgs + $forcedTrueArgs
-          $finalContent | ForEach-Object { 
-            Write-Host $_ -ForegroundColor Green 
-            $_ | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
-          }
-          
-          "`n被剔除的雷区参数：" | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
-          Write-Host "`n被剔除的雷区参数：" -ForegroundColor Yellow
-          $removedArgs | ForEach-Object { 
-            Write-Host $_
-            $_ | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
-          }
+          $finalContent = @('import("//electron/build/args/release.gn")', 'windows_sdk_version = "10.0.28000.2270"', '') + $activeArgs
+          $finalContent | ForEach-Object { Write-Host $_ -ForegroundColor Green }
 
           $finalContent | Out-File -FilePath "$env:GITHUB_WORKSPACE\safe_args.gn" -Encoding UTF8
-          $removedArgs | Out-File -FilePath "$env:GITHUB_WORKSPACE\removed_args.txt" -Encoding UTF8
           
           exit 0
 
@@ -332,5 +297,3 @@ jobs:
           name: test-results
           path: |
             safe_args.gn
-            removed_args.txt
-            test_full_log.txt
