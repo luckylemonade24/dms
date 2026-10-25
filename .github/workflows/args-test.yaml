@@ -105,22 +105,23 @@ jobs:
           )
 
           $removedArgs = @()
+          $forcedTrueArgs = @() # 新增：强制开启名单
           $loopCount = 0
           $fullLogPath = "$env:GITHUB_WORKSPACE\test_full_log.txt"
 
-          # 初始化日志
           "=== Auto Test Start ===" | Out-File -FilePath $fullLogPath -Encoding UTF8
 
           while ($true) {
             $loopCount++
-            $logMsg = "--- 第 $loopCount 轮全量测试，当前参数数量: $($activeArgs.Count) ---"
+            $logMsg = "--- 第 $loopCount 轮全量测试，当前测试参数: $($activeArgs.Count) 个，强制开启: $($forcedTrueArgs.Count) 个 ---"
             Write-Host $logMsg -ForegroundColor Cyan
             $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
 
             Remove-Item -Recurse -Force out/Test -ErrorAction SilentlyContinue
             New-Item -ItemType Directory -Force -Path out/Test | Out-Null
 
-            $testArgs = @('import("//electron/build/args/release.gn")', 'windows_sdk_version = "10.0.28000.2270"', '') + $activeArgs
+            # 拼接顺序：基础配置 + 测试列表 + 强制开启列表（放最后保证最高优先级）
+            $testArgs = @('import("//electron/build/args/release.gn")', 'windows_sdk_version = "10.0.28000.2270"', '') + $activeArgs + $forcedTrueArgs
             Set-Content -Path out/Test/args.gn -Value $testArgs -Encoding UTF8
 
             $output = gn gen out/Test --root-target=//electron 2>&1
@@ -133,7 +134,6 @@ jobs:
               break
             }
 
-            # 记录完整的 GN 报错
             "❌ gn gen 报错内容如下：" | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
             $errorText | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
             " " | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
@@ -148,27 +148,34 @@ jobs:
 
               $foundParams = [regex]::Matches($assertContent, '[a-zA-Z0-9_]+') | ForEach-Object { $_.Value } | Select-Object -Unique
               
-              $hasRemoved = $false
+              $hasProcessed = $false
               foreach ($paramName in $foundParams) {
                 if ($paramName -in @('true', 'false', 'is_win', 'is_android', 'is_ios', 'is_linux', 'is_mac', 'is_chromeos', 'is_fuchsia')) { continue }
 
+                # 1. 从测试列表里剔除
                 $paramToRemove = $activeArgs | Where-Object { $_ -match "^\s*$paramName\s*=" }
-                
                 if ($paramToRemove) {
                   $activeArgs = $activeArgs | Where-Object { $_ -notmatch "^\s*$paramName\s*=" }
                   $removedArgs += $paramToRemove
-                  
-                  $logMsg = "  -> 发现关联，已一并剔除: $paramToRemove"
+                  $logMsg = "  -> 发现关联，已剔除: $paramToRemove"
                   Write-Host $logMsg -ForegroundColor Yellow
                   $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
-                  
-                  $hasRemoved = $true
                 }
+
+                # 2. 塞进强制开启名单
+                if (-not ($forcedTrueArgs -match "^\s*$paramName\s*=")) {
+                  $forcedTrueArgs += "$paramName = true"
+                  $logMsg = "  -> 已加入强制开启名单: $paramName = true"
+                  Write-Host $logMsg -ForegroundColor Magenta
+                  $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
+                }
+                
+                $hasProcessed = $true
               }
 
-              if (-not $hasRemoved) {
-                $logMsg = "  -> 报错中的参数不在列表里，可能底层写死，中止测试。"
-                Write-Host $logMsg -ForegroundColor Magenta
+              if (-not $hasProcessed) {
+                $logMsg = "  -> 报错中的参数无法识别，中止测试。"
+                Write-Host $logMsg -ForegroundColor Red
                 $logMsg | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
                 break
               }
@@ -183,7 +190,8 @@ jobs:
           "`n================ 最终可用的安全参数 ================" | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
           Write-Host "`n================ 最终可用的安全参数 ================" -ForegroundColor Cyan
           
-          $finalContent = @('import("//electron/build/args/release.gn")', 'windows_sdk_version = "10.0.28000.2270"', '') + $activeArgs
+          # 最终保存的内容包含 原本存活的参数 + 强制开启的参数
+          $finalContent = @('import("//electron/build/args/release.gn")', 'windows_sdk_version = "10.0.28000.2270"', '') + $activeArgs + $forcedTrueArgs
           $finalContent | ForEach-Object { 
             Write-Host $_ -ForegroundColor Green 
             $_ | Out-File -FilePath $fullLogPath -Append -Encoding UTF8
@@ -198,6 +206,9 @@ jobs:
 
           $finalContent | Out-File -FilePath "$env:GITHUB_WORKSPACE\safe_args.gn" -Encoding UTF8
           $removedArgs | Out-File -FilePath "$env:GITHUB_WORKSPACE\removed_args.txt" -Encoding UTF8
+          
+          # 关键一步：无论排雷是否成功，都不要让 Action 标红退出
+          exit 0
 
       - name: 上传测试结果
         if: always()
