@@ -58,7 +58,6 @@ jobs:
             'angle_build_tests = false',
             'tint_build_benchmarks = false',
             'tint_build_unittests = false',
-            'enable_perfetto_trace_processor = false',
             'use_perfetto_trace_processor = false',
             'optional_trace_events_enabled = false',
             'node_enable_inspector = false',
