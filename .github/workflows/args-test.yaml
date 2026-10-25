@@ -42,6 +42,7 @@ jobs:
         run: |
           cd electron-src/src
 
+          # 已把确认报错的 24 个参数直接改为 true
           $activeArgs = @(
             'absl_build_tests = false'
             'angle_build_tests = false'
@@ -53,7 +54,7 @@ jobs:
             'blink_symbol_level = 0'
             'can_test_gcpw_signin_startup = false'
             'choice_screen_in_chrome = false'
-            'chrome_root_store_cert_management_ui = false'
+            'chrome_root_store_cert_management_ui = true'
             'cluster_size = 100'
             'dawn_dxc_enable_asserts_in_ndebug = false'
             'dawn_enable_d3d11 = false'
@@ -73,18 +74,18 @@ jobs:
             'enable_builtin_spellchecker = false'
             'enable_captive_portal_detection = false'
             'enable_chrome_notifications = false'
-            'enable_compose = false'
+            'enable_compose = true'
             'enable_compute_pressure = false'
             'enable_constraints = false'
             'enable_downgrade_processing = false'
             'enable_electron_extensions = false'
-            'enable_extensions = false'
-            'enable_extensions_core = false'
+            'enable_extensions = true'
+            'enable_extensions_core = true'
             'enable_extractors = false'
-            'enable_freetype = false'
+            'enable_freetype = true'
             'enable_glic_internal_resources = false'
-            'enable_guest_contents = false'
-            'enable_guest_view = false'
+            'enable_guest_contents = true'
+            'enable_guest_view = true'
             'enable_gwp_asan = false'
             'enable_gwp_asan_malloc = false'
             'enable_gwp_asan_partitionalloc = false'
@@ -93,50 +94,50 @@ jobs:
             'enable_hosted_apps = false'
             'enable_jxl_decoder = false'
             'enable_lens_desktop = false'
-            'enable_lens_overlay_backend = false'
+            'enable_lens_overlay_backend = true'
             'enable_library_cdms = false'
             'enable_media_remoting = false'
             'enable_media_remoting_redirection = false'
             'enable_media_remoting_rpc = false'
             'enable_message_center = false'
             'enable_mse_mpeg2ts_stream_parser = false'
-            'enable_on_device_translation = false'
+            'enable_on_device_translation = true'
             'enable_oop_basic_print_dialog = false'
             'enable_oop_printing = false'
             'enable_paint_preview = false'
-            'enable_pdf = false'
+            'enable_pdf = true'
             'enable_pdf_ink2 = false'
             'enable_pdf_translation = false'
             'enable_pdf_viewer = false'
-            'enable_perfetto_trace_processor = false'
+            'enable_perfetto_trace_processor = true'
             'enable_perfetto_trace_processor_json = false'
             'enable_perfetto_trace_processor_sqlite = false'
             'enable_perfetto_zlib = false'
-            'enable_platform_apps = false'
+            'enable_platform_apps = true'
             'enable_platform_dolby_vision = false'
             'enable_platform_encrypted_dolby_vision = false'
             'enable_platform_hevc = false'
-            'enable_plugins = false'
-            'enable_print_preview = false'
-            'enable_printing = false'
+            'enable_plugins = true'
+            'enable_print_preview = true'
+            'enable_printing = true'
             'enable_prompt_api = false'
             'enable_remoting = false'
             'enable_reporting = false'
             'enable_screen_ai_browsertests = false'
-            'enable_screen_ai_service = false'
-            'enable_speech_service = false'
-            'enable_supervised_users = false'
-            'enable_ttc_webui = false'
+            'enable_screen_ai_service = true'
+            'enable_speech_service = true'
+            'enable_supervised_users = true'
+            'enable_ttc_webui = true'
             'enable_webui_bookmarks = false'
             'enable_webui_certificate_viewer = false'
             'enable_webui_contextual_tasks_composebox = false'
-            'enable_webui_history = false'
-            'enable_webui_ntp = false'
+            'enable_webui_history = true'
+            'enable_webui_ntp = true'
             'enable_widevine = false'
-            'enterprise_cache_encryption = false'
+            'enterprise_cache_encryption = true'
             'enterprise_cloud_content_analysis = false'
             'enterprise_content_analysis = false'
-            'enterprise_data_controls = false'
+            'enterprise_data_controls = true'
             'enterprise_local_content_analysis = false'
             'enterprise_proxy = false'
             'enterprise_screenshot_protection = false'
@@ -161,7 +162,7 @@ jobs:
             'optional_trace_events_enabled = false'
             'os_level_geolocation_permission_supported = false'
             'pdf_enable_brotli = false'
-            'pdf_enable_freetype = false'
+            'pdf_enable_freetype = true'
             'pdf_enable_rust_png = false'
             'pdf_enable_v8 = false'
             'pdf_enable_xfa = false'
@@ -221,10 +222,11 @@ jobs:
           )
 
           $loopCount = 0
+          $retryCount = 0
 
           while ($true) {
             $loopCount++
-            Write-Host "--- 第 $loopCount 轮全量测试，当前测试参数: $($activeArgs.Count) 个 ---" -ForegroundColor Cyan
+            Write-Host "--- 第 $loopCount 轮测试，当前测试参数: $($activeArgs.Count) 个 ---" -ForegroundColor Cyan
 
             Remove-Item -Recurse -Force out/Test -ErrorAction SilentlyContinue
             New-Item -ItemType Directory -Force -Path out/Test | Out-Null
@@ -249,6 +251,9 @@ jobs:
             $match = [regex]::Match($flatErrorText, 'assert\s*\(([^\)]+)')
             
             if ($match.Success) {
+              # 碰到了正经的断言错误，重置重试计数器
+              $retryCount = 0
+              
               $assertContent = $match.Groups[1].Value
               Write-Host "🔍 解析出断言: assert($assertContent)" -ForegroundColor Yellow
 
@@ -256,11 +261,10 @@ jobs:
               
               $hasProcessed = $false
               foreach ($paramName in $foundParams) {
-                # 直接去列表里查，没有就跳过，不写任何白名单
                 $paramLine = $activeArgs | Where-Object { $_ -match "^\s*$paramName\s*=" }
                 
                 if ($paramLine) {
-                  # 如果列表里有这个参数，直接原地改成 true
+                  # 原地改成 true
                   $activeArgs = $activeArgs | ForEach-Object {
                     if ($_ -match "^\s*$paramName\s*=") {
                       return "$paramName = true"
@@ -277,8 +281,18 @@ jobs:
                 exit 1
               }
             } else {
-              Write-Host "❌ 中止：遇到了非断言错误，无法解析参数。" -ForegroundColor Red
-              exit 1
+              # 【重试机制】遇到文件占用等非断言错误
+              $retryCount++
+              if ($retryCount -gt 5) {
+                Write-Host "❌ 中止：连续 5 次遇到非断言错误，可能是严重环境问题。" -ForegroundColor Red
+                exit 1
+              }
+              
+              Write-Host "⚠️ 遇到了非断言错误（可能是文件被占用），等待 2 秒后重试当前轮次 (第 $retryCount 次重试)..." -ForegroundColor Magenta
+              Start-Sleep -Seconds 2
+              
+              $loopCount--
+              continue
             }
           }
 
