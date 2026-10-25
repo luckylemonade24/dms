@@ -51,7 +51,6 @@ jobs:
             'blink_symbol_level = 0',
             'use_dawn = false',
             'skia_use_dawn = false',
-            'use_icf = true',
             'init_stack_vars = false',
             'disable_fieldtrial_testing_config = true',
             'use_perfetto_trace_processor = false',
