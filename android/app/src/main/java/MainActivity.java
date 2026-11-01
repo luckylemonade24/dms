@@ -6,6 +6,7 @@ import android.app.DownloadManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
@@ -14,6 +15,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.*;
@@ -89,6 +91,18 @@ public class MainActivity extends Activity {
                 }
             }, "AndroidSaver");
 
+            // 核心 2：屏幕旋转接口，供注入的 JS 调用
+            webView.addJavascriptInterface(new Object() {
+                @android.webkit.JavascriptInterface
+                public void setLandscape() {
+                    runOnUiThread(() -> setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE));
+                }
+                @android.webkit.JavascriptInterface
+                public void setPortrait() {
+                    runOnUiThread(() -> setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
+                }
+            }, "AndroidScreen");
+
             final WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
                     .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
                     .build();
@@ -117,34 +131,43 @@ public class MainActivity extends Activity {
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     super.onPageFinished(view, url);
-                    // 注入 JS 拦截 Blob 导出
+                    // 注入 JS 拦截 Blob 导出 以及 网页全屏触发转屏
                     String js = "(function() {" +
+                            // 1. 拦截 Blob 导出
                             "  const originalClick = HTMLAnchorElement.prototype.click;" +
                             "  HTMLAnchorElement.prototype.click = function() {" +
                             "    if (this.download && this.href && this.href.startsWith('blob:')) {" +
                             "      const fileName = this.download;" +
-                            "      fetch(this.href)" +
-                            "        .then(res => res.blob())" +
-                            "        .then(blob => {" +
+                            "      fetch(this.href).then(res => res.blob()).then(blob => {" +
                             "          const reader = new FileReader();" +
                             "          reader.onload = () => {" +
                             "            const base64 = reader.result.split(',')[1];" +
-                            "            if (window.AndroidSaver) {" +
-                            "              window.AndroidSaver.saveFile(fileName, base64);" +
-                            "            }" +
+                            "            if (window.AndroidSaver) window.AndroidSaver.saveFile(fileName, base64);" +
                             "          };" +
                             "          reader.readAsDataURL(blob);" +
-                            "        });" +
+                            "      });" +
                             "      return;" +
                             "    }" +
                             "    return originalClick.apply(this, arguments);" +
+                            "  };" +
+                            
+                            // 2. 拦截标准全屏 API 触发转屏
+                            "  const originalRequestFullscreen = Element.prototype.requestFullscreen;" +
+                            "  Element.prototype.requestFullscreen = function() {" +
+                            "    if (window.AndroidScreen) window.AndroidScreen.setLandscape();" +
+                            "    if(originalRequestFullscreen) return originalRequestFullscreen.apply(this, arguments);" +
+                            "  };" +
+                            "  const originalExitFullscreen = Document.prototype.exitFullscreen;" +
+                            "  Document.prototype.exitFullscreen = function() {" +
+                            "    if (window.AndroidScreen) window.AndroidScreen.setPortrait();" +
+                            "    if(originalExitFullscreen) return originalExitFullscreen.apply(this, arguments);" +
                             "  };" +
                             "})();";
                     view.evaluateJavascript(js, null);
                 }
             });
 
-            // 核心 2：导入存档
+            // 核心 3：监听 WebView 原生全屏回调（如视频播放）
             webView.setWebChromeClient(new WebChromeClient() {
                 @Override
                 public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> newFilePathCallback, FileChooserParams fileChooserParams) {
@@ -162,6 +185,20 @@ public class MainActivity extends Activity {
                         return false;
                     }
                     return true;
+                }
+
+                @Override
+                public void onShowCustomView(View view, CustomViewCallback callback) {
+                    super.onShowCustomView(view, callback);
+                    // 如果网页触发原生全屏，强制横屏
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                }
+
+                @Override
+                public void onHideCustomView() {
+                    super.onHideCustomView();
+                    // 退出全屏恢复竖屏
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 }
             });
 
