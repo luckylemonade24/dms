@@ -14,18 +14,33 @@
 <!-- 网页图标（浏览器标签页 / 收藏夹）：不写这行，浏览器会去要 /favicon.ico 而报 404 -->
 <link rel="icon" type="image/png" href="图标/网页图标.png">
 <!-- CSS 带版本号（?v=）：样式改动后同步改这里，浏览器/预览服务就不会继续用缓存的旧样式 -->
-<link rel="stylesheet" href="css/style.css?v=v77">
-<link rel="stylesheet" href="css/battle.css?v=v77">
-<link rel="stylesheet" href="css/deck.css?v=v77">
-<link rel="stylesheet" href="css/run.css?v=v77">
-<link rel="stylesheet" href="css/tooltip.css?v=v77">
-<link rel="stylesheet" href="css/tour.css?v=v77">
-<link rel="stylesheet" href="css/master.css?v=v77">
-<link rel="stylesheet" href="css/academy.css?v=v77">
-<link rel="stylesheet" href="css/tutorial.css?v=v77">
-<link rel="stylesheet" href="css/profile.css?v=v77">
-<link rel="stylesheet" href="css/community.css?v=v77">
+<link rel="stylesheet" href="css/style.css?v=v146">
+<link rel="stylesheet" href="css/battle.css?v=v146">
+<link rel="stylesheet" href="css/deck.css?v=v146">
+<link rel="stylesheet" href="css/run.css?v=v146">
+<link rel="stylesheet" href="css/tooltip.css?v=v146">
+<link rel="stylesheet" href="css/tour.css?v=v146">
+<link rel="stylesheet" href="css/master.css?v=v146">
+<link rel="stylesheet" href="css/academy.css?v=v146">
+<link rel="stylesheet" href="css/tutorial.css?v=v146">
+<link rel="stylesheet" href="css/profile.css?v=v146">
+<link rel="stylesheet" href="css/community.css?v=v146">
 <link rel="stylesheet" href="css/mobile.css?v=v771">
+<style>
+  *, *::before, *::after {
+    image-rendering: -webkit-optimize-contrast !important;
+  }
+</style>
+<style>
+  .pv-img, 
+  #cardtip img {
+    width: auto !important;      
+    height: auto !important;     
+    max-width: none !important;  /* 保留您原本的 100% 限制 */
+    max-height: none !important; /* 干掉所有高度限制 */
+    object-fit: contain !important;
+  }
+</style>
 <script>window.__NET_HOST = 'dms.spldream.com';</script>
 <meta name="google-site-verification" content="C5YsEfCjLftGuq4EOIOIvsMBAf471HGpOXP24wXtJug" />
 </head>
@@ -35,13 +50,15 @@
 <div id="menu">
   <!-- 全屏开关（只在首页显示；放在 #menu 内部，菜单隐藏时它也跟着隐藏） -->
   <button id="btnFull" class="fsbtn" title="全屏 / 退出全屏">⛶</button>
+  <!-- 竖屏模式开关：点一下所有界面切竖屏排版（默认仍是横屏，什么都不改）。
+       状态存 localStorage，重开游戏会记住。战斗/组卡器有专门的竖屏布局，其余界面沿用原排版。 -->
+  <button id="btnRotate" class="fsbtn" title="切换竖屏 / 横屏">⟳</button>
   <!-- 社区：公告 / 卡组社区 / 加入官群（内容见 js/community_data.js，界面见 js/community.js） -->
   <button id="btnCommunity" class="fsbtn cm" title="社区：公告 · 玩家卡组 · 官方群">💬</button>
-  <!-- 添加到主屏幕：装好后点桌面图标打开 = 系统级全屏横屏（默认隐藏，由 ui.js 按能力显示） -->
-  <button id="btnA2HS" class="fsbtn a2hs hidden" title="添加到主屏幕（装好后打开即全屏横屏）">📲</button>
+  <!-- 「添加到主屏幕」按钮已移除：已经有 Android APK 安装包，不再需要引导装 PWA。 -->
   <!-- 版本号：首页左上角的一串显示字符（当前 0-0-7）。
        它和 ?v= 资源版本、Rules.BUILD 都无关，没有明确指示不要改动。 -->
-  <div id="verTag">0-0-9</div>
+  <div id="verTag">0-1-0</div>
   <!-- 备案号：首页左下角（工信部要求展示；点击跳工信部备案管理系统）。样式见 css/style.css 的 #icpTag -->
   <a id="icpTag" href="https://dms.spldream.com/" target="_blank" rel="noopener noreferrer">此网站非官方部署，官方网站点此打开</a>
   <!-- 人物系统：头像 + 名称 + 称号（由 profile_ui.js 填充，固定在右上角） -->
@@ -72,11 +89,14 @@
     <span id="dkCount" class="dk-count"></span>
     <span id="dkMsg" class="dk-msg"></span>
     <span class="dk-spacer"></span>
-    <button id="dkSave" class="pxbtn">保存</button>
-    <button id="dkNew" class="pxbtn ghost">新建</button>
-    <button id="dkDelete" class="pxbtn ghost">删除</button>
-    <button id="dkUse" class="pxbtn">使用此卡组</button>
-    <button id="dkClose" class="pxbtn ghost">返回</button>
+    <!-- display:contents（默认）→ 桌面排版完全不变；竖屏下才 grid 均分成一行 -->
+    <div class="dk-actions">
+      <button id="dkSave" class="pxbtn">保存</button>
+      <button id="dkNew" class="pxbtn ghost">新建</button>
+      <button id="dkDelete" class="pxbtn ghost">删除</button>
+      <button id="dkUse" class="pxbtn">使用此卡组</button>
+      <button id="dkClose" class="pxbtn ghost">返回</button>
+    </div>
   </div>
   <div class="dk-tabs" id="dkTabs"></div>
   <div class="dk-body">
@@ -101,6 +121,10 @@
         <span class="dim dk-hint">点击左侧卡牌加入，点击右侧移除</span>
       </div>
       <div class="dk-pool" id="dkPool"></div>
+      <!-- 竖屏专用：卡池 ⇄ 卡组 单栏切换（只在 body.portrait-mode 下显示） -->
+      <button id="dkToggle" class="dk-toggle" title="切换 卡池 / 卡组">‹</button>
+      <!-- 悬停/滑到「卡组」里的卡时，卡池这一侧临时换成该卡详情（离开即恢复卡池） -->
+      <div class="dk-detail hidden" id="dkPoolDetail"></div>
     </div>
     <div class="dk-right">
       <div class="dk-righthead">
@@ -109,6 +133,8 @@
         <button id="dkClear" class="pxbtn ghost small">清空</button>
       </div>
       <div class="dk-list" id="dkDeck"></div>
+      <!-- 悬停/滑到「卡池」里的卡时，卡组这一侧临时换成该卡详情（离开即恢复卡组） -->
+      <div class="dk-detail hidden" id="dkDetail"></div>
     </div>
   </div>
 </div>
@@ -152,14 +178,15 @@
   <div id="specMask" class="hidden">观战中 · 只能观看，不能操作</div>
   <div id="stage">
     <!-- 联机延迟：对局右上角（只在连上服务器且在对局中显示，由 ui.js 的 renderPing 控制） -->
-    <div id="netPing" class="hidden"><span id="netPingVal">--</span> ms</div>
-    <!-- 排位赛回合计时（只在排位房显示；好友房/PvE 一律隐藏，由 ui.js 的 renderRankTimer 控制） -->
-    <div id="rankTimer" class="hidden">⏱ --</div>
-    <!-- 顶部遗物栏 -->
+    <!-- 顶部遗物栏。联机延迟 / 排位计时也放在这一行里（flex 项），
+         不再绝对定位到右上角 —— 那样会压在「设置」按钮与种子信息上。 -->
     <div class="topbar">
       <span class="tb-title">遗物栏</span>
       <div class="relicBar" id="relicBar"></div>
       <span class="tb-spacer"></span>
+      <div id="netPing" class="hidden"><span id="netPingVal">--</span> ms</div>
+      <!-- 排位赛回合计时（只在排位房显示；好友房/PvE 一律隐藏，由 ui.js 的 renderRankTimer 控制） -->
+      <div id="rankTimer" class="hidden">⏱ --</div>
       <span class="tb-seed" id="seedInfo"></span>
       <!-- 自动战斗（仅「踏上征途」对局内显示，位于设置按钮左侧） -->
       <button id="battleAutoBtn" class="pxbtn small ghost hidden">自动战斗</button>
@@ -171,8 +198,11 @@
     <div class="main">
       <!-- 战斗列 -->
       <div class="battlecol">
-        <!-- 对手信息 -->
-        <div class="inforow" id="oppInfo">
+        <!-- 对手信息栏。data-drop="enemy-player-zone"：把己方怪物拖到对手信息栏（血条那一行）= 攻击本体。
+             注意：对局界面上**没有"对手头像"**这种元素，打本体的落点就是对手信息栏与对手战场。
+             （renderBoard 还会给 #oppBoard 容器和对手空格子动态设同样的 data-drop，
+               拖到敌方怪物身上时怪物元素的 data-drop 更近会优先命中，仍是打怪。） -->
+        <div class="inforow" id="oppInfo" data-drop="enemy-player-zone">
           <span class="nm" id="oppName">对手</span>
           <div class="hpwrap"><div class="hpbar" id="oppHPBar"></div><div class="hptxt" id="oppHP"></div></div>
           <span class="stat link" id="oppDeck" title="点击查看对手牌库（不含顺序）"></span>
@@ -183,7 +213,7 @@
         <!-- 对手手牌（卡背） -->
         <div class="handrow hand-opp" id="oppHand"></div>
         <!-- 对手怪物区 -->
-        <div class="board foe" id="oppBoard"></div>
+        <div class="board foe" id="oppBoard" data-drop="enemy-player-zone"></div>
         <!-- 中央交互带 -->
         <div class="center-zone" id="centerZone" data-drop="use">
           <div class="banner prep" id="phaseBanner">准备阶段</div>
@@ -192,8 +222,12 @@
         </div>
         <!-- 己方怪物区 -->
         <div class="board" id="myBoard"></div>
-        <!-- 己方信息 -->
-        <div class="inforow" id="myInfo">
+        <!-- 己方信息栏：横屏时就在战场列这个原位置（不占顶部）；
+             竖屏时由 ui.js 的 moveInfoRow() 搬进右栏，与日志并排当底部条 -->
+        <div class="inforow side-info" id="myInfo">
+          <!-- PVP 快捷对话：放在信息栏最上面，窄栏里也一定看得见（放底部会被法杖栏挤出可视区）。
+               面板与按钮同容器，才能用 absolute 相对本行定位 -->
+          <button id="emoteBtn" class="pxbtn ghost small hidden" title="发送快捷对话">💬 对话</button>
           <span class="nm" id="myName">我方</span>
           <div class="hpwrap"><div class="hpbar" id="myHPBar"></div><div class="hptxt" id="myHP"></div></div>
           <span class="stat link" id="myDeck" title="点击查看我的牌库（不含顺序）"></span>
@@ -203,16 +237,26 @@
           <div class="wandwrap"><div id="wandSlot" data-drop="wand"><span class="dim">法杖栏</span></div></div>
           <span class="stat" id="castInfo"></span>
           <span class="stat" id="summonInfo"></span>
+          <!-- 对话面板：必须和按钮同在 #myInfo 里（放 body 末尾会参照错父元素跑到屏幕外） -->
+          <div id="emotePanel" class="hidden">
+            <div class="emote-tabs">
+              <button class="pxbtn ghost small on" data-et="greet">问候</button>
+              <button class="pxbtn ghost small" data-et="salute">致敬</button>
+              <button class="pxbtn ghost small" data-et="taunt">嘲讽</button>
+            </div>
+            <div class="emote-list" id="emoteList"></div>
+          </div>
         </div>
         <!-- 己方手牌 -->
         <div class="handrow" id="myHand"></div>
       </div>
 
-      <!-- 右侧数据栏 -->
+      <!-- 右侧数据栏：卡牌详情 + 日志（宽度 320px，与原先完全一致）。
+           竖屏时 #myInfo 会被 ui.js 的 moveInfoRow() 搬进来，与日志并排当底部条。 -->
       <div class="sidebar">
         <div id="preview"><div class="dim">悬停卡牌查看详情</div></div>
-        <div id="viewer" class="hidden"></div>
         <div class="logbox" id="logbox"></div>
+        <div id="viewer" class="hidden"></div>
       </div>
     </div>
 
@@ -245,44 +289,138 @@
 </div>
 
 <!-- ================= 脚本（顺序不可乱） ================= -->
-<script src="js/rules.js?v=v77"></script>
-<script src="js/cards.js?v=v77"></script>
-<script src="js/tooltip.js?v=v77"></script>
-<script src="js/anim.js?v=v77"></script>
-<script src="js/audio.js?v=v77"></script>
-<script src="js/awaken_data.js?v=v77"></script>
-<script src="js/perks_data.js?v=v77"></script>
-  <script src="js/engine.js?v=v77"></script>
-<script src="js/card_play.js?v=v77"></script>
-<script src="js/ai.js?v=v77"></script>
-<script src="js/storage.js?v=v77"></script>
-<script src="js/achievements.js?v=v77"></script>
-<script src="js/run.js?v=v77"></script>
-<script src="js/deckbuilder.js?v=v77"></script>
-<script src="js/runui.js?v=v77"></script>
-<script src="js/tournament_data.js?v=v77"></script>
-<script src="js/tournament.js?v=v77"></script>
-<script src="js/tournament_ui.js?v=v77"></script>
-<script src="js/polling.js?v=v771"></script> 
-<script src="js/net_failover.js?v=v775"></script>
-<script src="js/net.js?v=v77"></script>
-<script src="js/master_ui.js?v=v77"></script>
-<script src="js/academy_data.js?v=v77"></script>
-<script src="js/academy.js?v=v77"></script>
-<script src="js/academy_ui.js?v=v77"></script>
-<script src="js/boss_data.js?v=v77"></script>
-<script src="js/boss.js?v=v77"></script>
-<script src="js/boss_ui.js?v=v77"></script>
-<script src="js/tutorial_data.js?v=v77"></script>
-<script src="js/tutorial.js?v=v77"></script>
-<script src="js/tutorial_ui.js?v=v77"></script>
-<script src="js/profile_ui.js?v=v77"></script>
-<script src="js/ui.js?v=v77"></script>
+<script src="/atlas-hook.js"></script>
+<script>
+(function() {
+    const PREFIX = '卡牌/缩略卡/';
+    
+    // 核心替换函数
+    function fixPath(url) {
+        if (typeof url !== 'string' || !url.includes(PREFIX)) return url;
+        
+        // 提取卡名（兼容全路径和相对路径）
+        let cardName = url.split(PREFIX)[1].replace(/\.(png|webp|jpg)$/i, '');
+        
+        // 只有这两个特殊名字需要纠正
+        if (cardName === 'lingSdaincang') cardName = '澪S典藏';
+        else if (cardName === '啮齿小鼠C') cardName = '啮齿小鼠';
+        
+        // 提取原来的前缀（以防你的路径是 http://... 或是 ../ 开头）
+        let prefix = url.split(PREFIX)[0];
+        return prefix + '卡牌/高清卡/' + cardName + '详情.png';
+    }
+
+    // 1. 拦截 img.src = '...'
+    const originalSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+    Object.defineProperty(HTMLImageElement.prototype, 'src', {
+        set: function(val) {
+            originalSrc.set.call(this, fixPath(val));
+        },
+        get: originalSrc.get
+    });
+
+    // 2. 拦截 img.setAttribute('src', '...')
+    const originalSetAttribute = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function(name, value) {
+        if (this.tagName === 'IMG' && name.toLowerCase() === 'src') {
+            value = fixPath(value);
+        }
+        originalSetAttribute.call(this, name, value);
+    };
+
+    // 3. 拦截 innerHTML = '<img src="...">' (你的项目大概率死在这里)
+    const originalInnerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+    Object.defineProperty(Element.prototype, 'innerHTML', {
+        set: function(val) {
+            if (typeof val === 'string' && val.includes(PREFIX)) {
+                // 使用正则把 HTML 字符串里的旧路径全部替换成新路径
+                val = val.replace(/(src=["'])([^"']*?卡牌\/缩略卡\/[^"']*?)(["'])/g, function(match, p1, p2, p3) {
+                    return p1 + fixPath(p2) + p3;
+                });
+            }
+            originalInnerHTML.set.call(this, val);
+        },
+        get: originalInnerHTML.get
+    });
+})();
+</script>
+<script src="js/rules.js?v=v146"></script>
+<script src="js/cards.js?v=v146"></script>
+<script src="js/tooltip.js?v=v146"></script>
+<script src="js/card3d.js?v=v146"></script>
+<script src="js/anim.js?v=v146"></script>
+<script src="js/audio.js?v=v146"></script>
+<script src="js/awaken_data.js?v=v146"></script>
+<script src="js/perks_data.js?v=v146"></script>
+<script src="js/engine.js?v=v146"></script>
+<script src="js/card_play.js?v=v146"></script>
+<script src="js/ai.js?v=v146"></script>
+<script src="js/storage.js?v=v146"></script>
+<script src="js/achievements.js?v=v146"></script>
+<script src="js/run.js?v=v146"></script>
+<script src="js/deckbuilder.js?v=v146"></script>
+<script src="js/runui.js?v=v146"></script>
+<script src="js/tournament_data.js?v=v146"></script>
+<script src="js/tournament.js?v=v146"></script>
+<script src="js/tournament_ui.js?v=v146"></script>
+<script src="js/net.js?v=v146"></script>
+<script src="js/master_ui.js?v=v146"></script>
+<script src="js/academy_data.js?v=v146"></script>
+<script src="js/academy.js?v=v146"></script>
+<script src="js/academy_ui.js?v=v146"></script>
+<script src="js/boss_data.js?v=v146"></script>
+<script src="js/boss.js?v=v146"></script>
+<script src="js/boss_ui.js?v=v146"></script>
+<script src="js/tutorial_data.js?v=v146"></script>
+<script src="js/tutorial.js?v=v146"></script>
+<script src="js/tutorial_ui.js?v=v146"></script>
+<script src="js/profile_ui.js?v=v146"></script>
+<script src="js/ui.js?v=v146"></script>
 <!-- 社区：数据（服务器可直接替换 community_data.js）+ 界面逻辑（放在 ui.js 之后，用到 UI.toast） -->
-<script src="js/community_data.js?v=v77"></script>
-<script src="js/community.js?v=v77"></script>
-<script src="preload-list.js"></script>
-<script src="preload.js"></script>
-<script src="js/mobile.js?v=v771"></script>
+<script src="js/community_data.js?v=v146"></script>
+<script src="js/community.js?v=v146"></script>
+<script src="js/mobile.js?v=v146"></script>
+<script src="/preload-list.js?v=v146"></script>
+<script src="/preload.js?v=v146"></script>
+<script>
+(function() {
+    let tempPortraitActivated = false;
+    const deckEl = document.getElementById('deck');
+
+    function checkAndEnable() {
+        if (!window.UI) return;
+        // 1. 检测物理屏幕是不是竖屏（高 > 宽）
+        const isPhysicalPortrait = window.innerHeight > window.innerWidth;
+        // 2. 如果是物理竖屏，且当前没有手动开启过 portrait-mode
+        if (isPhysicalPortrait && !UI.isPortrait()) {
+            tempPortraitActivated = true;
+            UI.setPortraitMode(true, true); // 静默强制开启，不弹 toast
+        }
+    }
+
+    if (deckEl) {
+        const observer = new MutationObserver(function() {
+            // 当组卡器显示时
+            if (!deckEl.classList.contains('hidden')) {
+                checkAndEnable();
+            } 
+            // 当组卡器隐藏时
+            else {
+                // 如果刚才是由我们临时开启的竖屏，现在就关掉，恢复给 mobile.css 处理
+                if (tempPortraitActivated) {
+                    if (window.UI) UI.setPortraitMode(false, true); 
+                    tempPortraitActivated = false;
+                }
+            }
+        });
+        // 监听 #deck 元素的 class 变化
+        observer.observe(deckEl, { attributes: true, attributeFilter: ['class'] });
+    }
+})();
+</script>
+<!-- PVP 快捷对话：气泡层（全屏、不挡点击）。面板不在这里 —— 它必须和按钮同在 #myInfo 内才能正确定位 -->
+<div id="bubbleLayer" aria-hidden="true"></div>
+<!-- 竖屏组卡器：卡牌详情浮层。贴在所看卡牌的「另一半屏」，保证不盖住正在看的那张卡 -->
+<div id="dkFloat" class="dk-float hidden" aria-hidden="true"></div>
 </body>
 </html>

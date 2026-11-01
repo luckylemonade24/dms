@@ -1,1 +1,244 @@
-#academy{overscroll-behavior:contain;background:linear-gradient(#08080adb,#08080adb),url(../背景/halls_background.png) 50%/cover no-repeat;position:fixed;inset:0;overflow-y:auto}#academy .ac-wrap{box-sizing:border-box;flex-direction:column;min-height:100vh;padding:12px 18px 16px;display:flex}.ac-title{color:var(--gold);letter-spacing:4px;text-shadow:3px 3px #000;margin-bottom:8px;font-size:28px}.ac-live{color:var(--text);font-size:calc(16px * var(--fs,1));margin:8px 0}.ac-head{border:2px solid var(--gold-dim);background:#18181af0;flex-wrap:wrap;align-items:center;gap:16px;margin-bottom:10px;padding:10px 16px;display:flex}.ac-head .ac-title{font-size:calc(20px * var(--fs,1));letter-spacing:2px;margin:0}.ac-head .spacer{flex:1}.ac-head .ac-hp{color:#ff7a6a;font-weight:700;font-size:calc(16px * var(--fs,1))}.ac-head .ac-xue{color:#8fd0ff;font-weight:700;font-size:calc(16px * var(--fs,1))}.ac-head .ac-lv{color:var(--gold);font-weight:700;font-size:calc(16px * var(--fs,1))}.ac-sec{flex-direction:column;flex:auto;min-height:0;margin-bottom:8px;display:flex}.ac-sec-t{color:var(--text);font-size:calc(16px * var(--fs,1));margin:4px 0}.ac-sec-t .ac-tip{color:var(--dim);font-size:calc(12px * var(--fs,1));margin-left:10px}.ac-cards{border:2px solid var(--line);background:#00000059;flex-wrap:wrap;flex:auto;align-content:flex-start;gap:8px;min-height:120px;padding:8px;display:flex;overflow-y:auto}.ac-cards.ac-drop.hover,.ac-drop.hover{border-color:var(--green);background:#7ec8501f}.ac-card{cursor:grab;touch-action:none;width:92px;position:relative}.ac-card img{width:100%;display:block}.ac-card .tier{font-size:calc(12px * var(--fs,1));background:#000000bf;position:absolute;top:1px;left:1px}.ac-card .ac-cname{font-size:calc(12px * var(--fs,1));text-align:center;color:#fff;white-space:nowrap;text-overflow:ellipsis;background:#000000d1;display:block;overflow:hidden}.ac-card .ac-price{font-size:calc(11px * var(--fs,1));color:var(--gold);border:1px solid var(--gold-dim);background:#000000d1;padding:0 3px;position:absolute;top:1px;right:1px}.ac-card .ac-star{text-align:center;font-size:calc(13px * var(--fs,1));color:#ffd24a;text-shadow:1px 1px #000,0 0 6px #000;letter-spacing:1px;position:absolute;bottom:16px;left:0;right:0}.ac-card .ac-awaken{bottom:33px}.ac-card.ro{cursor:default;opacity:.95}.ac-card.ro .ac-price{display:none}.ac-ghost{pointer-events:none;z-index:999;opacity:.9;width:84px;position:fixed;transform:translate(-50%,-50%)}.ac-ghost img{width:100%}.ac-bottom{flex:none;align-items:stretch;gap:12px;margin-top:8px;display:flex}.ac-bl,.ac-br{border:2px dashed var(--line);background:#18181af0;padding:12px 16px}.ac-bl{flex:1}.ac-br{flex-direction:column;flex:0 0 340px;justify-content:center;gap:10px;display:flex}.ac-bl.hover,.ac-br.hover{border-color:var(--red);background:#d85a4a24}.ac-lvinfo{color:var(--text);font-size:calc(16px * var(--fs,1));flex-wrap:wrap;gap:18px;margin-bottom:10px;display:flex}.ac-lvinfo b{color:var(--gold)}.ac-lvbtns{flex-wrap:wrap;gap:10px;display:flex}.ac-sellhint{color:var(--dim);font-size:calc(12px * var(--fs,1));margin-top:8px}.ac-btns{flex-wrap:wrap;gap:12px;margin-top:12px;display:flex}.ac-perk{max-width:760px}.ac-perklist{flex-wrap:wrap;justify-content:center;gap:12px;margin-top:10px;display:flex}.ac-perkcard{text-align:left;cursor:pointer;border:2px solid var(--gold-dim);min-width:190px;max-width:240px;color:var(--text);font:inherit;background:#18181af2;border-radius:6px;flex-direction:column;flex:200px;gap:6px;padding:12px 14px;display:flex}.ac-perkcard:hover{background:#28282cfa}.ac-perkcard .pk-top{align-items:baseline;gap:8px;display:flex}.ac-perkcard .pk-rar{font-size:calc(13px * var(--fs,1));letter-spacing:2px;font-weight:700}.ac-perkcard .pk-cat{font-size:calc(12px * var(--fs,1));opacity:.85}.ac-perkcard b{font-size:calc(17px * var(--fs,1));letter-spacing:1px}.ac-perkcard em{font-size:calc(13px * var(--fs,1));color:#c9c2ae;font-style:normal;line-height:1.6}#academy .ac-wrap.ac-entry{text-align:center;justify-content:flex-start;align-items:center;padding-top:28px}#academy .ac-wrap.ac-entry>.ac-title{margin-bottom:12px}#academy .ac-wrap.ac-entry>.dim{max-width:760px;margin:0 auto}#academy .ac-wrap.ac-entry>.ac-live{text-align:center}#academy .ac-wrap.ac-entry .ac-btns{justify-content:center}#academy .ac-wrap.ac-entry .ac-hist{width:100%;max-width:900px}.ac-shop{z-index:995;background:#000000b8;justify-content:center;align-items:center;display:flex;position:fixed;inset:0}.ac-shopbox{background:var(--panel);border:3px solid var(--gold-dim);width:94%;max-width:1090px;padding:20px 26px;box-shadow:5px 5px #000}.ac-shopbox h3{color:var(--gold);font-size:calc(20px * var(--fs,1));margin-bottom:14px}.ac-shopgrid{flex-wrap:wrap;justify-content:center;gap:12px;display:flex}.ac-slot{border:2px solid var(--line);cursor:pointer;text-align:center;background:#0006;width:132px;padding:5px}.ac-slot:hover{border-color:var(--gold)}.ac-slot img{width:100%;display:block}.ac-slot.empty{cursor:default;height:196px;color:var(--dim);justify-content:center;align-items:center;display:flex}.ac-slot.bought{opacity:.45;filter:grayscale();cursor:default}.ac-slot.poor{border-color:#5a3a3a}.ac-slot{position:relative}.ac-shopmain{align-items:stretch;gap:10px;display:flex}.ac-lockall{width:64px;min-height:112px;font-size:calc(12px * var(--fs,1));text-align:center;cursor:pointer;flex-direction:column;flex:none;justify-content:center;align-self:flex-start;align-items:center;gap:8px;line-height:1.5;display:flex}.ac-lockall .ac-lockico{font-size:calc(22px * var(--fs,1));line-height:1}.ac-lockall.on{color:#ffd24a;box-shadow:inset 0 0 12px #d8b04a73;border-color:#b09231!important}.ac-slot.locked{border-color:#b09231;box-shadow:inset 0 0 10px #d8b04a73}.ac-slot.locked .ac-slotprice{color:#ffd24a}.ac-slotname{font-size:calc(12px * var(--fs,1));color:#fff;margin-top:4px}.ac-slotprice{font-size:calc(13px * var(--fs,1));color:var(--gold)}.ac-odds{color:var(--dim);font-size:calc(13px * var(--fs,1));margin:14px 0 6px;line-height:1.6}.ac-reslist,.ac-standings,.ac-hist{border:2px solid var(--line);background:#00000059;flex:auto;padding:10px 14px}.ac-res,.ac-stand,.ac-histrow{font-size:calc(15px * var(--fs,1));border-bottom:1px dashed #50505059;align-items:center;gap:12px;padding:6px 0;display:flex}.ac-res.mine,.ac-stand.me,.ac-histrow.me{background:#d8b04a1a}.ac-stand.out{opacity:.5}.ac-resA{text-align:right;min-width:170px}.ac-resB{min-width:170px}.ac-score{color:var(--gold);text-align:center;min-width:96px;font-weight:700;font-size:calc(17px * var(--fs,1))}.ac-rank{color:var(--gold);min-width:40px}.ac-histno{min-width:90px;color:var(--gold)}.ac-histchamp{min-width:260px}.ac-histrank{color:var(--dim)}.ac-histrow{cursor:pointer}.ac-histrow:hover{color:var(--gold)}.chip.star{color:#ffd24a;border-color:#8a7028}@media (height<=560px),(pointer:coarse),(width<=1100px){#academy .ac-wrap.ac-prep{box-sizing:border-box;grid-template:"head head""deck bag"minmax(0,1fr)"opp opp""btm btm"/1fr 1fr;gap:4px;height:100dvh;min-height:0;padding:6px 10px 8px;display:grid}#academy .ac-wrap.ac-prep>.ac-head{grid-area:head}#acSecDeck{grid-area:deck}#acSecBag{grid-area:bag}#acSecOpp{grid-area:opp}#academy .ac-wrap.ac-prep>.ac-bottom{grid-area:btm}#academy .ac-head{flex-wrap:nowrap;gap:8px;margin-bottom:0;padding:4px 10px}#academy .ac-head .ac-title{font-size:calc(15px * var(--fs,1));letter-spacing:1px}#academy .ac-head .ac-hp,#academy .ac-head .ac-xue,#academy .ac-head .ac-lv{font-size:calc(13px * var(--fs,1))}#academy .ac-head button{font-size:calc(12px * var(--fs,1));padding:3px 8px}#academy .ac-sec{min-height:0;margin-bottom:0}#academy .ac-sec-t{font-size:calc(13px * var(--fs,1));white-space:nowrap;text-overflow:ellipsis;margin:2px 0;overflow:hidden}#academy .ac-sec-t .ac-tip{font-size:calc(11px * var(--fs,1));margin-left:6px}#academy .ac-cards{-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;gap:4px;min-height:0;padding:4px;overflow-y:auto}#academy .ac-card{width:62px}#academy .ac-card .ac-cname,#academy .ac-card .ac-price{font-size:calc(10px * var(--fs,1))}#academy .ac-card .ac-star{font-size:calc(11px * var(--fs,1));bottom:13px}#acSecOpp .ac-cards{touch-action:pan-x;flex-wrap:nowrap;max-height:52px;overflow:auto hidden}#acSecOpp .ac-card{flex:none;width:48px}#acSecOpp .ac-card .ac-cname{display:none}#academy .ac-bottom{gap:8px;margin-top:0}#academy .ac-bl,#academy .ac-br{padding:5px 10px}#academy .ac-br{flex:0 0 236px;gap:5px}#academy .ac-lvinfo{font-size:calc(11px * var(--fs,1));gap:8px;margin-bottom:3px;line-height:1.4}#academy .ac-lvbtns{gap:6px}#academy .ac-sellhint{font-size:calc(11px * var(--fs,1));margin-top:3px}#academy .pxbtn,#academy .pxbtn.small{font-size:calc(12px * var(--fs,1));padding:3px 9px}#academy .ac-br>.dim.small{display:none}#academy .ac-shop{padding:4px 0}#academy .ac-shopbox{flex-direction:column;width:98%;max-height:calc(100dvh - 8px);padding:8px 10px 4px;display:flex;overflow-y:auto}#academy .ac-shopbox h3{font-size:calc(14px * var(--fs,1));margin-bottom:5px}#academy .ac-shopmain{gap:6px;min-height:0}#academy .ac-shopgrid{grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;display:grid}#academy .ac-slot{width:auto;min-width:0;padding:3px}#academy .ac-slot img{object-fit:contain;max-height:76px}#academy .ac-slot.empty{height:92px}#academy .ac-slotname{font-size:calc(10px * var(--fs,1))}#academy .ac-slotprice{font-size:calc(11px * var(--fs,1))}#academy .ac-lockall{width:46px;min-height:72px;font-size:calc(11px * var(--fs,1));gap:3px}#academy .ac-lockall .ac-lockico{font-size:calc(16px * var(--fs,1))}#academy .ac-odds{font-size:calc(11px * var(--fs,1));margin:5px 0 3px}#academy .ac-btns{background:var(--panel);flex:none;gap:8px;margin:6px 0 0;padding:6px 0 2px;position:sticky;bottom:-4px}}
+/* ============================================================
+ * 学院考核  academy.css（尽量铺满屏幕）
+ * ========================================================== */
+#academy {
+  position: fixed; inset: 0; overflow-y: auto;
+  overscroll-behavior: contain;          /* 滚到底别把整页带着一起动 */
+  background: linear-gradient(rgba(8,8,10,.86), rgba(8,8,10,.86)), url('../背景/halls_background.png') center/cover no-repeat;
+}
+#academy .ac-wrap {
+  min-height: 100vh; display: flex; flex-direction: column;
+  padding: 12px 18px 16px; box-sizing: border-box;
+}
+.ac-title { color: var(--gold); font-size: 28px; letter-spacing: 4px; margin-bottom: 8px; text-shadow: 3px 3px 0 #000; }
+.ac-live { color: var(--text); margin: 8px 0; font-size: calc(16px * var(--fs, 1)); }
+
+.ac-head {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  border: 2px solid var(--gold-dim); background: rgba(24,24,26,.94); padding: 10px 16px; margin-bottom: 10px;
+}
+.ac-head .ac-title { font-size: calc(20px * var(--fs, 1)); margin: 0; letter-spacing: 2px; }
+.ac-head .spacer { flex: 1; }
+.ac-head .ac-hp { color: #ff7a6a; font-weight: bold; font-size: calc(16px * var(--fs, 1)); }
+.ac-head .ac-xue { color: #8fd0ff; font-weight: bold; font-size: calc(16px * var(--fs, 1)); }
+.ac-head .ac-lv { color: var(--gold); font-weight: bold; font-size: calc(16px * var(--fs, 1)); }
+
+.ac-sec { margin-bottom: 8px; display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.ac-sec-t { color: var(--text); font-size: calc(16px * var(--fs, 1)); margin: 4px 0 4px; }
+.ac-sec-t .ac-tip { color: var(--dim); font-size: calc(12px * var(--fs, 1)); margin-left: 10px; }
+.ac-cards {
+  display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start;
+  min-height: 120px; flex: 1 1 auto; padding: 8px;
+  overflow-y: auto;                 /* 卡多时在卡区内部滚动，而不是把整页顶下去（底部按钮也能一直露着） */
+  border: 2px solid var(--line); background: rgba(0,0,0,.35);
+}
+.ac-cards.ac-drop.hover, .ac-drop.hover { border-color: var(--green); background: rgba(126,200,80,.12); }
+.ac-card { position: relative; width: 92px; cursor: grab; touch-action: none; }
+.ac-card img { width: 100%; display: block; }
+.ac-card .tier { position: absolute; top: 1px; left: 1px; background: rgba(0,0,0,.75); font-size: calc(12px * var(--fs, 1)); }
+.ac-card .ac-cname {
+  display: block; font-size: calc(12px * var(--fs, 1)); text-align: center; color: #fff; background: rgba(0,0,0,.82);
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.ac-card .ac-price {
+  position: absolute; top: 1px; right: 1px; font-size: calc(11px * var(--fs, 1)); color: var(--gold);
+  background: rgba(0,0,0,.82); border: 1px solid var(--gold-dim); padding: 0 3px;
+}
+.ac-card .ac-star {
+  position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-size: calc(13px * var(--fs, 1));
+  color: #ffd24a; text-shadow: 1px 1px 0 #000, 0 0 6px #000; letter-spacing: 1px;
+}
+/* 觉醒词条角标：放在星级【上面一行】——和星级同一行会盖住最左边那颗星 */
+.ac-card .ac-awaken {
+  bottom: 33px;
+}
+.ac-card.ro { cursor: default; opacity: .95; }
+.ac-card.ro .ac-price { display: none; }
+.ac-ghost { position: fixed; width: 84px; transform: translate(-50%,-50%); pointer-events: none; z-index: 999; opacity: .9; }
+.ac-ghost img { width: 100%; }
+
+.ac-bottom { display: flex; gap: 12px; align-items: stretch; margin-top: 8px; flex: 0 0 auto; }
+.ac-bl, .ac-br { border: 2px dashed var(--line); background: rgba(24,24,26,.94); padding: 12px 16px; }
+.ac-bl { flex: 1; }
+.ac-br { flex: 0 0 340px; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+.ac-bl.hover, .ac-br.hover { border-color: var(--red); background: rgba(216,90,74,.14); }
+.ac-lvinfo { display: flex; gap: 18px; flex-wrap: wrap; color: var(--text); font-size: calc(16px * var(--fs, 1)); margin-bottom: 10px; }
+.ac-lvinfo b { color: var(--gold); }
+.ac-lvbtns { display: flex; gap: 10px; flex-wrap: wrap; }
+.ac-sellhint { color: var(--dim); font-size: calc(12px * var(--fs, 1)); margin-top: 8px; }
+
+.ac-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+
+/* 升级三选一（特技）：三张竖排卡片，边框按稀有度着色 */
+.ac-perk { max-width: 760px; }
+.ac-perklist { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+.ac-perkcard {
+  flex: 1 1 200px; min-width: 190px; max-width: 240px; text-align: left; cursor: pointer;
+  display: flex; flex-direction: column; gap: 6px; padding: 12px 14px;
+  background: rgba(24,24,26,.95); border: 2px solid var(--gold-dim);
+  color: var(--text); border-radius: 6px; font: inherit;
+}
+.ac-perkcard:hover { background: rgba(40,40,44,.98); }
+.ac-perkcard .pk-top { display: flex; gap: 8px; align-items: baseline; }
+.ac-perkcard .pk-rar { font-size: calc(13px * var(--fs, 1)); letter-spacing: 2px; font-weight: bold; }
+.ac-perkcard .pk-cat { font-size: calc(12px * var(--fs, 1)); opacity: .85; }
+.ac-perkcard b { font-size: calc(17px * var(--fs, 1)); letter-spacing: 1px; }
+.ac-perkcard em { font-size: calc(13px * var(--fs, 1)); line-height: 1.6; color: #c9c2ae; font-style: normal; }
+
+/* 报名 / 历届界面（.ac-entry）：与魔绫大赛同款排版 —— 容器居中、标题与按钮居中，
+ * 不再靠左。备战页（.ac-prep）是网格布局，不受这里影响。 */
+#academy .ac-wrap.ac-entry {
+  align-items: center; justify-content: flex-start; text-align: center;
+  padding-top: 28px;
+}
+#academy .ac-wrap.ac-entry > .ac-title { margin-bottom: 12px; }
+#academy .ac-wrap.ac-entry > .dim { max-width: 760px; margin: 0 auto; }
+#academy .ac-wrap.ac-entry > .ac-live { text-align: center; }
+#academy .ac-wrap.ac-entry .ac-btns { justify-content: center; }
+#academy .ac-wrap.ac-entry .ac-hist { width: 100%; max-width: 900px; }
+
+/* 商店 */
+.ac-shop { position: fixed; inset: 0; z-index: 995; background: rgba(0,0,0,.72); display: flex; align-items: center; justify-content: center; }
+.ac-shopbox {
+  background: var(--panel); border: 3px solid var(--gold-dim); padding: 20px 26px; max-width: 1090px; width: 94%;
+  box-shadow: 5px 5px 0 #000;
+}
+.ac-shopbox h3 { color: var(--gold); font-size: calc(20px * var(--fs, 1)); margin-bottom: 14px; }
+.ac-shopgrid { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.ac-slot {
+  width: 132px; border: 2px solid var(--line); background: rgba(0,0,0,.4); padding: 5px; cursor: pointer; text-align: center;
+}
+.ac-slot:hover { border-color: var(--gold); }
+.ac-slot img { width: 100%; display: block; }
+.ac-slot.empty { display: flex; align-items: center; justify-content: center; height: 196px; cursor: default; color: var(--dim); }
+.ac-slot.bought { opacity: .45; filter: grayscale(1); cursor: default; }
+.ac-slot.poor { border-color: #5a3a3a; }
+/* 商品锁定：商店左侧的统一锁定按钮 */
+.ac-slot { position: relative; }
+.ac-shopmain { display: flex; gap: 10px; align-items: stretch; }
+.ac-lockall {
+  flex: 0 0 auto; width: 64px; min-height: 112px; align-self: flex-start; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px; font-size: calc(12px * var(--fs, 1)); line-height: 1.5;
+  text-align: center; cursor: pointer;
+}
+.ac-lockall .ac-lockico { font-size: calc(22px * var(--fs, 1)); line-height: 1; }
+.ac-lockall.on { border-color: #b09231 !important; box-shadow: inset 0 0 12px rgba(216,176,74,.45); color: #ffd24a; }
+.ac-slot.locked { border-color: #b09231; box-shadow: inset 0 0 10px rgba(216,176,74,.45); }
+.ac-slot.locked .ac-slotprice { color: #ffd24a; }
+.ac-slotname { font-size: calc(12px * var(--fs, 1)); color: #fff; margin-top: 4px; }
+.ac-slotprice { font-size: calc(13px * var(--fs, 1)); color: var(--gold); }
+.ac-odds { color: var(--dim); font-size: calc(13px * var(--fs, 1)); margin: 14px 0 6px; line-height: 1.6; }
+
+/* 战报 / 排名 */
+.ac-reslist, .ac-standings, .ac-hist { border: 2px solid var(--line); background: rgba(0,0,0,.35); padding: 10px 14px; flex: 1 1 auto; }
+.ac-res, .ac-stand, .ac-histrow {
+  display: flex; align-items: center; gap: 12px; padding: 6px 0; font-size: calc(15px * var(--fs, 1));
+  border-bottom: 1px dashed rgba(80,80,80,.35);
+}
+.ac-res.mine, .ac-stand.me, .ac-histrow.me { background: rgba(216,176,74,.10); }
+.ac-stand.out { opacity: .5; }
+.ac-resA { min-width: 170px; text-align: right; }
+.ac-resB { min-width: 170px; }
+.ac-score { color: var(--gold); font-weight: bold; min-width: 96px; text-align: center; font-size: calc(17px * var(--fs, 1)); }
+.ac-rank { color: var(--gold); min-width: 40px; }
+.ac-histno { min-width: 90px; color: var(--gold); }
+.ac-histchamp { min-width: 260px; }
+.ac-histrank { color: var(--dim); }
+.ac-histrow { cursor: pointer; }
+.ac-histrow:hover { color: var(--gold); }
+
+/* 场上怪物星级角标 */
+.chip.star { color: #ffd24a; border-color: #8a7028; }
+
+/* ============================================================
+ * 手机横屏 / 矮屏适配（视口高 ≤ 560px，如 844×390）
+ * 原布局竖着堆 3 个卡区 + 底部操作区，在 390px 高的屏上需要 ~840px（实测溢出 447px），
+ * 结果："开始本轮考核 / 商店"按钮跑到屏幕外，且卡组与背包无法同屏 —— 拖拽调卡在手机上根本没法操作。
+ * 这里改成"双列网格"：整屏放得下、不做页面滚动（卡区内部各自滚动）。
+ * ========================================================== */
+/* 触发条件（满足任一条即用手机布局）：
+ *   ① max-height: 560px —— 手机横屏
+ *   ② pointer: coarse   —— 任何触屏设备（平板 / 折叠屏展开 / 手机"桌面版网站"）
+ *   ③ max-width: 900px  —— 很窄的窗口
+ * 只写 ① 时，视口高度 > 560 的触屏设备会掉回桌面布局：商店商品折成两行、
+ * 「刷新 / 关闭」被顶出屏幕 —— 看着就像"改回去了"。鼠标 + 大窗口仍走桌面布局。 */
+@media (max-height: 560px), (pointer: coarse), (max-width: 1100px) {
+  /* 只改准备界面（ac-prep）：战报 / 历届等长列表页面仍需整页滚动，不能被定高裁掉 */
+  #academy .ac-wrap.ac-prep {
+    display: grid; height: 100vh; height: 100dvh;   /* dvh：手机浏览器地址栏会吃掉 vh，dvh 才是真正可见高度 */
+    min-height: 0; box-sizing: border-box;
+    padding: 6px 10px 8px; gap: 4px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    grid-template-areas: "head head" "deck bag" "opp opp" "btm btm";
+  }
+  #academy .ac-wrap.ac-prep > .ac-head { grid-area: head; }
+  #acSecDeck { grid-area: deck; }
+  #acSecBag { grid-area: bag; }
+  #acSecOpp { grid-area: opp; }
+  #academy .ac-wrap.ac-prep > .ac-bottom { grid-area: btm; }
+
+  /* 顶栏压成一行 */
+  #academy .ac-head { padding: 4px 10px; gap: 8px; margin-bottom: 0; flex-wrap: nowrap; }
+  #academy .ac-head .ac-title { font-size: calc(15px * var(--fs, 1)); letter-spacing: 1px; }
+  #academy .ac-head .ac-hp, #academy .ac-head .ac-xue, #academy .ac-head .ac-lv { font-size: calc(13px * var(--fs, 1)); }
+  #academy .ac-head button { padding: 3px 8px; font-size: calc(12px * var(--fs, 1)); }
+
+  /* 三个卡区：可压缩、内部滚动 */
+  #academy .ac-sec { margin-bottom: 0; min-height: 0; }
+  /* 标题强制单行（超出省略）：否则"我的卡组"那行的说明文字一折行，卡区就比背包矮一截 */
+  #academy .ac-sec-t { font-size: calc(13px * var(--fs, 1)); margin: 2px 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #academy .ac-sec-t .ac-tip { font-size: calc(11px * var(--fs, 1)); margin-left: 6px; }
+  #academy .ac-cards {
+    min-height: 0; padding: 4px; gap: 4px;
+    overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+    /* 空白处也要能滑：卡区容器本身是拖放区（data-drop），而全局有 [data-drop]{touch-action:none}
+       → 手指按在两卡之间的空处时浏览器不接管滚动，自定义滚动又只认卡片，于是空白处一片滑不动。
+       这里只把"容器空白处"放开为可纵向滑；卡片自己仍是 none（拖拽手感、长按翻看列表都不变）。 */
+    touch-action: pan-y;
+  }
+  #academy .ac-card { width: 62px; }
+  #academy .ac-card .ac-cname { font-size: calc(10px * var(--fs, 1)); }
+  #academy .ac-card .ac-price { font-size: calc(10px * var(--fs, 1)); }
+  #academy .ac-card .ac-star { font-size: calc(11px * var(--fs, 1)); bottom: 13px; }
+
+  /* 对手卡组只读：压成一条横条，把竖向空间让给"卡组 / 背包" */
+  #acSecOpp .ac-cards { max-height: 52px; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; touch-action: pan-x; }
+  #acSecOpp .ac-card { width: 48px; flex: 0 0 auto; }
+  #acSecOpp .ac-card .ac-cname { display: none; }
+
+  /* 底部：等级信息（左，兼出售区）/ 商店与开战（右，兼出售区） */
+  #academy .ac-bottom { margin-top: 0; gap: 8px; }
+  #academy .ac-bl, #academy .ac-br { padding: 5px 10px; }
+  #academy .ac-br { flex: 0 0 236px; gap: 5px; }
+  #academy .ac-lvinfo { gap: 8px; font-size: calc(11px * var(--fs, 1)); margin-bottom: 3px; line-height: 1.4; }
+  #academy .ac-lvbtns { gap: 6px; }
+  #academy .ac-sellhint { margin-top: 3px; font-size: calc(11px * var(--fs, 1)); }
+  #academy .pxbtn, #academy .pxbtn.small { font-size: calc(12px * var(--fs, 1)); padding: 3px 9px; }
+  /* 右下角这行提示（对手名/刷新说明）在矮屏上省掉：对手名已在对手条里，刷新说明在商店里 */
+  #academy .ac-br > .dim.small { display: none; }
+
+  /* 商店：① 商品固定单行 6 格（改 grid，宽度再窄也不折行）② 整框按"可见高度"限高并内部滚动
+     ③ 「刷新 / 关闭」吸底 → 内容再长也永远点得到 */
+  #academy .ac-shop { padding: 4px 0; }
+  #academy .ac-shopbox {
+    max-height: calc(100vh - 8px); max-height: calc(100dvh - 8px);   /* dvh：手机地址栏会吃掉 vh */
+    overflow-y: auto; padding: 8px 10px 4px; width: 98%;
+    display: flex; flex-direction: column;
+  }
+  #academy .ac-shopbox h3 { font-size: calc(14px * var(--fs, 1)); margin-bottom: 5px; }
+  #academy .ac-shopmain { gap: 6px; min-height: 0; }
+  #academy .ac-shopgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; }
+  #academy .ac-slot { width: auto; min-width: 0; padding: 3px; }
+  #academy .ac-slot img { max-height: 76px; object-fit: contain; }
+  #academy .ac-slot.empty { height: 92px; }
+  #academy .ac-slotname { font-size: calc(10px * var(--fs, 1)); }
+  #academy .ac-slotprice { font-size: calc(11px * var(--fs, 1)); }
+  #academy .ac-lockall { width: 46px; min-height: 72px; font-size: calc(11px * var(--fs, 1)); gap: 3px; }
+  #academy .ac-lockall .ac-lockico { font-size: calc(16px * var(--fs, 1)); }
+  #academy .ac-odds { margin: 5px 0 3px; font-size: calc(11px * var(--fs, 1)); }
+  #academy .ac-btns {
+    position: sticky; bottom: -4px; margin: 6px 0 0; padding: 6px 0 2px;
+    background: var(--panel); gap: 8px; flex: 0 0 auto;
+  }
+}

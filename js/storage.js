@@ -1,1 +1,419 @@
-var DeckRules=function(){"use strict";function e(e){var t={};return e.forEach(function(e){t[e]=(t[e]||0)+1}),t}function t(t){var r=[],n=e(t),a=t.length;a<Rules.DECK_MIN&&r.push("卡组至少 "+Rules.DECK_MIN+" 张（当前 "+a+"）"),a>Rules.DECK_MAX&&r.push("卡组最多 "+Rules.DECK_MAX+" 张（当前 "+a+"）");var i=0;for(var o in n){var u=CARDS[o];u?(n[o]>u.maxCopies&&r.push("【"+u.name+"】超出上限（"+n[o]+"/"+u.maxCopies+"）"),"artifact"===u.type&&(i+=n[o])):r.push("存在未知卡牌："+o)}return i>Rules.ARTIFACT_MAX&&r.push("神器最多携带 "+Rules.ARTIFACT_MAX+" 张"),{ok:0===r.length,errors:r,size:a,counts:n}}function r(t,r){var n=CARDS[r];if(!n)return!1;if(t.length>=Rules.DECK_MAX)return!1;var a=e(t);if((a[r]||0)>=n.maxCopies)return!1;if("artifact"===n.type){var i=0;for(var o in a)CARDS[o]&&"artifact"===CARDS[o].type&&(i+=a[o]);if(i>=Rules.ARTIFACT_MAX)return!1}return!0}return{validate:t,validateStarter:function(e){var r=t(e),n=r.errors.slice();return e.length!==Rules.DECK_START&&n.push("初始卡组需为 "+Rules.DECK_START+" 张（当前 "+e.length+"）"),{ok:0===n.length,errors:n,size:r.size,counts:r.counts}},canAdd:r,canAddStarter:function(e,t){return!(e.length>=Rules.DECK_START)&&r(e,t)},counts:e,BIG_MIN:20,BIG_MAX:40,validateBig:function(t){var r=[],n=e(t),a=t.length;a<20&&r.push("大卡组至少 20 张（当前 "+a+"）"),a>40&&r.push("大卡组最多 40 张（当前 "+a+"）");var i=0;for(var o in n){var u=CARDS[o];u?(n[o]>u.maxCopies&&r.push("【"+u.name+"】超出上限（"+n[o]+"/"+u.maxCopies+"）"),"artifact"===u.type&&(i+=n[o])):r.push("存在未知卡牌："+o)}return i>Rules.ARTIFACT_MAX&&r.push("神器最多携带 "+Rules.ARTIFACT_MAX+" 张"),{ok:0===r.length,errors:r,size:a,counts:n}},canAddBig:function(t,r){if(t.length>=40)return!1;var n=CARDS[r];if(!n)return!1;var a=e(t);if((a[r]||0)>=n.maxCopies)return!1;if("artifact"===n.type){var i=0;for(var o in a)CARDS[o]&&"artifact"===CARDS[o].type&&(i+=a[o]);if(i>=Rules.ARTIFACT_MAX)return!1}return!0}}}(),SaveData=function(){"use strict";var e="dd2_save_v1",t=null,r=.85;function n(){return{version:2,decks:[{name:"新手卡组",cardIds:PRESET_DECKS.starter.slice()},{name:"突袭卡组",cardIds:PRESET_DECKS.raider.slice()}],activeDeck:0,difficulty:"novice",fontScale:1,ranked:{score:1},run:null,tour:null,tourHistory:[],masterHistory:[],academy:null,academyHistory:[],boss:{cleared:0},seedText:"",tutor:{asked:!1,done:!1,step:0},audio:{on:!0,sfx:.55,bgm:.18},player:{name:"玩家",avatar:"初始头像1",title:"雪景学院新生"},achievements:{},stats:{}}}function a(e){var t=n();if(!e||"object"!=typeof e)return t;if(Array.isArray(e.decks)){var a=e.decks.filter(function(e){return e&&Array.isArray(e.cardIds)}).map(function(e){return{name:String(e.name||"卡组").slice(0,12),cardIds:e.cardIds.filter(function(e){return!!CARDS[e]}),big:!!e.big}});a.length&&(t.decks=a)}"number"==typeof e.activeDeck&&e.activeDeck>=0&&e.activeDeck<t.decks.length&&(t.activeDeck=e.activeDeck);var i={hobby:"novice",amateur:"hobby",pro:"amateur"},o="number"==typeof e.version?e.version:0;["novice","hobby","amateur","pro","champion"].indexOf(e.difficulty)>=0?t.difficulty=o<2&&i[e.difficulty]?i[e.difficulty]:e.difficulty:["easy","normal","hard"].indexOf(e.difficulty)>=0&&(t.difficulty="novice"),"hobby"===t.difficulty&&(t.difficulty="amateur");var u=e.run;u&&"object"==typeof u&&Array.isArray(u.deck)&&u.map&&Array.isArray(u.map.rows)&&u.map.rows.length?(t.run=u,"number"!=typeof t.run.seed&&(t.run.seed=1),"number"!=typeof t.run.battles&&(t.run.battles=0),Array.isArray(t.run.relics)||(t.run.relics=[]),"number"!=typeof t.run.gold&&(t.run.gold=0),"number"!=typeof t.run.hp&&(t.run.hp=30),"number"!=typeof t.run.maxHp&&(t.run.maxHp=30),Array.isArray(t.run.done)||(t.run.done=[]),"number"!=typeof t.run.act&&(t.run.act=1)):t.run=null,e.audio&&"object"==typeof e.audio&&(t.audio={on:!1!==e.audio.on,sfx:"number"==typeof e.audio.sfx?Math.max(0,Math.min(1,e.audio.sfx)):.55,bgm:"number"==typeof e.audio.bgm?Math.max(0,Math.min(1,e.audio.bgm)):.18}),"number"==typeof e.fontScale&&isFinite(e.fontScale)&&(t.fontScale=Math.max(r,Math.min(1.4,e.fontScale))),e.ranked&&"number"==typeof e.ranked.score&&isFinite(e.ranked.score)&&(t.ranked={score:Math.max(1,Math.min(100,Math.round(e.ranked.score)))}),null!=e.seedText&&(t.seedText=String(e.seedText).slice(0,12));var s=e.tutor;s&&"object"==typeof s&&(t.tutor.asked=!!s.asked,t.tutor.done=!!s.done,t.tutor.step="number"==typeof s.step&&s.step>=0?Math.floor(s.step):0),e.tour&&"object"==typeof e.tour&&Array.isArray(e.tour.order)&&Array.isArray(e.tour.entrants)?t.tour=e.tour:t.tour=null,Array.isArray(e.tourHistory)&&(t.tourHistory=e.tourHistory.filter(function(e){return e&&"object"==typeof e&&e.name})),Array.isArray(e.masterHistory)&&(t.masterHistory=e.masterHistory.filter(function(e){return e&&"object"==typeof e}).slice(0,20)),e.academy&&"object"==typeof e.academy&&Array.isArray(e.academy.ents)?t.academy=e.academy:t.academy=null,Array.isArray(e.academyHistory)&&(t.academyHistory=e.academyHistory.filter(function(e){return e&&"object"==typeof e&&e.name}));var c=e.boss;if(c&&"object"==typeof c){var f="number"==typeof c.cleared&&isFinite(c.cleared)?Math.floor(c.cleared):0;t.boss={cleared:Math.max(0,Math.min(16,f))}}else t.boss={cleared:0};var l=e.player;if(l&&"object"==typeof l&&("string"==typeof l.name&&l.name.trim()&&(t.player.name=l.name.trim().slice(0,12)),"string"==typeof l.avatar&&l.avatar&&(t.player.avatar=l.avatar.slice(0,40)),"string"==typeof l.title&&l.title&&(t.player.title=l.title.slice(0,20))),e.achievements&&"object"==typeof e.achievements){var d={};for(var y in e.achievements)e.achievements[y]&&(d[String(y).slice(0,40)]=e.achievements[y]);t.achievements=d}if(e.stats&&"object"==typeof e.stats){var m={};for(var p in e.stats){var v=e.stats[p];"number"==typeof v&&isFinite(v)&&(m[String(p).slice(0,40)]=v)}t.stats=m}return t}function i(){var r=null;try{r=localStorage.getItem(e)}catch(e){r=null}if(r)try{return t=a(JSON.parse(r))}catch(e){}return t=n(),o(),t}function o(){try{localStorage.setItem(e,JSON.stringify(t))}catch(e){}}function u(){return t||i(),t}function s(){return u().tutor||{asked:!1,done:!1,step:0}}function c(e){var t=s();return e&&"object"==typeof e&&(null!=e.asked&&(t.asked=!!e.asked),null!=e.done&&(t.done=!!e.done),null!=e.step&&(t.step=Math.max(0,Math.floor(e.step)))),u().tutor=t,o(),t}function f(){if("undefined"!=typeof window&&window.Net&&"function"==typeof window.Net.refreshMe)try{window.Net.refreshMe()}catch(e){}}function l(){return u().player}function d(){return u().achievements||{}}function y(){return u().stats||{}}function m(e,t){var r=y()[e];return"number"==typeof r?r:null==t?0:t}function p(e,t){return u().stats[e]=t,o(),t}return{load:i,save:o,get:u,reset:function(){t=n(),o()},getPlayer:l,setPlayer:function(e){var t=l();if(e&&"object"==typeof e){if("string"==typeof e.name){var r=e.name.trim().slice(0,12);r&&(t.name=r)}"string"==typeof e.avatar&&e.avatar&&(t.avatar=e.avatar.slice(0,40)),"string"==typeof e.title&&e.title&&(t.title=e.title.slice(0,20))}return o(),f(),t},getPlayerName:function(){var e=l();return e&&e.name||"玩家"},getAchievements:d,hasAchievement:function(e){return!!d()[e]},unlockAchievement:function(e){var t=d();return!t[e]&&(t[e]=Date.now(),u().achievements=t,o(),!0)},getStats:y,getStat:m,setStat:p,bumpStat:function(e,t){return p(e,m(e)+(null==t?1:t))},exportAll:function(){return{app:"地牢决斗师-踏上征途",kind:"dd2-save",version:1,exportedAt:(new Date).toISOString(),data:JSON.parse(JSON.stringify(u()))}},importAll:function(e){var r=e&&e.data?e.data:e;return r&&"object"==typeof r&&Array.isArray(r.decks)&&r.decks.length?(t=a(r),o(),{ok:!0,data:t}):{ok:!1,msg:"不是有效的存档文件（缺少卡组数据）"}},activeDeck:function(){var e=u();return e.decks[e.activeDeck]||e.decks[0]},setActiveDeck:function(e){var t=u();e>=0&&e<t.decks.length&&(t.activeDeck=e,o(),f())},addDeck:function(e,t,r){var n=u();return n.decks.push({name:String(e||"新卡组").slice(0,12),cardIds:t.slice(),big:!!r}),n.activeDeck=n.decks.length-1,o(),f(),n.activeDeck},updateDeck:function(e,t,r,n){var a=u();a.decks[e]&&(a.decks[e]={name:String(t||"卡组").slice(0,12),cardIds:r.slice(),big:!!n},o(),f())},removeDeck:function(e){var t=u();return!(t.decks.length<=1)&&(t.decks[e]&&(t.decks.splice(e,1),t.activeDeck>=t.decks.length&&(t.activeDeck=t.decks.length-1),o(),f()),!0)},setDifficulty:function(e){u().difficulty=e,o()},getDifficulty:function(){return u().difficulty},setFontScale:function(e){var t=Number(e);return isFinite(t)||(t=1),u().fontScale=Math.max(r,Math.min(1.4,t)),o(),u().fontScale},getFontScale:function(){var e=u().fontScale;return"number"==typeof e&&isFinite(e)?Math.max(r,Math.min(1.4,e)):1},getRankedScore:function(){var e=u().ranked,t=e&&"number"==typeof e.score?e.score:1;return isFinite(t)||(t=1),Math.max(1,Math.min(100,Math.round(t)))},setRankedScore:function(e){var t=Number(e);return isFinite(t)||(t=1),u().ranked={score:Math.max(1,Math.min(100,Math.round(t)))},o(),u().ranked.score},setRun:function(e){u().run=e,o()},getRun:function(){return u().run},clearRun:function(){u().run=null,o()},hasRun:function(){return!!u().run},setTour:function(e){u().tour=e,o()},getTour:function(){return u().tour},setTourHistory:function(e){u().tourHistory=Array.isArray(e)?e:[],o()},getTourHistory:function(){return u().tourHistory||[]},getMasterHistory:function(){return u().masterHistory||[]},addMasterRecord:function(e){if(e&&"object"==typeof e){var t=u();t.masterHistory=t.masterHistory||[],t.masterHistory.unshift(e),t.masterHistory.length>20&&(t.masterHistory.length=20),o()}},setAcademy:function(e){u().academy=e,o()},getAcademy:function(){return u().academy},setAcademyHistory:function(e){u().academyHistory=Array.isArray(e)?e:[],o()},getAcademyHistory:function(){return u().academyHistory||[]},setBoss:function(e){u().boss=e,o()},getBoss:function(){return u().boss||{cleared:0}},getAudio:function(){return u().audio},setAudio:function(e){var t=u().audio;return e&&"object"==typeof e&&(null!=e.on&&(t.on=!!e.on),null!=e.sfx&&(t.sfx=Math.max(0,Math.min(1,e.sfx))),null!=e.bgm&&(t.bgm=Math.max(0,Math.min(1,e.bgm)))),o(),t},getSeedText:function(){return u().seedText||""},setSeedText:function(e){u().seedText=String(null==e?"":e).slice(0,12),o()},getTutor:s,setTutor:c,isTutorAsked:function(){return!!s().asked},markTutorAsked:function(){c({asked:!0})},isTutorDone:function(){return!!s().done},markTutorDone:function(){c({done:!0,step:0})}}}();
+/* ============================================================
+ * 存档与卡组校验  storage.js
+ *  - SaveData：localStorage 持久化（卡组 / 当前卡组 / 难度 / 跑图进度）
+ *  - DeckRules：卡组合法性校验（20–50 张、单卡上限、神器 ≤1）
+ * ========================================================== */
+
+/* ---------------- 卡组校验 ---------------- */
+var DeckRules = (function () {
+  'use strict';
+
+  function counts(cardIds) {
+    var m = {};
+    cardIds.forEach(function (id) { m[id] = (m[id] || 0) + 1; });
+    return m;
+  }
+
+  function validate(cardIds) {
+    var errors = [], m = counts(cardIds), size = cardIds.length;
+    if (size < Rules.DECK_MIN) errors.push('卡组至少 ' + Rules.DECK_MIN + ' 张（当前 ' + size + '）');
+    if (size > Rules.DECK_MAX) errors.push('卡组最多 ' + Rules.DECK_MAX + ' 张（当前 ' + size + '）');
+    var artifacts = 0;
+    for (var id in m) {
+      var cd = CARDS[id];
+      if (!cd) { errors.push('存在未知卡牌：' + id); continue; }
+      if (m[id] > cd.maxCopies) errors.push('【' + cd.name + '】超出上限（' + m[id] + '/' + cd.maxCopies + '）');
+      if (cd.type === 'artifact') artifacts += m[id];
+    }
+    if (artifacts > Rules.ARTIFACT_MAX) errors.push('神器最多携带 ' + Rules.ARTIFACT_MAX + ' 张');
+    return { ok: errors.length === 0, errors: errors, size: size, counts: m };
+  }
+
+  // 是否还能再加一张该卡（用于卡池点击拦截）
+  function canAdd(cardIds, id) {
+    var cd = CARDS[id];
+    if (!cd) return false;
+    if (cardIds.length >= Rules.DECK_MAX) return false;
+    var m = counts(cardIds);
+    if ((m[id] || 0) >= cd.maxCopies) return false;
+    if (cd.type === 'artifact') {
+      var arts = 0;
+      for (var k in m) if (CARDS[k] && CARDS[k].type === 'artifact') arts += m[k];
+      if (arts >= Rules.ARTIFACT_MAX) return false;
+    }
+    return true;
+  }
+
+  // 组卡器（初始卡组）专用：在原 20–50 校验基础上，要求恰好为 DECK_START 张
+  function validateStarter(cardIds) {
+    var v = validate(cardIds);
+    var errors = v.errors.slice();
+    if (cardIds.length !== Rules.DECK_START) errors.push('初始卡组需为 ' + Rules.DECK_START + ' 张（当前 ' + cardIds.length + '）');
+    return { ok: errors.length === 0, errors: errors, size: v.size, counts: v.counts };
+  }
+  // 组卡器是否还能再加一张（受 DECK_START 上限约束）
+  function canAddStarter(cardIds, id) {
+    if (cardIds.length >= Rules.DECK_START) return false;
+    return canAdd(cardIds, id);
+  }
+
+  /* ---- 大卡组模式（晋升之路）：允许 20~40 张 ---- */
+  var BIG_MIN = 20, BIG_MAX = 40;
+  function validateBig(cardIds) {
+    var errors = [], m = counts(cardIds), size = cardIds.length;
+    if (size < BIG_MIN) errors.push('大卡组至少 ' + BIG_MIN + ' 张（当前 ' + size + '）');
+    if (size > BIG_MAX) errors.push('大卡组最多 ' + BIG_MAX + ' 张（当前 ' + size + '）');
+    var artifacts = 0;
+    for (var id in m) {
+      var cd = CARDS[id];
+      if (!cd) { errors.push('存在未知卡牌：' + id); continue; }
+      if (m[id] > cd.maxCopies) errors.push('【' + cd.name + '】超出上限（' + m[id] + '/' + cd.maxCopies + '）');
+      if (cd.type === 'artifact') artifacts += m[id];
+    }
+    if (artifacts > Rules.ARTIFACT_MAX) errors.push('神器最多携带 ' + Rules.ARTIFACT_MAX + ' 张');
+    return { ok: errors.length === 0, errors: errors, size: size, counts: m };
+  }
+  function canAddBig(cardIds, id) {
+    if (cardIds.length >= BIG_MAX) return false;
+    var cd = CARDS[id]; if (!cd) return false;
+    var m = counts(cardIds);
+    if ((m[id] || 0) >= cd.maxCopies) return false;
+    if (cd.type === 'artifact') {
+      var arts = 0;
+      for (var k in m) if (CARDS[k] && CARDS[k].type === 'artifact') arts += m[k];
+      if (arts >= Rules.ARTIFACT_MAX) return false;
+    }
+    return true;
+  }
+
+  return { validate: validate, validateStarter: validateStarter, canAdd: canAdd, canAddStarter: canAddStarter, counts: counts,
+    BIG_MIN: BIG_MIN, BIG_MAX: BIG_MAX, validateBig: validateBig, canAddBig: canAddBig };
+})();
+
+/* ---------------- 持久化 ---------------- */
+var SaveData = (function () {
+  'use strict';
+
+  var KEY = 'dd2_save_v1';
+  var state = null;
+
+  /* 字号倍率（设置 → 字号）：0.85 ~ 1.4，1 = 默认大小。
+     实际生效靠 CSS 里的 calc(Npx * var(--fs, 1))（见 style.css 的 :root）。 */
+  var FS_MIN = 0.85, FS_MAX = 1.4;
+  function defaults() {
+    return {
+      version: 2,
+      decks: [
+        { name: '新手卡组', cardIds: PRESET_DECKS.starter.slice() },
+        { name: '突袭卡组', cardIds: PRESET_DECKS.raider.slice() }
+      ],
+      activeDeck: 0,
+      difficulty: 'novice',
+      fontScale: 1,        // 字号倍率（1 = 默认大小，见设置面板）
+      ranked: { score: 1 },// 排位赛冠军积分 1~100（赢 +1 / 输 -1，服务器结算后写回）
+      run: null,           // 跑图进度（见 run.js RunManager）
+      tour: null,          // 魔绫大赛进行中的赛事（见 tournament.js）
+      tourHistory: [],     // 历届魔绫大赛排名
+      masterHistory: [],   // 大师赛（联机）近 20 场对战记录
+      academy: null,       // 学院考核进行中的一届（见 academy.js）
+      academyHistory: [],  // 历届学院考核排名
+      boss: { cleared: 0 }, // 晋升之路进度：已通关最高关卡（见 boss.js）
+      seedText: '',        // 手动指定的跑图种子（留空 = 随机）
+      tutor: { asked: false, done: false, step: 0 },   // 入学手册：是否已询问过新手 / 是否毕业 / 上次进度
+      audio: { on: true, sfx: 0.55, bgm: 0.18 },
+      player: { name: '玩家', avatar: '初始头像1', title: '雪景学院新生' },   // 人物系统：头像 / 名称 / 称号
+      achievements: {},   // 已解锁成就：{ 成就id: 解锁时间戳 }
+      stats: {}           // 跨局统计计数（征途通关/死亡/连续、大赛连冠、决斗胜场…）
+    };
+  }
+
+  function sanitize(d) {
+    var s = defaults();
+    if (!d || typeof d !== 'object') return s;
+    if (Array.isArray(d.decks)) {
+      var decks = d.decks.filter(function (x) { return x && Array.isArray(x.cardIds); }).map(function (x) {
+        return { name: String(x.name || '卡组').slice(0, 12), cardIds: x.cardIds.filter(function (id) { return !!CARDS[id]; }), big: !!x.big };
+      });
+      if (decks.length) s.decks = decks;
+    }
+    if (typeof d.activeDeck === 'number' && d.activeDeck >= 0 && d.activeDeck < s.decks.length) s.activeDeck = d.activeDeck;
+    // 难度：novice(新手)/amateur(业余)/pro(专业)/champion(冠军)
+    // 旧版本存档按版本号迁移（hobby→novice / amateur→hobby / pro→amateur）；更旧的 easy/normal/hard → novice
+    var _dmMap = { hobby: 'novice', amateur: 'hobby', pro: 'amateur' };
+    var _oldVer = (typeof d.version === 'number') ? d.version : 0;
+    if (['novice', 'hobby', 'amateur', 'pro', 'champion'].indexOf(d.difficulty) >= 0) {
+      s.difficulty = (_oldVer < 2 && _dmMap[d.difficulty]) ? _dmMap[d.difficulty] : d.difficulty;
+    } else if (['easy', 'normal', 'hard'].indexOf(d.difficulty) >= 0) {
+      s.difficulty = 'novice';
+    }
+    if (s.difficulty === 'hobby') s.difficulty = 'amateur';   // 「爱好者」档已移除 → 归入业余档
+    // 跑图存档：保留 run.js 的完整结构（地图 / 生命 / 金币 / 卡组 / 遗物 / 种子）
+    var r = d.run;
+    if (r && typeof r === 'object' && Array.isArray(r.deck) && r.map && Array.isArray(r.map.rows) && r.map.rows.length) {
+      s.run = r;
+      if (typeof s.run.seed !== 'number') s.run.seed = 1;
+      if (typeof s.run.battles !== 'number') s.run.battles = 0;
+      if (!Array.isArray(s.run.relics)) s.run.relics = [];
+      if (typeof s.run.gold !== 'number') s.run.gold = 0;
+      if (typeof s.run.hp !== 'number') s.run.hp = 30;
+      if (typeof s.run.maxHp !== 'number') s.run.maxHp = 30;
+      if (!Array.isArray(s.run.done)) s.run.done = [];
+      if (typeof s.run.act !== 'number') s.run.act = 1;
+    } else {
+      s.run = null;   // 旧版/损坏存档：丢弃
+    }
+    if (d.audio && typeof d.audio === 'object') {
+      s.audio = {
+        on: d.audio.on !== false,
+        sfx: typeof d.audio.sfx === 'number' ? Math.max(0, Math.min(1, d.audio.sfx)) : 0.55,
+        bgm: typeof d.audio.bgm === 'number' ? Math.max(0, Math.min(1, d.audio.bgm)) : 0.18
+      };
+    }
+    // 字号倍率：老存档没有这个字段 → 保持默认 1（视觉与改动前完全一致）
+    if (typeof d.fontScale === 'number' && isFinite(d.fontScale)) {
+      s.fontScale = Math.max(FS_MIN, Math.min(FS_MAX, d.fontScale));
+    }
+    // 排位积分：老存档没有 → 从 1 分（入门选手）开始
+    if (d.ranked && typeof d.ranked.score === 'number' && isFinite(d.ranked.score)) {
+      s.ranked = { score: Math.max(1, Math.min(100, Math.round(d.ranked.score))) };
+    }
+    if (d.seedText != null) s.seedText = String(d.seedText).slice(0, 12);
+    // 入学手册：新旧存档都要有这块（旧存档 = 还没被问过，下次进游戏就会问）
+    var t = d.tutor;
+    if (t && typeof t === 'object') {
+      s.tutor.asked = !!t.asked;
+      s.tutor.done = !!t.done;
+      s.tutor.step = (typeof t.step === 'number' && t.step >= 0) ? Math.floor(t.step) : 0;
+    }
+    // 魔绫大赛：进行中的赛事与历届排名
+    if (d.tour && typeof d.tour === 'object' && Array.isArray(d.tour.order) && Array.isArray(d.tour.entrants)) s.tour = d.tour;
+    else s.tour = null;
+    if (Array.isArray(d.tourHistory)) s.tourHistory = d.tourHistory.filter(function (x) { return x && typeof x === 'object' && x.name; });
+    // 大师赛（联机）：只保留最近 20 场
+    if (Array.isArray(d.masterHistory)) s.masterHistory = d.masterHistory.filter(function (x) { return x && typeof x === 'object'; }).slice(0, 20);
+    // 学院考核：进行中的一届与历届排名
+    if (d.academy && typeof d.academy === 'object' && Array.isArray(d.academy.ents)) s.academy = d.academy;
+    else s.academy = null;
+    if (Array.isArray(d.academyHistory)) s.academyHistory = d.academyHistory.filter(function (x) { return x && typeof x === 'object' && x.name; });
+    // 晋升之路：进度（已通关最高关卡）；随整档导出/导入
+    var bs = d.boss;
+    if (bs && typeof bs === 'object') {
+      var cl = (typeof bs.cleared === 'number' && isFinite(bs.cleared)) ? Math.floor(bs.cleared) : 0;
+      s.boss = { cleared: Math.max(0, Math.min(16, cl)) };
+    } else s.boss = { cleared: 0 };
+    // 人物系统（头像 / 名称 / 称号）
+    var pl = d.player;
+    if (pl && typeof pl === 'object') {
+      if (typeof pl.name === 'string' && pl.name.trim()) s.player.name = pl.name.trim().slice(0, 12);
+      if (typeof pl.avatar === 'string' && pl.avatar) s.player.avatar = pl.avatar.slice(0, 40);
+      if (typeof pl.title === 'string' && pl.title) s.player.title = pl.title.slice(0, 20);
+    }
+    // 成就解锁表
+    if (d.achievements && typeof d.achievements === 'object') {
+      var ach = {};
+      for (var ak in d.achievements) { if (d.achievements[ak]) ach[String(ak).slice(0, 40)] = d.achievements[ak]; }
+      s.achievements = ach;
+    }
+    // 跨局统计
+    if (d.stats && typeof d.stats === 'object') {
+      var st = {};
+      for (var sk in d.stats) { var sv = d.stats[sk]; if (typeof sv === 'number' && isFinite(sv)) st[String(sk).slice(0, 40)] = sv; }
+      s.stats = st;
+    }
+    return s;
+  }
+
+  function load() {
+    var raw = null;
+    try { raw = localStorage.getItem(KEY); } catch (e) { raw = null; }
+    if (raw) {
+      try { state = sanitize(JSON.parse(raw)); return state; } catch (e) { /* 损坏则重建 */ }
+    }
+    state = defaults();
+    save();
+    return state;
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* 隐私模式等忽略 */ }
+  }
+  function get() { if (!state) load(); return state; }
+  function reset() { state = defaults(); save(); }
+
+  function activeDeck() { var s = get(); return s.decks[s.activeDeck] || s.decks[0]; }
+  // 卡组变动也要通知联机（席位名片上带卡组名 / 卡表，换卡组后对手看到的不该是旧的）
+  function setActiveDeck(i) { var s = get(); if (i >= 0 && i < s.decks.length) { s.activeDeck = i; save(); notifyNet(); } }
+  function addDeck(name, cardIds, big) { var s = get(); s.decks.push({ name: String(name || '新卡组').slice(0, 12), cardIds: cardIds.slice(), big: !!big }); s.activeDeck = s.decks.length - 1; save(); notifyNet(); return s.activeDeck; }
+  function updateDeck(i, name, cardIds, big) { var s = get(); if (s.decks[i]) { s.decks[i] = { name: String(name || '卡组').slice(0, 12), cardIds: cardIds.slice(), big: !!big }; save(); notifyNet(); } }
+  function removeDeck(i) { var s = get(); if (s.decks.length <= 1) return false; if (s.decks[i]) { s.decks.splice(i, 1); if (s.activeDeck >= s.decks.length) s.activeDeck = s.decks.length - 1; save(); notifyNet(); } return true; }
+
+  function setDifficulty(d) { get().difficulty = d; save(); }
+  function getDifficulty() { return get().difficulty; }
+
+  /* 字号倍率：可调字体（设置面板）。返回实际生效值（已 clamp）。 */
+  function setFontScale(v) {
+    var n = Number(v);
+    if (!isFinite(n)) n = 1;
+    get().fontScale = Math.max(FS_MIN, Math.min(FS_MAX, n));
+    save();
+    return get().fontScale;
+  }
+  function getFontScale() {
+    var v = get().fontScale;
+    return (typeof v === 'number' && isFinite(v)) ? Math.max(FS_MIN, Math.min(FS_MAX, v)) : 1;
+  }
+
+  /* 排位赛冠军积分（1~100）：一局定胜负，赢 +1 / 输 -1。
+   * 结算由服务器下发（{t:'ranked-result'}），这里只负责存与读。 */
+  function getRankedScore() {
+    var r = get().ranked;
+    var v = (r && typeof r.score === 'number') ? r.score : 1;
+    if (!isFinite(v)) v = 1;
+    return Math.max(1, Math.min(100, Math.round(v)));
+  }
+  function setRankedScore(v) {
+    var n = Number(v);
+    if (!isFinite(n)) n = 1;
+    get().ranked = { score: Math.max(1, Math.min(100, Math.round(n))) };
+    save();
+    return get().ranked.score;
+  }
+
+  function setRun(r) { get().run = r; save(); }
+  function getRun() { return get().run; }
+  function clearRun() { get().run = null; save(); }
+  function hasRun() { return !!get().run; }
+
+  // 大师赛（联机）战绩：新记录放最前，只留最近 20 场
+  function getMasterHistory() { return get().masterHistory || []; }
+  function addMasterRecord(rec) {
+    if (!rec || typeof rec !== 'object') return;
+    var s = get();
+    s.masterHistory = s.masterHistory || [];
+    s.masterHistory.unshift(rec);
+    if (s.masterHistory.length > 20) s.masterHistory.length = 20;
+    save();
+  }
+
+  function setTour(t) { get().tour = t; save(); }
+  function getTour() { return get().tour; }
+  function setTourHistory(h) { get().tourHistory = Array.isArray(h) ? h : []; save(); }
+  function getTourHistory() { return get().tourHistory || []; }
+
+  function setBoss(b) { get().boss = b; save(); }
+  function getBoss() { return get().boss || { cleared: 0 }; }
+
+  function setAcademy(a) { get().academy = a; save(); }
+  function getAcademy() { return get().academy; }
+  function setAcademyHistory(h) { get().academyHistory = Array.isArray(h) ? h : []; save(); }
+  function getAcademyHistory() { return get().academyHistory || []; }
+
+  function getSeedText() { return get().seedText || ''; }
+  function setSeedText(t) { get().seedText = String(t == null ? '' : t).slice(0, 12); save(); }
+
+  // ---- 入学手册（新手教程）----
+  function getTutor() { return get().tutor || { asked: false, done: false, step: 0 }; }
+  function setTutor(o) {
+    var t = getTutor();
+    if (o && typeof o === 'object') {
+      if (o.asked != null) t.asked = !!o.asked;
+      if (o.done != null) t.done = !!o.done;
+      if (o.step != null) t.step = Math.max(0, Math.floor(o.step));
+    }
+    get().tutor = t; save(); return t;
+  }
+  function isTutorAsked() { return !!getTutor().asked; }
+  function markTutorAsked() { setTutor({ asked: true }); }
+  function isTutorDone() { return !!getTutor().done; }
+  function markTutorDone() { setTutor({ done: true, step: 0 }); }
+
+  function getAudio() { return get().audio; }
+  function setAudio(o) {
+    var a = get().audio;
+    if (o && typeof o === 'object') {
+      if (o.on != null) a.on = !!o.on;
+      if (o.sfx != null) a.sfx = Math.max(0, Math.min(1, o.sfx));
+      if (o.bgm != null) a.bgm = Math.max(0, Math.min(1, o.bgm));
+    }
+    save();
+    return a;
+  }
+
+  /* ---------------- 人物系统（头像 / 名称 / 称号） ---------------- */
+  // 人物资料 / 卡组一变，就顺手告诉联机层重新发名片（否则房间里还挂着旧昵称）。
+  // 放在这里是因为改名、换头像、换称号、换卡组最终都走这几个函数 —— 一处覆盖全部。
+  // 用 typeof 守卫：存档模块不该硬依赖联机模块；未联机时 Net.refreshMe() 会安静返回。
+  function notifyNet() {
+    if (typeof window !== 'undefined' && window.Net && typeof window.Net.refreshMe === 'function') {
+      try { window.Net.refreshMe(); } catch (e) { /* 联机层异常不该影响存盘 */ }
+    }
+  }
+  function getPlayer() { return get().player; }
+  function setPlayer(o) {
+    var p = getPlayer();
+    if (o && typeof o === 'object') {
+      if (typeof o.name === 'string') { var nm = o.name.trim().slice(0, 12); if (nm) p.name = nm; }
+      if (typeof o.avatar === 'string' && o.avatar) p.avatar = o.avatar.slice(0, 40);
+      if (typeof o.title === 'string' && o.title) p.title = o.title.slice(0, 20);
+    }
+    save(); notifyNet(); return p;
+  }
+  function getPlayerName() { var p = getPlayer(); return (p && p.name) || '玩家'; }
+
+  /* ---------------- 成就 ---------------- */
+  function getAchievements() { return get().achievements || {}; }
+  function hasAchievement(id) { return !!getAchievements()[id]; }
+  function unlockAchievement(id) {
+    var a = getAchievements();
+    if (a[id]) return false;
+    a[id] = Date.now(); get().achievements = a; save();
+    return true;
+  }
+
+  /* ---------------- 跨局统计 ---------------- */
+  function getStats() { return get().stats || {}; }
+  function getStat(k, def) { var v = getStats()[k]; return typeof v === 'number' ? v : (def == null ? 0 : def); }
+  function setStat(k, v) { get().stats[k] = v; save(); return v; }
+  function bumpStat(k, n) { return setStat(k, getStat(k) + (n == null ? 1 : n)); }
+
+  /* ---------------- 整档导出 / 导入 ---------------- */
+  function exportAll() {
+    return {
+      app: '地牢决斗师-踏上征途', kind: 'dd2-save', version: 1,
+      exportedAt: new Date().toISOString(),
+      data: JSON.parse(JSON.stringify(get()))
+    };
+  }
+  // 兼容两种写法：{app,data:{...}} 或直接给 data 本体
+  function importAll(obj) {
+    var d = (obj && obj.data) ? obj.data : obj;
+    if (!d || typeof d !== 'object' || !Array.isArray(d.decks) || !d.decks.length) {
+      return { ok: false, msg: '不是有效的存档文件（缺少卡组数据）' };
+    }
+    state = sanitize(d);
+    save();
+    return { ok: true, data: state };
+  }
+
+  return {
+    load: load, save: save, get: get, reset: reset,
+    getPlayer: getPlayer, setPlayer: setPlayer, getPlayerName: getPlayerName,
+    getAchievements: getAchievements, hasAchievement: hasAchievement, unlockAchievement: unlockAchievement,
+    getStats: getStats, getStat: getStat, setStat: setStat, bumpStat: bumpStat,
+    exportAll: exportAll, importAll: importAll,
+    activeDeck: activeDeck, setActiveDeck: setActiveDeck,
+    addDeck: addDeck, updateDeck: updateDeck, removeDeck: removeDeck,
+    setDifficulty: setDifficulty, getDifficulty: getDifficulty,
+    setFontScale: setFontScale, getFontScale: getFontScale,
+    getRankedScore: getRankedScore, setRankedScore: setRankedScore,
+    setRun: setRun, getRun: getRun, clearRun: clearRun, hasRun: hasRun,
+    setTour: setTour, getTour: getTour, setTourHistory: setTourHistory, getTourHistory: getTourHistory,
+    getMasterHistory: getMasterHistory, addMasterRecord: addMasterRecord,
+    setAcademy: setAcademy, getAcademy: getAcademy, setAcademyHistory: setAcademyHistory, getAcademyHistory: getAcademyHistory,
+    setBoss: setBoss, getBoss: getBoss,
+    getAudio: getAudio, setAudio: setAudio,
+    getSeedText: getSeedText, setSeedText: setSeedText,
+    getTutor: getTutor, setTutor: setTutor,
+    isTutorAsked: isTutorAsked, markTutorAsked: markTutorAsked,
+    isTutorDone: isTutorDone, markTutorDone: markTutorDone
+  };
+})();

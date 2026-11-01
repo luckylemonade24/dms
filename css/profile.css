@@ -1,1 +1,110 @@
-#menuProfile{z-index:4;border:2px solid var(--gold-dim,#8a7028);background:#100e14c7;align-items:center;gap:10px;padding:8px 14px 8px 8px;display:flex;position:absolute;top:14px;right:16px;box-shadow:4px 4px #000,inset 0 0 20px #d8b04a12}#menuProfile.hidden{display:none!important}#menuProfile .pf-ava{border:2px solid var(--gold,#d8b04a);object-fit:cover;width:60px;height:60px;image-rendering:pixelated;background:#0d0c11;display:block}#menuProfile .pf-txt{text-align:left;flex-direction:column;gap:2px;display:flex}#menuProfile .pf-name{color:#ffe9a8;letter-spacing:1px;font-weight:700;font-size:calc(16px * var(--fs,1))}#menuProfile .pf-title{color:var(--gold,#d8b04a);font-size:calc(13px * var(--fs,1))}#menuProfile .pf-hint{color:var(--dim,#8f8b80);font-size:calc(12px * var(--fs,1))}#menuProfile .pf-zone{cursor:pointer}#menuProfile .pf-zone:hover{filter:brightness(1.3)}#menuProfile .pf-zone:after{content:""}.pf-grid{grid-template-columns:repeat(6,1fr);gap:8px;max-height:330px;margin:6px 0;padding:4px;display:grid;overflow-y:auto}.pf-cell{cursor:pointer;background:#0d0c11;border:2px solid #3a3446;padding:2px;transition:border-color .12s;position:relative}.pf-cell img{width:100%;image-rendering:pixelated;display:block}.pf-cell:hover{border-color:var(--gold,#d8b04a)}.pf-cell.on{border-color:var(--gold,#d8b04a);box-shadow:0 0 10px #d8b04abf}.pf-cell.on:after{content:"使用中";font-size:calc(10px * var(--fs,1));color:#211c0d;text-align:center;background:#d8b04ae6;position:absolute;bottom:0;left:0;right:0}.pf-cell.lock{cursor:not-allowed}.pf-cell.lock img{filter:grayscale()brightness(.45)}.pf-cell.lock:hover{border-color:#6a3a3a}.pf-cell .pf-lock{font-size:calc(18px * var(--fs,1));color:#cfa;text-shadow:0 0 4px #000;justify-content:center;align-items:center;display:flex;position:absolute;inset:0}.pf-tabs{gap:6px;margin:8px 0 2px;display:flex}.pf-list{text-align:left;max-height:320px;margin:4px 0;overflow-y:auto}.pf-row{border-bottom:1px dashed #3a3446;align-items:flex-start;gap:9px;padding:7px 8px;display:flex}.pf-row:last-child{border-bottom:none}.pf-row .pf-ico{object-fit:cover;width:36px;height:36px;image-rendering:pixelated;background:#0d0c11;border:1px solid #3a3446;flex:0 0 36px}.pf-row .pf-ico.lock{filter:grayscale()brightness(.45)}.pf-row .pf-bd{flex:1;min-width:0}.pf-row .pf-nm{color:var(--dim,#8f8b80)}.pf-row.got .pf-nm{color:var(--green,#7ec850);font-weight:700}.pf-row .pf-ds{color:var(--dim,#8f8b80);font-size:calc(12px * var(--fs,1));line-height:1.45}.pf-row .pf-pg{color:#9fd3ff;font-size:calc(12px * var(--fs,1))}.pf-row .pf-use{flex:none;align-self:center}.pf-row.cur{background:#d8b04a1a}.pf-row.cur .pf-nm{color:var(--gold,#d8b04a)}@media (height<=620px),(pointer:coarse),(width<=1100px){#menuProfile{gap:6px;max-width:max(120px,50vw - 170px);padding:3px 8px 3px 4px;top:6px;right:8px;box-shadow:2px 2px #000}#menuProfile .pf-ava{border-width:1px;width:34px;height:34px}#menuProfile .pf-txt{flex-direction:row;align-items:baseline;gap:8px;min-width:0}#menuProfile .pf-name,#menuProfile .pf-title{text-overflow:ellipsis;white-space:nowrap;min-width:0;overflow:hidden}#menuProfile .pf-name{font-size:calc(12px * var(--fs,1));letter-spacing:0}#menuProfile .pf-title{font-size:calc(11px * var(--fs,1))}#menuProfile .pf-hint{display:none}.pf-grid{grid-template-columns:repeat(5,1fr);gap:6px;max-height:42vh}.pf-list{max-height:44vh}.pf-row{gap:6px;padding:5px 6px}}.pf-name-input{width:240px;font-size:calc(16px * var(--fs,1));text-align:center;color:#ffe9a8;letter-spacing:1px;background:#0d0c11;border:2px solid #8a7028;padding:7px}.pf-paste{resize:vertical;color:#cfe;width:100%;height:130px;font-family:monospace;font-size:calc(12px * var(--fs,1));background:#0d0c11;border:2px solid #3a3446;margin:6px 0;padding:6px;line-height:1.4}.pf-file{color:var(--dim,#8f8b80);font-size:calc(12px * var(--fs,1))}.pf-note{color:var(--dim,#8f8b80);font-size:calc(12px * var(--fs,1));line-height:1.5}
+/* ============================================================
+ * 人物系统  profile.css
+ *  - 主菜单右上角的人物块：头像 + 名称 + 称号（点击分别换头像 / 改名 / 看成就）
+ *  - 头像选择网格 / 称号·成就列表 / 名称编辑 / 存档导入导出
+ * ========================================================== */
+
+/* ---------------- 主菜单人物块 ---------------- */
+#menuProfile {
+  position: absolute; top: 14px; right: 16px; z-index: 4;
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(16, 14, 20, .78);
+  border: 2px solid var(--gold-dim, #8a7028);
+  box-shadow: 4px 4px 0 #000, inset 0 0 20px rgba(216, 176, 74, .07);
+  padding: 8px 14px 8px 8px;
+}
+#menuProfile.hidden { display: none !important; }
+#menuProfile .pf-ava {
+  width: 60px; height: 60px; display: block;
+  border: 2px solid var(--gold, #d8b04a); background: #0d0c11; object-fit: cover;
+  image-rendering: pixelated;                     /* 头像素材是像素图，放大时保持锐利 */
+}
+#menuProfile .pf-txt { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+#menuProfile .pf-name { color: #ffe9a8; font-weight: bold; letter-spacing: 1px; font-size: calc(16px * var(--fs, 1)); }
+#menuProfile .pf-title { color: var(--gold, #d8b04a); font-size: calc(13px * var(--fs, 1)); }
+#menuProfile .pf-hint { color: var(--dim, #8f8b80); font-size: calc(12px * var(--fs, 1)); }
+#menuProfile .pf-zone { cursor: pointer; }
+#menuProfile .pf-zone:hover { filter: brightness(1.3); }
+#menuProfile .pf-zone::after { content: ''; }
+
+/* ---------------- 头像选择 ---------------- */
+.pf-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
+  max-height: 330px; overflow-y: auto; padding: 4px; margin: 6px 0;
+}
+.pf-cell {
+  position: relative; border: 2px solid #3a3446; background: #0d0c11;
+  padding: 2px; cursor: pointer; transition: border-color .12s;
+}
+.pf-cell img { width: 100%; display: block; image-rendering: pixelated; }
+.pf-cell:hover { border-color: var(--gold, #d8b04a); }
+.pf-cell.on { border-color: var(--gold, #d8b04a); box-shadow: 0 0 10px rgba(216, 176, 74, .75); }
+.pf-cell.on::after {
+  content: '使用中'; position: absolute; left: 0; right: 0; bottom: 0;
+  font-size: calc(10px * var(--fs, 1)); background: rgba(216, 176, 74, .9); color: #211c0d; text-align: center;
+}
+.pf-cell.lock { cursor: not-allowed; }
+.pf-cell.lock img { filter: grayscale(1) brightness(.45); }
+.pf-cell.lock:hover { border-color: #6a3a3a; }
+.pf-cell .pf-lock {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: calc(18px * var(--fs, 1)); color: #cfa; text-shadow: 0 0 4px #000;
+}
+
+/* ---------------- 称号 / 成就列表 ---------------- */
+.pf-tabs { display: flex; gap: 6px; margin: 8px 0 2px; }
+.pf-list { max-height: 320px; overflow-y: auto; text-align: left; margin: 4px 0; }
+.pf-row {
+  display: flex; gap: 9px; align-items: flex-start;
+  padding: 7px 8px; border-bottom: 1px dashed #3a3446;
+}
+.pf-row:last-child { border-bottom: none; }
+.pf-row .pf-ico { width: 36px; height: 36px; flex: 0 0 36px; border: 1px solid #3a3446; background: #0d0c11; object-fit: cover; image-rendering: pixelated; }
+.pf-row .pf-ico.lock { filter: grayscale(1) brightness(.45); }
+.pf-row .pf-bd { flex: 1; min-width: 0; }
+.pf-row .pf-nm { color: var(--dim, #8f8b80); }
+.pf-row.got .pf-nm { color: var(--green, #7ec850); font-weight: bold; }
+.pf-row .pf-ds { color: var(--dim, #8f8b80); font-size: calc(12px * var(--fs, 1)); line-height: 1.45; }
+.pf-row .pf-pg { color: #9fd3ff; font-size: calc(12px * var(--fs, 1)); }
+.pf-row .pf-use { flex: 0 0 auto; align-self: center; }
+.pf-row.cur { background: rgba(216, 176, 74, .1); }
+.pf-row.cur .pf-nm { color: var(--gold, #d8b04a); }
+
+/* ============================================================
+ * 手机横屏（矮视口）适配
+ * 必须放在文件末尾：同优先级下"后出现的规则"才生效 ——
+ * 之前这段写在基础规则前面，结果 .pf-grid / .pf-list 的手机端尺寸被后面的基础规则盖掉，
+ * 头像网格在 390px 高的屏上仍是 6 列 330px 高（本该 5 列 42vh）。
+ * ========================================================== */
+/* 触发条件同 deck.css：矮视口 **或** 触屏设备 **或** 窄窗口（鼠标大窗口不受影响） */
+@media (max-height: 620px), (pointer: coarse), (max-width: 1100px) {
+  /* 主菜单玩家栏缩小 + 三行文字并成一行，避免遮挡标题与按钮 */
+  /* 宽度上限按视口算：居中标题约占 290px，两侧各留 170px 余量 →
+   * 无论名字/称号多长，玩家栏都不会横向压到标题上（超出部分省略号截断） */
+  #menuProfile { top: 6px; right: 8px; padding: 3px 8px 3px 4px; gap: 6px; box-shadow: 2px 2px 0 #000;
+    max-width: max(120px, calc(50vw - 170px)); }
+  #menuProfile .pf-ava { width: 34px; height: 34px; border-width: 1px; }
+  #menuProfile .pf-txt { flex-direction: row; align-items: baseline; gap: 8px; min-width: 0; }
+  #menuProfile .pf-name, #menuProfile .pf-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #menuProfile .pf-name { font-size: calc(12px * var(--fs, 1)); letter-spacing: 0; }
+  #menuProfile .pf-title { font-size: calc(11px * var(--fs, 1)); }
+  #menuProfile .pf-hint { display: none; }   /* 触屏上"点头像/点名字"这类提示没意义，省掉这行宽度 */
+
+  /* 头像网格 / 称号·成就列表：各自内部滚动，配合弹窗限高，保证底部按钮始终可点 */
+  .pf-grid { max-height: 42vh; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .pf-list { max-height: 44vh; }
+  .pf-row { padding: 5px 6px; gap: 6px; }
+}
+
+/* ---------------- 名称编辑 / 存档导入导出 ---------------- */
+.pf-name-input {
+  width: 240px; padding: 7px; font-size: calc(16px * var(--fs, 1)); text-align: center;
+  background: #0d0c11; color: #ffe9a8; border: 2px solid #8a7028; letter-spacing: 1px;
+}
+.pf-paste {
+  width: 100%; height: 130px; margin: 6px 0; padding: 6px; resize: vertical;
+  background: #0d0c11; color: #cfe; border: 2px solid #3a3446;
+  font-family: monospace; font-size: calc(12px * var(--fs, 1)); line-height: 1.4;
+}
+.pf-file { color: var(--dim, #8f8b80); font-size: calc(12px * var(--fs, 1)); }
+.pf-note { color: var(--dim, #8f8b80); font-size: calc(12px * var(--fs, 1)); line-height: 1.5; }

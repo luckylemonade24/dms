@@ -1,1 +1,290 @@
-@font-face{font-family:fusion;src:url(../字体/fusion-pixel-12px-proportional-latin.ttf.woff2)format("woff2")}:root{--bg:#141414;--panel:#232323;--panel2:#2c2c2c;--line:#3d3d3d;--gold:#d8b04a;--gold-dim:#8a7028;--green:#7ec850;--red:#d85a4a;--blue:#5b9bd5;--purple:#a08cd8;--text:#d6d2c4;--dim:#8f8b80;--fs:1}*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;color:var(--text);font-family:fusion,monospace;font-size:calc(14px * var(--fs,1));image-rendering:pixelated;background:#0a0a0a;overflow:hidden}img{image-rendering:pixelated;-webkit-user-drag:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;pointer-events:none}html,body{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none;touch-action:pan-x pan-y}input,textarea{-webkit-user-select:text;user-select:text}button,.mbtn,.pxbtn,.pxbtn.ghost,select,input,.dk-tab{touch-action:manipulation}.card,.monster,[data-drop],.ac-card{touch-action:none}.dk-card,.pk-row,.rw-card,.sh-row{touch-action:manipulation}#rotateHint{z-index:2000;text-align:center;color:#e8e2d0;font-size:calc(16px * var(--fs,1));background:#08080af5;flex-direction:column;justify-content:center;align-items:center;gap:14px;line-height:1.7;display:flex;position:fixed;inset:0}#rotateHint .rh-ico{font-size:52px;animation:1.8s ease-in-out infinite rh-rot}#rotateHint .rh-tip{font-size:calc(13px * var(--fs,1));color:#9d9887}#rotateHint .rh-btns{flex-wrap:wrap;justify-content:center;gap:12px;margin:4px 0 2px;display:flex}@keyframes rh-rot{0%,40%{transform:rotate(0)}60%,to{transform:rotate(90deg)}}.hidden{display:none!important}#specMask{z-index:60;color:#ffe9a8;font-size:calc(15px * var(--fs,1));letter-spacing:2px;text-shadow:0 2px 8px #000;cursor:not-allowed;background:#0000002e;justify-content:center;align-items:flex-start;padding-top:14px;display:flex;position:fixed;inset:0}.ms-pass{max-width:132px}.ms-lock{font-size:calc(12px * var(--fs,1));letter-spacing:1px;vertical-align:middle;color:#ffe9a8;background:#ffe9a81f;border:1px solid #ffe9a880;border-radius:10px;margin-left:8px;padding:1px 8px}.ms-tip{opacity:.75;font-size:calc(12px * var(--fs,1));margin-top:6px}.ac-awaken{font-size:calc(11px * var(--fs,1));line-height:calc(16px * var(--fs,1));letter-spacing:1px;color:#1a1206;pointer-events:none;background:linear-gradient(#ffe9a8,#f0b83c);border:1px solid #00000059;border-radius:8px;padding:0 5px;position:absolute;bottom:33px;left:2px;box-shadow:0 1px 4px #00000080}.fsbtn{z-index:40;width:42px;height:42px;line-height:1;font-size:calc(20px * var(--fs,1));color:#ffd24a;cursor:pointer;text-shadow:0 1px 3px #000;background:#0000008c;border:1px solid #ffd24a73;border-radius:8px;padding:0;position:fixed;top:12px;left:12px}.fsbtn:hover{background:#000000c7;border-color:#ffd24acc}.fsbtn.on{color:#fff;border-color:#fff9}.fsbtn.cm{left:62px}.fsbtn.a2hs{left:112px}#verTag{z-index:40;font-size:calc(12px * var(--fs,1));letter-spacing:1px;color:#e8e2d080;text-shadow:0 1px 3px #000;pointer-events:none;user-select:none;position:fixed;top:58px;left:12px}#icpTag{z-index:40;font-size:calc(12px * var(--fs,1));letter-spacing:.5px;color:#e8e2d080;text-shadow:0 1px 3px #000;line-height:1.2;text-decoration:none;position:fixed;bottom:10px;left:12px}#icpTag:hover{color:#ffd24ae6;text-decoration:underline}@media (width<=560px){.fsbtn{width:36px;height:36px;font-size:calc(17px * var(--fs,1));top:8px;left:8px}.fsbtn.cm{left:50px}.fsbtn.a2hs{left:92px}#verTag{font-size:calc(11px * var(--fs,1));top:48px;left:8px}#icpTag{font-size:calc(11px * var(--fs,1));bottom:6px;left:8px}}.ct-awaken,.pv-awaken{color:#ffe9a8;font-size:calc(12px * var(--fs,1));background:linear-gradient(#f0b83c2e,#f0b83c0f);border:1px solid #f0b83ca6;border-radius:6px;margin-top:6px;padding:6px 8px;line-height:1.5}.ct-awaken .ct-aw-h,.pv-awaken .pv-aw-h{color:#ffd24a;letter-spacing:1px;margin-bottom:3px;font-weight:700;display:block}.monster .chip.awk{color:#1a1206;background:linear-gradient(#ffe9a8,#f0b83c);border-color:#00000059;font-weight:700}.dim{color:var(--dim)}button{cursor:pointer;font-family:inherit}#menu{background:#0d0d0d url(../背景/halls_background.png) 50%/cover no-repeat;flex-direction:column;justify-content:center;align-items:center;display:flex;position:fixed;inset:0}#menu:before{content:"";background:#08080ab8;position:absolute;inset:0}#menu .inner{z-index:2;text-align:center;position:relative}#menu h1{color:var(--gold);letter-spacing:6px;text-shadow:3px 3px #000;margin-bottom:6px;font-size:46px}#menu .sub{color:var(--dim);letter-spacing:2px;margin-bottom:40px}#menu .mbtn{background:var(--panel);width:260px;color:var(--text);border:2px solid var(--line);font-size:calc(18px * var(--fs,1));letter-spacing:3px;margin:12px auto;padding:14px 0;transition:all .15s;display:block;box-shadow:3px 3px #000}#menu .mbtn:hover{background:var(--panel2);border-color:var(--gold);color:var(--gold);transform:translate(-1px,-1px);box-shadow:4px 4px #000}#menu .mbtn.primary{border-color:var(--gold-dim);color:var(--gold)}@media (height<=620px),(pointer:coarse),(width<=1100px){#menu{padding:8px}#menu .inner{text-align:center;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;width:min(92vw,700px);display:grid}#menu h1{letter-spacing:3px;grid-column:1/-1;justify-self:center;margin:0 0 2px;font-size:26px}#menu .sub{font-size:calc(11px * var(--fs,1));letter-spacing:1px;grid-column:1/-1;justify-self:center;margin-bottom:2px}#menu .mbtn{width:auto;font-size:calc(14px * var(--fs,1));letter-spacing:2px;margin:0;padding:8px 0}}#battle{background:linear-gradient(#08080ad1,#08080ad1),url(../背景/caves_background.png) 50%/cover no-repeat;position:fixed;inset:0;overflow:hidden}#stage{transform-origin:0 0;user-select:none;background:#0c0c0e8c;flex-direction:column;width:1280px;height:720px;display:flex;position:absolute}#floatLayer,#dragLayer{pointer-events:none;z-index:900;position:fixed;inset:0}#dragLayer{z-index:950}.float{font-size:calc(22px * var(--fs,1));text-shadow:2px 2px #000;white-space:nowrap;font-weight:700;position:absolute;transform:translate(-50%)}.float.dmg{color:#ff6a5a}.float.heal{color:#7ee06a}.float.dodge{color:#8fd0ff}.dragghost{pointer-events:none;opacity:.9;filter:drop-shadow(0 0 6px #000);width:78px;height:109px;position:fixed;transform:translate(-50%,-50%)}.dragghost img{object-fit:contain;width:100%;height:100%}#toast{border:2px solid var(--gold-dim);color:var(--gold);z-index:1100;opacity:0;pointer-events:none;background:#141416f2;padding:8px 20px;transition:all .2s;position:fixed;top:76px;left:50%;transform:translate(-50%,-12px);box-shadow:3px 3px #000}#toast.show{opacity:1;transform:translate(-50%)}#modal{z-index:990;background:#000000b3;justify-content:center;align-items:center;display:flex;position:fixed;inset:0}.mbox{background:var(--panel);border:3px solid var(--gold-dim);text-align:center;overscroll-behavior:contain;min-width:340px;max-height:92vh;padding:26px 34px;overflow-y:auto;box-shadow:5px 5px #000}@media (height<=620px),(pointer:coarse),(width<=1100px){#modal{padding:6px}#modal .mbox{min-width:0;max-width:94vw;max-height:94vh;padding:12px 16px;overflow-y:auto}#modal .mbox h3{font-size:calc(17px * var(--fs,1));margin-bottom:8px}#modal .mbtns{margin-top:10px}#modal .mbox p{font-size:calc(12px * var(--fs,1));margin:4px 0}}.mbox h3{color:var(--gold);font-size:calc(22px * var(--fs,1));letter-spacing:2px;margin-bottom:14px}.mbox p{margin:8px 0}.mbtns{justify-content:center;gap:14px;margin-top:18px;display:flex}#confirmBox{z-index:1400;background:#000000b8;justify-content:center;align-items:center;padding:8px;display:flex;position:fixed;inset:0}#confirmBox .cf-box{background:var(--panel);border:3px solid var(--line);border-radius:10px;min-width:240px;max-width:86vw;max-height:90vh;padding:16px 20px;overflow-y:auto;box-shadow:0 10px 44px #000}#confirmBox .cf-msg{color:var(--text);font-size:calc(14px * var(--fs,1));margin:0;line-height:1.6}#confirmBox .mbtns{margin-top:14px}.mbtns.col{flex-direction:column;gap:8px}.pxbtn{background:var(--gold-dim);color:#151515;border:2px solid var(--gold);font-size:calc(15px * var(--fs,1));letter-spacing:2px;padding:10px 22px;box-shadow:3px 3px #000}.pxbtn:hover{background:var(--gold)}.pxbtn.ghost{background:var(--panel2);color:var(--text);border-color:var(--line)}.pxbtn.ghost:hover{border-color:var(--gold);color:var(--gold)}*{scrollbar-color:#3a3444 #14141a}::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:#14141a}::-webkit-scrollbar-thumb{background:#3a3444;border:2px solid #14141a}::-webkit-scrollbar-thumb:hover{background:#4a4356}::-webkit-scrollbar-corner{background:#14141a}
+/* ============================================================
+ * 全局像素风样式  style.css
+ * ========================================================== */
+@font-face {
+  font-family: 'fusion';
+  src: url('../字体/fusion-pixel-12px-proportional-zh_hans.otf.woff2') format('woff2');
+}
+:root {
+  --bg: #141414; --panel: #232323; --panel2: #2c2c2c; --line: #3d3d3d;
+  --gold: #d8b04a; --gold-dim: #8a7028; --green: #7ec850; --red: #d85a4a;
+  --blue: #5b9bd5; --purple: #a08cd8; --text: #d6d2c4; --dim: #8f8b80;
+  /* 字号倍率（设置 → 字号）。所有"正文级" font-size 都写成 calc(Npx * var(--fs, 1))，
+     默认 1 = 与历史版本完全一致；大标题（>24px）不参与联动，避免放大后顶破布局。
+     由 js/ui.js 的 applyFontScale() 写在 <html> 的 inline style 上。 */
+  --fs: 1;
+  }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: #0a0a0a; color: var(--text);
+  font-family: 'fusion', monospace; font-size: calc(14px * var(--fs, 1));
+  image-rendering: pixelated;
+}
+/* 图片：像素化 + 彻底禁掉「长按图片 → 存储图片/拷贝图片」。
+   部分国产浏览器与微信内置浏览器不理会 contextmenu 的 preventDefault，
+   但只要图片本身不参与命中测试，长按命中的就是外层容器（普通 div）→ 不会弹图片菜单。
+   项目里没有任何逻辑依赖 img 作为事件目标（点击/悬停都绑在外层 [data-tip]/[data-drop] 上）。 */
+img {
+  image-rendering: pixelated;
+  -webkit-user-drag: none; -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;      /* iOS Safari：长按不弹"存储图像" */
+  pointer-events: none;             /* Android / 国产浏览器：图片不参与命中测试 */
+}
+
+/* ---------------- 触屏 / 移动端适配 ---------------- */
+html, body {
+  -webkit-tap-highlight-color: transparent;    /* 去掉点按时的蓝色高亮块 */
+  -webkit-touch-callout: none;                 /* 长按不弹"拷贝图片 / 存储图片"菜单 */
+  overscroll-behavior: none;                   /* 禁掉橡皮筋回弹与下拉刷新 */
+  -webkit-user-select: none; user-select: none; /* 长按/拖动不选中文字（输入框除外，见下） */
+  /* 页面本身不滚（overflow:hidden），这里只关掉"双指缩放"：pan-x/pan-y 允许平移但不允许捏合缩放。
+     手指在游戏内的可滚动区域上仍然是它们各自滚动（touch-action 只从触点向上取到该滚动容器为止）。 */
+  touch-action: pan-x pan-y;
+}
+input, textarea { -webkit-user-select: text; user-select: text; }
+/* 按钮/输入：允许平移与缩放，但不触发"双击缩放"（消除点击延迟） */
+button, .mbtn, .pxbtn, .pxbtn.ghost, select, input, .dk-tab { touch-action: manipulation; }
+/* 可拖拽元素的触摸手势交给 pointer 事件：否则触屏拖拽会被浏览器滚动/缩放手势打断（pointercancel → 卡牌丢失/幽灵卡残留） */
+.card, .monster, [data-drop], .ac-card { touch-action: none; }
+/* 以下只是"点击目标"、不是拖拽源：必须允许纵向滑动，否则在卡面上起手就滑不动列表（手机上看不到后面的牌） */
+.dk-card, .pk-row, .rw-card, .sh-row { touch-action: manipulation; }
+
+/* ---------------- 竖屏提示（触屏设备竖着拿时盖住界面） ---------------- */
+#rotateHint {
+  position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px; text-align: center;
+  background: rgba(8, 8, 10, .96); color: #e8e2d0; font-size: calc(16px * var(--fs, 1)); line-height: 1.7;
+}
+#rotateHint .rh-ico { font-size: 52px; animation: rh-rot 1.8s ease-in-out infinite; }
+#rotateHint .rh-tip { font-size: calc(13px * var(--fs, 1)); color: #9d9887; }
+#rotateHint .rh-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin: 4px 0 2px; }
+
+@keyframes rh-rot { 0%, 40% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
+.hidden { display: none !important; }
+
+/* 联机观战遮罩：用 fixed 覆盖整个视口，接住观战者的所有点击/拖拽，
+ * 底下的手牌、棋盘、法杖栏等一律点不到（服务端同样会拒绝，双保险）。 */
+#specMask {
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 14px;
+  background: rgba(0, 0, 0, .18);
+  color: #ffe9a8; font-size: calc(15px * var(--fs, 1)); letter-spacing: 2px;
+  text-shadow: 0 2px 8px #000;
+  cursor: not-allowed;
+}
+
+/* 房间密码相关 */
+.ms-pass { max-width: 132px; }
+.ms-lock {
+  margin-left: 8px; padding: 1px 8px; border-radius: 10px;
+  font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; vertical-align: middle;
+  color: #ffe9a8; border: 1px solid rgba(255, 233, 168, .5);
+  background: rgba(255, 233, 168, .12);
+}
+.ms-tip { margin-top: 6px; opacity: .75; font-size: calc(12px * var(--fs, 1)); }
+
+/* 3★ 觉醒词条角标（学院考核）。具体 bottom 由 academy.css 覆盖到星级上一行。 */
+.ac-awaken {
+  position: absolute; left: 2px; bottom: 33px;
+  padding: 0 5px; border-radius: 8px;
+  font-size: calc(11px * var(--fs, 1)); line-height: calc(16px * var(--fs, 1)); letter-spacing: 1px;
+  color: #1a1206; background: linear-gradient(180deg, #ffe9a8, #f0b83c);
+  border: 1px solid rgba(0, 0, 0, .35);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .5);
+  pointer-events: none;
+}
+
+/* 首页左上角：全屏开关 */
+.fsbtn {
+  position: fixed; left: 12px; top: 12px; z-index: 40;
+  width: 42px; height: 42px; padding: 0; line-height: 1;
+  font-size: calc(20px * var(--fs, 1)); color: #ffd24a;
+  background: rgba(0, 0, 0, .55);
+  border: 1px solid rgba(255, 210, 74, .45);
+  border-radius: 8px; cursor: pointer;
+  text-shadow: 0 1px 3px #000;
+}
+.fsbtn:hover { background: rgba(0, 0, 0, .78); border-color: rgba(255, 210, 74, .8); }
+.fsbtn.on { color: #fff; border-color: rgba(255, 255, 255, .6); }
+.fsbtn.cm { left: 62px; }                      /* 第二个：社区（公告 / 卡组 / 官方群） */
+#btnRotate { left: 112px; }                    /* 第三个：竖屏 / 横屏切换（「添加到主屏幕」已下架，见 index.html） */
+/* 版本号：首页左上角、紧贴那排按钮下方的一串字符（内容是写死的，见 index.html 的 #verTag） */
+#verTag {
+  position: fixed; left: 12px; top: 58px; z-index: 40;
+  font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px;
+  color: rgba(232, 226, 208, .5); text-shadow: 0 1px 3px #000;
+  pointer-events: none; user-select: none;
+}
+/* 备案号：首页左下角（工信部要求展示，见 index.html 的 #icpTag）。
+   与 #verTag 同款配色，但它是可点的链接，所以不能写 pointer-events: none。 */
+#icpTag {
+  position: fixed; left: 12px; bottom: 10px; z-index: 40;
+  font-size: calc(12px * var(--fs, 1)); letter-spacing: .5px; line-height: 1.2;
+  color: rgba(232, 226, 208, .5); text-shadow: 0 1px 3px #000;
+  text-decoration: none;
+}
+#icpTag:hover { color: rgba(255, 210, 74, .9); text-decoration: underline; }
+@media (max-width: 560px) {
+  .fsbtn { width: 36px; height: 36px; font-size: calc(17px * var(--fs, 1)); left: 8px; top: 8px; }
+  .fsbtn.cm { left: 50px; }
+  #btnRotate { left: 92px; }
+  #verTag { left: 8px; top: 48px; font-size: calc(11px * var(--fs, 1)); }
+  #icpTag { left: 8px; bottom: 6px; font-size: calc(11px * var(--fs, 1)); }
+}
+
+/* 卡牌详情浮窗里的「觉醒」区块（学院考核 / 对局内通用） */
+.ct-awaken, .pv-awaken {
+  margin-top: 6px; padding: 6px 8px;
+  border: 1px solid rgba(240, 184, 60, .65);
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(240, 184, 60, .18), rgba(240, 184, 60, .06));
+  color: #ffe9a8; font-size: calc(12px * var(--fs, 1)); line-height: 1.5;
+}
+.ct-awaken .ct-aw-h, .pv-awaken .pv-aw-h {
+  display: block; margin-bottom: 3px;
+  color: #ffd24a; font-weight: 700; letter-spacing: 1px;
+}
+
+/* 对局内棋盘上的词条标签（3★ 怪的 mchips 里） */
+.monster .chip.awk {
+  background: linear-gradient(180deg, #ffe9a8, #f0b83c);
+  color: #1a1206; border-color: rgba(0, 0, 0, .35); font-weight: 700;
+}
+.dim { color: var(--dim); }
+button { font-family: inherit; cursor: pointer; }
+
+/* ---------------- 主菜单 ---------------- */
+#menu {
+  position: fixed; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: #0d0d0d url('../背景/halls_background.png') center/cover no-repeat;
+}
+/* 2026-10-25 玩家要求：主页遮罩先调亮 50%、又觉得太亮调低 40%（.72 → .36 → .50） */
+#menu::before { content: ''; position: absolute; inset: 0; background: rgba(8,8,10,.50); }
+#menu .inner { position: relative; z-index: 2; text-align: center; }
+#menu h1 {
+  color: var(--gold); font-size: 46px; letter-spacing: 6px; margin-bottom: 6px;
+  text-shadow: 3px 3px 0 #000;
+}
+#menu .sub { color: var(--dim); margin-bottom: 40px; letter-spacing: 2px; }
+#menu .mbtn {
+  display: block; width: 260px; margin: 12px auto; padding: 14px 0;
+  background: var(--panel); color: var(--text); border: 2px solid var(--line);
+  font-size: calc(18px * var(--fs, 1)); letter-spacing: 3px; transition: .15s;
+  box-shadow: 3px 3px 0 #000;
+}
+#menu .mbtn:hover { background: var(--panel2); border-color: var(--gold); color: var(--gold); transform: translate(-1px,-1px); box-shadow: 4px 4px 0 #000; }
+#menu .mbtn.primary { border-color: var(--gold-dim); color: var(--gold); }
+
+/* ============================================================
+ * 手机横屏（矮视口）主菜单：按钮改两列 + 整体缩小
+ *  - 原来 9 个 260px 宽的大按钮竖排 ≈ 480px 高，手机横屏只有 ~320px，上下会被切掉
+ *  - 标题/说明跨两列，按钮 2 列 × 5 行，纵向需求降到 ~250px
+ *  - 右上角人物块同时缩小（头像 60→34、三行文字并成一行、隐藏桌面版提示语），不再压住标题/按钮
+ *  - 触发条件：矮视口 **或** 触屏设备 **或** 窄窗口（鼠标大窗口保持原桌面样式）
+ * ========================================================== */
+@media (max-height: 620px), (pointer: coarse), (max-width: 1100px) {
+  #menu { padding: 8px; }
+  #menu .inner {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 10px; width: min(92vw, 700px); text-align: center;
+  }
+  /* 标题/说明跨两列并各自居中（justify-self 让元素盒子贴合文字宽度，不再横向占满整行） */
+  #menu h1 { grid-column: 1 / -1; justify-self: center; font-size: 26px; letter-spacing: 3px; margin: 0 0 2px; }
+  #menu .sub { grid-column: 1 / -1; justify-self: center; font-size: calc(11px * var(--fs, 1)); letter-spacing: 1px; margin-bottom: 2px; }
+  #menu .mbtn { width: auto; margin: 0; padding: 8px 0; font-size: calc(14px * var(--fs, 1)); letter-spacing: 2px; }
+  /* 右上角玩家栏的缩小规则见 profile.css（该文件在 style.css 之后加载，放这里会被覆盖） */
+}
+
+/* ---------------- 舞台（1280×720 等比缩放） ---------------- */
+/* 2026-10-25 玩家要求：战斗界面遮罩调亮 70%（.82 → .25）。
+   ⚠ 只影响整页背景层；卡牌详情弹窗、日志面板这些仍有自己的深色底，不受影响。 */
+#battle { position: fixed; inset: 0; overflow: hidden; background:
+  linear-gradient(rgba(8,8,10,.25), rgba(8,8,10,.25)), url('../背景/caves_background.png') center/cover no-repeat; }
+#stage {
+  position: absolute; width: 1280px; height: 720px;
+  transform-origin: top left;
+  display: flex; flex-direction: column;
+  background: rgba(12,12,14,.55);
+  user-select: none;
+}
+
+/* ---------------- 浮层 ---------------- */
+#floatLayer, #dragLayer { position: fixed; inset: 0; pointer-events: none; z-index: 900; }
+#dragLayer { z-index: 950; }
+.float {
+  position: absolute; transform: translate(-50%,0); font-size: calc(22px * var(--fs, 1)); font-weight: bold;
+  text-shadow: 2px 2px 0 #000; white-space: nowrap;
+}
+.float.dmg { color: #ff6a5a; }
+.float.heal { color: #7ee06a; }
+.float.dodge { color: #8fd0ff; }
+.dragghost { position: fixed; width: 78px; height: 109px; transform: translate(-50%,-50%);
+  pointer-events: none; opacity: .9; filter: drop-shadow(0 0 6px #000); }
+.dragghost img { width: 100%; height: 100%; object-fit: contain; }
+
+/* ---------------- 提示 / 弹窗 ---------------- */
+#toast {
+  position: fixed; left: 50%; top: 76px; transform: translate(-50%,-12px);
+  background: rgba(20,20,22,.95); border: 2px solid var(--gold-dim); color: var(--gold);
+  /* z-index 必须高于 #modal(990) / .ac-shop(995) / .ac-ghost(999)：换头像等弹窗里弹出的提示不能被遮罩盖住 */
+  padding: 8px 20px; z-index: 1100; opacity: 0; transition: .2s; pointer-events: none;
+  box-shadow: 3px 3px 0 #000;
+}
+#toast.show { opacity: 1; transform: translate(-50%,0); }
+#modal { position: fixed; inset: 0; z-index: 990; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.7); }
+.mbox {
+  background: var(--panel); border: 3px solid var(--gold-dim); padding: 26px 34px; text-align: center;
+  min-width: 340px; box-shadow: 5px 5px 0 #000;
+  max-height: 92vh; overflow-y: auto;   /* 内容比屏幕高时内部滚动（否则底部按钮会跑到屏幕外点不到） */
+  overscroll-behavior: contain;         /* 滚到底不再把滚动传给页面（手机上会变成整页上下拖动） */
+}
+/* 手机横屏（矮视口）：所有弹窗限高并内部滚动，避免内容比屏幕高、底部按钮点不到 */
+@media (max-height: 620px), (pointer: coarse), (max-width: 1100px) {
+  #modal { padding: 6px; }
+  #modal .mbox { max-height: 94vh; overflow-y: auto; padding: 12px 16px; min-width: 0; max-width: 94vw; }
+  #modal .mbox h3 { font-size: calc(17px * var(--fs, 1)); margin-bottom: 8px; }
+  #modal .mbtns { margin-top: 10px; }
+  #modal .mbox p { margin: 4px 0; font-size: calc(12px * var(--fs, 1)); }
+}
+.mbox h3 { color: var(--gold); font-size: calc(22px * var(--fs, 1)); margin-bottom: 14px; letter-spacing: 2px; }
+.mbox p { margin: 8px 0; }
+.mbtns { display: flex; gap: 14px; justify-content: center; margin-top: 18px; }
+
+/* 局内确认框（替代 window.confirm —— 原生弹窗会把浏览器踢出全屏） */
+#confirmBox {
+  position: fixed; inset: 0; z-index: 1400;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, .72); padding: 8px;
+}
+#confirmBox .cf-box {
+  background: var(--panel); border: 3px solid var(--line); border-radius: 10px;
+  box-shadow: 0 10px 44px #000;
+  padding: 16px 20px; min-width: 240px; max-width: 86vw; max-height: 90vh; overflow-y: auto;
+}
+#confirmBox .cf-msg {
+  margin: 0; color: var(--text);
+  font-size: calc(14px * var(--fs, 1)); line-height: 1.6;
+}
+#confirmBox .mbtns { margin-top: 14px; }
+.mbtns.col { flex-direction: column; gap: 8px; }
+.pxbtn {
+  padding: 10px 22px; background: var(--gold-dim); color: #151515; border: 2px solid var(--gold);
+  font-size: calc(15px * var(--fs, 1)); letter-spacing: 2px; box-shadow: 3px 3px 0 #000;
+}
+.pxbtn:hover { background: var(--gold); }
+.pxbtn.ghost { background: var(--panel2); color: var(--text); border-color: var(--line); }
+.pxbtn.ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ---- 滚动条统一深色 ----
+ * 浏览器默认滚动条是浅色（白底），在深色界面上很突兀（日志栏、组卡器卡池/卡组列表最明显）。
+ * 这里统一成"深底 + 深灰滑块"，与学院考核等界面的观感一致；
+ * scrollbar-color 是标准属性（新版 Chromium / Firefox），::-webkit-scrollbar 兼容旧版。 */
+* { scrollbar-color: #3a3444 #14141a; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #14141a; }
+::-webkit-scrollbar-thumb { background: #3a3444; border: 2px solid #14141a; }
+::-webkit-scrollbar-thumb:hover { background: #4a4356; }
+::-webkit-scrollbar-corner { background: #14141a; }

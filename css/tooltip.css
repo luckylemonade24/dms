@@ -1,1 +1,25 @@
-#cardtip{z-index:1200;pointer-events:none;border:3px solid var(--gold-dim);background:#18181bfa;width:280px;max-height:calc(100vh - 16px);padding:10px 12px;position:fixed;box-shadow:5px 5px #000}#cardtip.hidden{display:none!important}#cardtip .ct-name{color:var(--gold);font-size:calc(15px * var(--fs,1));align-items:center;gap:6px;margin-bottom:6px;display:flex}#cardtip .ct-max{color:var(--dim);font-size:calc(11px * var(--fs,1));margin-left:auto;font-weight:400}#cardtip img{object-fit:contain;image-rendering:auto;border:1px solid var(--line);background:#0e0e10;width:100%;max-height:min(320px,45vh);display:block}#cardtip .ct-meta{color:var(--blue);font-size:calc(12px * var(--fs,1));margin:6px 0 4px}#cardtip .ct-eff{color:var(--text);font-size:calc(12.5px * var(--fs,1));line-height:1.65}#cardtip .ct-eq{color:#e0a05a;font-size:calc(12px * var(--fs,1));margin-top:5px}
+/* ============================================================
+ * 卡牌详情悬停浮窗  tooltip.css
+ * ========================================================== */
+#cardtip {
+  position: fixed; z-index: 1200; pointer-events: none;
+  width: 280px; padding: 10px 12px;
+  max-height: calc(100vh - 16px);   /* 硬性不超过屏高：矮屏（手机横屏）下由 tooltip.js 进一步压缩图片/裁切 */
+  background: rgba(24, 24, 27, .98);
+  border: 3px solid var(--gold-dim);
+  box-shadow: 5px 5px 0 #000;
+}
+#cardtip.hidden { display: none !important; }
+#cardtip .ct-name {
+  color: var(--gold); font-size: calc(15px * var(--fs, 1)); margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+#cardtip .ct-max { color: var(--dim); font-size: calc(11px * var(--fs, 1)); margin-left: auto; font-weight: normal; }
+#cardtip img {
+  width: 100%; max-height: 320px; object-fit: contain; display: block;
+  max-height: min(320px, 45vh);   /* 手机横屏（屏高 ~390px）按屏高封顶，保证浮窗能整屏显示；桌面（≥720px）仍是 320px */
+  image-rendering: auto; background: #0e0e10; border: 1px solid var(--line);   /* 高清卡（1300px 插画）缩小显示：平滑缩放，避免 pixelated 丢像素发糊 */
+}
+#cardtip .ct-meta { color: var(--blue); font-size: calc(12px * var(--fs, 1)); margin: 6px 0 4px; }
+#cardtip .ct-eff { color: var(--text); font-size: calc(12.5px * var(--fs, 1)); line-height: 1.65; }
+#cardtip .ct-eq { color: #e0a05a; font-size: calc(12px * var(--fs, 1)); margin-top: 5px; }

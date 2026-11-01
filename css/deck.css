@@ -1,1 +1,379 @@
-#deck{z-index:40;background:#0a0a0cf7;flex-direction:column;padding:12px 16px 16px;display:flex;position:fixed;inset:0}.small{font-size:calc(12px * var(--fs,1));padding:3px 10px}.dk-top{border-bottom:2px solid var(--line);flex-wrap:wrap;align-items:center;gap:8px;padding-bottom:10px;display:flex}.dk-title{color:var(--gold);font-size:calc(20px * var(--fs,1));letter-spacing:3px;margin-right:8px}.dk-name{color:var(--text);border:2px solid var(--line);font-family:inherit;font-size:calc(14px * var(--fs,1));background:#151517;width:150px;padding:5px 8px}.dk-name:focus{border-color:var(--gold);outline:none}.dk-namebtn{color:var(--text);border:2px solid var(--line);font-family:inherit;font-size:calc(14px * var(--fs,1));cursor:pointer;text-align:left;background:#151517;align-items:center;gap:6px;width:150px;padding:5px 8px;display:flex}.dk-namebtn:hover{border-color:var(--gold,#d8b04a)}.dk-namebtn #dkNameTxt{text-overflow:ellipsis;white-space:nowrap;color:#ffe9a8;flex:1;min-width:0;overflow:hidden}.dk-ncaret{color:var(--gold,#d8b04a);font-size:calc(12px * var(--fs,1));flex:none}.dk-switch{max-width:430px}.dk-switch h3{color:var(--gold,#d8b04a);font-size:calc(18px * var(--fs,1));text-align:center;margin-bottom:6px}.dk-swname{justify-content:center;align-items:center;gap:8px;margin:8px 0 10px;display:flex}.dk-swname .pf-name-input{width:200px}.dk-swlist{border:2px solid var(--line);text-align:left;background:#00000059;max-height:46vh;overflow-y:auto}.dk-swrow{cursor:pointer;border-bottom:1px dashed #3a3446;align-items:center;gap:10px;padding:8px 10px;display:flex}.dk-swrow:last-child{border-bottom:none}.dk-swrow:hover{background:#d8b04a1f}.dk-swrow.cur{background:#d8b04a29}.dk-swn{text-overflow:ellipsis;white-space:nowrap;color:#ffe9a8;flex:1;min-width:0;overflow:hidden}.dk-swc{color:var(--dim,#8f8b80);font-size:calc(12px * var(--fs,1));flex:none}.dk-swb{color:var(--gold,#d8b04a);font-size:calc(12px * var(--fs,1));flex:none}.dk-spacer{flex:1}.dk-count{font-size:calc(13px * var(--fs,1));color:var(--dim)}.dk-count.ok{color:var(--green)}.dk-count.bad{color:#e0a05a}.dk-msg{font-size:calc(12px * var(--fs,1))}.dk-msg.ok{color:var(--green)}.dk-msg.bad{color:#d85a4a}.dk-tabs{flex-wrap:wrap;align-items:center;gap:6px;padding:8px 0;display:flex}.dk-tablabel{color:var(--dim);font-size:calc(12px * var(--fs,1));margin-right:4px}.dk-tab{background:var(--panel);color:var(--text);border:2px solid var(--line);font-family:inherit;font-size:calc(13px * var(--fs,1));cursor:pointer;padding:4px 10px}.dk-tab:hover{border-color:var(--gold-dim)}.dk-tab.on{border-color:var(--gold);color:var(--gold)}.dk-tabn{color:var(--dim);font-size:calc(11px * var(--fs,1));margin-left:5px}.dk-body{flex:1;gap:14px;min-height:0;display:flex}.dk-left{flex-direction:column;flex:1;min-width:0;display:flex}.dk-right{border:2px solid var(--line);background:#18181ae6;flex-direction:column;flex:0 0 340px;width:340px;display:flex}.dk-filters{flex-wrap:wrap;align-items:center;gap:8px;padding-bottom:8px;display:flex}.dk-select,.dk-search{color:var(--text);border:2px solid var(--line);font-family:inherit;font-size:calc(13px * var(--fs,1));background:#151517;padding:4px 6px}.dk-select:focus,.dk-search:focus{border-color:var(--gold);outline:none}.dk-search{width:130px}.dk-hint{font-size:calc(12px * var(--fs,1))}.dk-pool{flex:1;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));align-content:start;gap:6px;padding-right:6px;display:grid;overflow-y:auto}.dk-card{cursor:pointer;border:2px solid var(--line);text-align:center;user-select:none;background:#1a1a1c;padding:3px;position:relative}.dk-card:hover{border-color:var(--gold);transform:translateY(-2px)}.dk-card img{object-fit:contain;width:100%;display:block}.dk-card .dk-cn{font-size:calc(10px * var(--fs,1));color:var(--text);white-space:nowrap;text-overflow:ellipsis;margin-top:2px;display:block;overflow:hidden}.dk-card .dk-n{font-size:calc(11px * var(--fs,1));color:#151515;background:var(--gold);border-radius:2px;padding:0 4px;position:absolute;top:2px;right:2px}.dk-card.owned{border-color:var(--gold-dim);background:#24211a}.dk-card.full{opacity:.38}.dk-card.full:hover{border-color:var(--line);cursor:not-allowed;transform:none}.dk-righthead{border-bottom:2px solid var(--line);color:var(--gold);font-size:calc(14px * var(--fs,1));align-items:center;gap:8px;padding:8px 10px;display:flex}.dk-list{flex:1;padding:6px;overflow-y:auto}.dk-row{cursor:pointer;border:1px solid #0000;align-items:center;gap:8px;padding:3px 4px;display:flex}.dk-row:hover{border-color:var(--red);background:#d85a4a1a}.dk-row img{object-fit:contain;width:30px;height:42px;image-rendering:pixelated}.dk-row .dk-rn{font-size:calc(12px * var(--fs,1));color:var(--text);white-space:nowrap;text-overflow:ellipsis;flex:1;overflow:hidden}.dk-row .dk-rc{font-size:calc(12px * var(--fs,1));color:var(--gold)}.dk-row .dk-rc i{color:var(--dim);font-style:normal}.deckinfo{font-size:calc(12.5px * var(--fs,1));color:var(--blue);margin-bottom:16px}.deckinfo.warn{color:#e0a05a}.mbtn.disabled{opacity:.4;pointer-events:none}@media (height<=620px),(pointer:coarse),(width<=1100px){#deck{grid-template-rows:auto minmax(0,1fr);grid-template-columns:126px minmax(0,1fr) minmax(0,1fr);gap:4px 6px;padding:5px 6px 6px;display:grid}.dk-top{border-bottom:none;flex-direction:column;grid-area:1/1;align-items:stretch;gap:3px;padding:0}.dk-title{font-size:calc(14px * var(--fs,1));letter-spacing:1px;margin:0 0 2px}.dk-name{width:auto;font-size:calc(12px * var(--fs,1));padding:3px 5px}.dk-count,.dk-msg{font-size:calc(11px * var(--fs,1));line-height:1.3}.dk-spacer{display:none}.dk-top .pxbtn{font-size:calc(12px * var(--fs,1));padding:3px 6px}.dk-tabs{flex-direction:column;grid-area:2/1;align-items:stretch;gap:3px;min-height:0;padding:0;overflow-y:auto}.dk-tablabel{margin:0 0 2px}.dk-tab{font-size:calc(12px * var(--fs,1));text-align:left;padding:2px 6px}.dk-body{grid-area:1/2/span 2/span 2;gap:8px;min-height:0}.dk-left{flex:auto}.dk-right{flex:0 0 258px;width:auto;max-width:46%}.dk-righthead{font-size:calc(12px * var(--fs,1));padding:4px 7px}.dk-filters{gap:4px;padding-bottom:3px}.dk-select,.dk-search{font-size:calc(12px * var(--fs,1));padding:2px 4px}.dk-select{max-width:96px}.dk-search{flex:auto;width:auto;min-width:0}.dk-hint{display:none}.dk-pool{grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:4px;padding-right:4px}.dk-card{padding:2px}.dk-card .dk-cn{font-size:calc(9px * var(--fs,1))}.dk-card .dk-n{font-size:calc(10px * var(--fs,1))}.dk-namebtn{width:auto;font-size:calc(12px * var(--fs,1));padding:3px 6px}.dk-switch{max-width:92vw}.dk-switch h3{font-size:calc(15px * var(--fs,1))}.dk-swname .pf-name-input{width:150px;font-size:calc(14px * var(--fs,1));padding:4px}.dk-swlist{max-height:38vh}.dk-swrow{gap:8px;padding:10px}.dk-swc,.dk-swb{font-size:calc(11px * var(--fs,1))}.dk-list{grid-template-columns:1fr 1fr;align-content:start;gap:2px 6px;padding:4px;display:grid}.dk-row{gap:5px;padding:2px 3px}.dk-row img{width:30px;height:42px}.dk-row .dk-rn,.dk-row .dk-rc{font-size:calc(11px * var(--fs,1))}}
+/* ============================================================
+ * 组卡器  deck.css
+ * ========================================================== */
+
+#deck {
+  position: fixed; inset: 0; z-index: 40;
+  display: flex; flex-direction: column;
+  background: rgba(10, 10, 12, .97);
+  padding: 12px 16px 16px;
+}
+
+.small { font-size: calc(12px * var(--fs, 1)); padding: 3px 10px; }
+/* 5 个按钮的包装层：默认 display:contents（对 flex 父容器完全透明，桌面排版零变化），
+   只有竖屏模式才把它变成一行 5 列的 grid。 */
+.dk-actions { display: contents; }
+/* 竖屏专用的「卡池 ⇄ 卡组」切换按钮：横屏永远不显示 */
+.dk-toggle { display: none; }
+
+/* 顶部工具条 */
+.dk-top { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 2px solid var(--line); flex-wrap: wrap; }
+.dk-title { color: var(--gold); font-size: calc(20px * var(--fs, 1)); letter-spacing: 3px; margin-right: 8px; }
+.dk-name {
+  background: #151517; color: var(--text); border: 2px solid var(--line);
+  padding: 5px 8px; font-family: inherit; font-size: calc(14px * var(--fs, 1)); width: 150px;
+}
+.dk-name:focus { outline: none; border-color: var(--gold); }
+/* 卡组名：可点控件，点开「改名 / 切换卡组」面板 */
+.dk-namebtn {
+  background: #151517; color: var(--text); border: 2px solid var(--line);
+  padding: 5px 8px; font-family: inherit; font-size: calc(14px * var(--fs, 1)); width: 150px;
+  display: flex; align-items: center; gap: 6px; cursor: pointer; text-align: left;
+}
+.dk-namebtn:hover { border-color: var(--gold, #d8b04a); }
+.dk-namebtn #dkNameTxt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #ffe9a8; }
+.dk-ncaret { flex: 0 0 auto; color: var(--gold, #d8b04a); font-size: calc(12px * var(--fs, 1)); }
+
+/* ---------------- 切换卡组 / 改名面板 ---------------- */
+.dk-switch { max-width: 430px; }
+.dk-switch h3 { color: var(--gold, #d8b04a); font-size: calc(18px * var(--fs, 1)); margin-bottom: 6px; text-align: center; }
+.dk-swname { display: flex; gap: 8px; align-items: center; justify-content: center; margin: 8px 0 10px; }
+.dk-swname .pf-name-input { width: 200px; }
+.dk-swlist { max-height: 46vh; overflow-y: auto; border: 2px solid var(--line); background: rgba(0, 0, 0, .35); text-align: left; }
+.dk-swrow {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px; cursor: pointer;
+  border-bottom: 1px dashed #3a3446;
+}
+.dk-swrow:last-child { border-bottom: none; }
+.dk-swrow:hover { background: rgba(216, 176, 74, .12); }
+.dk-swrow.cur { background: rgba(216, 176, 74, .16); }
+.dk-swn { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #ffe9a8; }
+.dk-swc { flex: 0 0 auto; color: var(--dim, #8f8b80); font-size: calc(12px * var(--fs, 1)); }
+.dk-swb { flex: 0 0 auto; color: var(--gold, #d8b04a); font-size: calc(12px * var(--fs, 1)); }
+.dk-spacer { flex: 1; }
+.dk-count { font-size: calc(13px * var(--fs, 1)); color: var(--dim); }
+.dk-count.ok { color: var(--green); }
+.dk-count.bad { color: #e0a05a; }
+.dk-msg { font-size: calc(12px * var(--fs, 1)); }
+.dk-msg.ok { color: var(--green); }
+.dk-msg.bad { color: #d85a4a; }
+
+/* 已存卡组标签 */
+.dk-tabs { display: flex; align-items: center; gap: 6px; padding: 8px 0; flex-wrap: wrap; }
+.dk-tablabel { color: var(--dim); font-size: calc(12px * var(--fs, 1)); margin-right: 4px; }
+.dk-tab {
+  background: var(--panel); color: var(--text); border: 2px solid var(--line);
+  padding: 4px 10px; font-family: inherit; font-size: calc(13px * var(--fs, 1)); cursor: pointer;
+}
+.dk-tab:hover { border-color: var(--gold-dim); }
+.dk-tab.on { border-color: var(--gold); color: var(--gold); }
+.dk-tabn { color: var(--dim); font-size: calc(11px * var(--fs, 1)); margin-left: 5px; }
+
+/* 主体双栏 */
+.dk-body { flex: 1; display: flex; gap: 14px; min-height: 0; }
+/* position:relative 是给 #dkPoolDetail（卡池上方那个详情小窗）当包含块的 */
+.dk-left { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
+.dk-right { width: 340px; flex: 0 0 340px; display: flex; flex-direction: column;
+  position: relative;   /* #dkDetail 覆盖式详情的定位基准（JS overlayDetail 也会兜底设置） */
+  background: rgba(24, 24, 26, .9); border: 2px solid var(--line); }
+
+.dk-filters { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; flex-wrap: wrap; }
+.dk-select, .dk-search {
+  background: #151517; color: var(--text); border: 2px solid var(--line);
+  padding: 4px 6px; font-family: inherit; font-size: calc(13px * var(--fs, 1));
+}
+.dk-select:focus, .dk-search:focus { outline: none; border-color: var(--gold); }
+.dk-search { width: 130px; }
+.dk-hint { font-size: calc(12px * var(--fs, 1)); }
+
+.dk-pool {
+  flex: 1; overflow-y: auto; display: grid; gap: 6px;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+  align-content: start; padding-right: 6px;
+  /* overflow-anchor: none —— 关掉 Chrome 的"滚动锚定"。
+     2026-10-27 玩家反馈"点卡入卡组时整个卡池上下跳动"：
+     点一下这张卡多了「已选 N/M」标记 → 网格行高变化 → 浏览器为了保持视觉焦点
+     自己挪 scrollTop，和 JS 恢复的滚动位置打架，看起来就是整块上下抖。
+     注意：卡池的滚动容器是 .dk-pool（卡组栏才是 .dk-list），别加错对象。 */
+  overflow-anchor: none;
+}
+.dk-card {
+  position: relative; cursor: pointer; border: 2px solid var(--line);
+  background: #1a1a1c; padding: 3px; text-align: center; user-select: none;
+}
+.dk-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.dk-card img { width: 100%; display: block; object-fit: contain; }
+.dk-card .dk-cn { display: block; font-size: calc(10px * var(--fs, 1)); color: var(--text); margin-top: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.dk-card .dk-n {
+  position: absolute; top: 2px; right: 2px; font-size: calc(11px * var(--fs, 1)); color: #151515;
+  background: var(--gold); padding: 0 4px; border-radius: 2px;
+}
+.dk-card.owned { border-color: var(--gold-dim); background: #24211a; }
+.dk-card.full { opacity: .38; }
+.dk-card.full:hover { transform: none; border-color: var(--line); cursor: not-allowed; }
+
+.dk-righthead {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border-bottom: 2px solid var(--line); color: var(--gold); font-size: calc(14px * var(--fs, 1));
+}
+/* overflow-anchor: none —— 关掉浏览器的"滚动锚定"。
+   2026-10-27 玩家反馈"点卡入卡组时整个卡池上下跳动"：
+   点一下会重建列表内容，Chrome 的 scroll anchoring 为了保持视觉焦点会自己挪 scrollTop
+   （实测 260 → 350），和 JS 里恢复的滚动位置打架，看起来就是抖一下。 */
+.dk-list { flex: 1; overflow-y: auto; padding: 6px; overflow-anchor: none; }
+.dk-row {
+  display: flex; align-items: center; gap: 8px; padding: 3px 4px; cursor: pointer;
+  border: 1px solid transparent;
+}
+.dk-row:hover { border-color: var(--red); background: rgba(216, 90, 74, .1); }
+.dk-row img { width: 30px; height: 42px; object-fit: contain; image-rendering: pixelated; }
+.dk-row .dk-rn { flex: 1; font-size: calc(12px * var(--fs, 1)); color: var(--text); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.dk-row .dk-rc { font-size: calc(12px * var(--fs, 1)); color: var(--gold); }
+.dk-row .dk-rc i { color: var(--dim); font-style: normal; }
+
+/* 主菜单上的当前卡组提示 / 按钮禁用态 */
+.deckinfo { font-size: calc(12.5px * var(--fs, 1)); color: var(--blue); margin-bottom: 16px; }
+.deckinfo.warn { color: #e0a05a; }
+.mbtn.disabled { opacity: .4; pointer-events: none; }
+
+/* ============================================================
+ * 手机横屏（矮视口）：最左一栏 + 卡池 + 卡组（两列）
+ * 原布局的"顶部工具条（标题/卡组名/数量/提示/5 个按钮）+ 卡组标签行 + 卡池上方筛选行"
+ * 在 390px 高的屏上，这几条横条吃掉太多竖向空间，卡池只剩很矮一条。
+ * 现改成：最左一栏竖向收纳"顶栏 + 卡组标签"，右边并排"卡池 / 我的卡组（两列、卡牌原尺寸）"。
+ * ========================================================== */
+/* 触发条件（满足任一条即用左侧一栏布局）：
+ *   ① max-height: 620px —— 手机横屏（矮视口）
+ *   ② pointer: coarse   —— 任何触屏设备（平板 / 折叠屏展开 / 手机"桌面版网站"）
+ *   ③ max-width: 900px  —— 很窄的窗口
+ * 之前只写了 ①，于是"视口高度 > 620 的触屏设备"会掉回桌面布局（顶部一整排横条按钮、
+ * 卡组单列），看起来就像"左侧那一栏丢了"。鼠标 + 大窗口仍保持原来的桌面布局。 */
+@media (max-height: 620px), (pointer: coarse), (max-width: 1100px) {
+  #deck {
+    padding: 5px 6px 6px;
+    display: grid; column-gap: 6px; row-gap: 4px;
+    grid-template-columns: 126px minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  /* 最左一栏：原顶栏竖过来 */
+  .dk-top {
+    grid-column: 1; grid-row: 1;
+    flex-direction: column; align-items: stretch;
+    gap: 3px; padding: 0; border-bottom: none;
+  }
+  .dk-title { font-size: calc(14px * var(--fs, 1)); letter-spacing: 1px; margin: 0 0 2px; }
+  .dk-name { width: auto; font-size: calc(12px * var(--fs, 1)); padding: 3px 5px; }
+  .dk-count, .dk-msg { font-size: calc(11px * var(--fs, 1)); line-height: 1.3; }
+  .dk-spacer { display: none; }
+  .dk-top .pxbtn { padding: 3px 6px; font-size: calc(12px * var(--fs, 1)); }
+  /* 最左一栏：已存卡组标签也竖过来（多了就自己滚） */
+  .dk-tabs {
+    grid-column: 1; grid-row: 2;
+    flex-direction: column; align-items: stretch;
+    gap: 3px; padding: 0; overflow-y: auto; min-height: 0;
+  }
+  .dk-tablabel { margin: 0 0 2px; }
+  .dk-tab { padding: 2px 6px; font-size: calc(12px * var(--fs, 1)); text-align: left; }
+  /* 右侧：卡池 + 我的卡组并排（各占一半） */
+  .dk-body { grid-column: 2 / span 2; grid-row: 1 / span 2; gap: 8px; min-height: 0; }
+  .dk-left { flex: 1 1 auto; }
+  /* 卡组列表两列（缩略图 30×42 + 卡名）约需 260px；卡池拿剩下的全部宽度（卡池是主区域） */
+  .dk-right { width: auto; flex: 0 0 258px; max-width: 46%; }
+  .dk-righthead { padding: 4px 7px; font-size: calc(12px * var(--fs, 1)); }
+  /* 卡池上方筛选行：压到只剩一条（搜索框自适应剩余宽度） */
+  .dk-filters { padding-bottom: 3px; gap: 4px; }
+  .dk-select, .dk-search { font-size: calc(12px * var(--fs, 1)); padding: 2px 4px; }
+  .dk-select { max-width: 96px; }
+  .dk-search { width: auto; flex: 1 1 auto; min-width: 0; }
+  .dk-hint { display: none; }                       /* 手机上没位置放这行说明 */
+  .dk-pool { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 4px; padding-right: 4px; }
+  .dk-card { padding: 2px; }
+  .dk-card .dk-cn { font-size: calc(9px * var(--fs, 1)); }
+  .dk-card .dk-n { font-size: calc(10px * var(--fs, 1)); }
+  /* 卡组名（可点）与「改名 / 切换卡组」面板 */
+  .dk-namebtn { width: auto; font-size: calc(12px * var(--fs, 1)); padding: 3px 6px; }
+  .dk-switch { max-width: 92vw; }
+  .dk-switch h3 { font-size: calc(15px * var(--fs, 1)); }
+  .dk-swname .pf-name-input { width: 150px; font-size: calc(14px * var(--fs, 1)); padding: 4px; }
+  .dk-swlist { max-height: 38vh; }
+  .dk-swrow { padding: 10px; gap: 8px; }                /* 触屏：行高一点更好点 */
+  .dk-swc, .dk-swb { font-size: calc(11px * var(--fs, 1)); }
+
+  /* 卡组列表分两列、卡牌保持原尺寸（30×42）→ 一屏看得更多，少滚动 */
+  .dk-list { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 6px; align-content: start; padding: 4px; }
+  .dk-row { padding: 2px 3px; gap: 5px; }
+  .dk-row img { width: 30px; height: 42px; }
+  .dk-row .dk-rn, .dk-row .dk-rc { font-size: calc(11px * var(--fs, 1)); }
+}
+
+/* ================= 组卡器：悬停/滑动卡牌 → 对面那一栏换成详情 ================= */
+/* 卡池的卡 → 显示在卡组栏（#dkDetail）；卡组的卡 → 显示在卡池栏（#dkPoolDetail）。
+   两个容器与列表同处一栏、靠 .hidden 互斥切换，不重建 innerHTML。 */
+.dk-detail {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  padding: 10px 12px 16px;
+  background: rgba(16, 16, 18, .92);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+}
+.dk-detail .pv-title {
+  font-size: calc(16px * var(--fs, 1)); color: var(--gold);
+  margin-bottom: 6px; line-height: 1.3;
+}
+.dk-detail .pv-img {
+  display: block; width: 100%; max-width: 100%; height: auto;
+  margin: 6px auto 8px; border-radius: 8px;
+}
+.dk-detail .pv-meta {
+  font-size: calc(12px * var(--fs, 1)); color: var(--dim);
+  margin-bottom: 8px; line-height: 1.5;
+}
+.dk-detail .pv-effect {
+  font-size: calc(13px * var(--fs, 1)); color: var(--text);
+  line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+}
+.dk-detail .pv-awaken {
+  margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line);
+  font-size: calc(12px * var(--fs, 1)); color: var(--blue); line-height: 1.5;
+}
+.dk-detail .pv-aw-h { color: var(--gold); margin-bottom: 3px; }
+.dk-detail .dk-detailfoot {
+  margin-top: 12px; text-align: center;
+  font-size: calc(11px * var(--fs, 1)); color: var(--dim); opacity: .8;
+}
+
+/* ★ 覆盖式详情 + 内容自适应（用户 2026-10-26 反馈的三个问题之一）：
+   #dkDetail 不再「整栏替换」卡组列表 —— JS(overlayDetail) 把它精确叠在
+   #dkDeck 的框上（位置、大小 = 原框），列表保持可见。
+   滚动改为禁用：内容由 .pv-fit 整体等比缩放进框内，无需滑动即可看清全貌。
+   .pv-fit 被三个详情容器共用（#dkDetail / #dkPoolDetail / .dk-float）。 */
+.pv-fit { width: 100%; transform-origin: top center; }
+#dkDetail {
+  position: absolute; z-index: 6;
+  overflow: hidden;                 /* 内容缩放由 .pv-fit 负责，不出滚动条 */
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .7);
+  border-color: var(--gold-dim, #8a7028);
+}
+/* 图先按高度收一块，给标题/文字留地方；仍放不下时 .pv-fit 再整体缩 */
+#dkDetail .pv-img {
+  width: auto; height: auto;
+  max-width: 100%; max-height: 58%;
+  object-fit: contain; margin: 4px auto 8px;
+}
+
+/* ------------------------------------------------------------
+ * 卡组里看卡 → 卡池**上方浮一个详情小窗**（卡池保持可见）
+ * 以前是「整栏替换 + 图片 width:100%」：卡池栏很宽，1300×1818 的卡详情图
+ * 被拉成一整屏那么高，一屏只能看到卡的顶上一小块。现在改成限宽限高的弹窗，
+ * 图片按高度收缩（object-fit: contain），整张卡一眼看完。
+ * 卡池 → 卡组栏那个方向仍是整栏替换（用户确认那个尺寸是对的），不受影响。
+ * ---------------------------------------------------------- */
+#dkPoolDetail {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(460px, 92%);
+  max-height: calc(100% - 16px);
+  z-index: 6;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .7);
+  border-color: var(--gold-dim, #8a7028);
+}
+/* 整张卡按高度收进来，绝不再被栏宽拉爆。
+   宽高都给 auto + 双上限 → 浏览器按固有比例（1300×1818）等比缩到 272×380，整卡可见。 */
+#dkPoolDetail .pv-img {
+  width: auto; height: auto;
+  max-width: 100%; max-height: 380px;
+  object-fit: contain; margin: 6px auto 8px;
+}
+#dkPoolDetail .pv-title { text-align: center; }
+#dkPoolDetail .dk-detailfoot { margin-top: 10px; }
+
+/* ============================================================
+ * 竖屏模式的组卡器（body.portrait-mode）
+ * ------------------------------------------------------------
+ * 用户要求：竖屏下「顶部是卡组/确认/新建等 UI，剩余大部分都是卡池显示」。
+ * 所以竖屏改成**单栏**：
+ *   顶部 = 标题 + 卡组名 + 数量 + 5 个按钮 + 已存卡组标签 + 筛选行（占约 1/4 屏）
+ *   主体 = 一整块卡池（占约 3/4 屏）
+ *   卡组列表默认收起，点右侧的 #dkToggle 才滑出来（单栏没地方并排放两张列表）。
+ * 桌面横屏排版完全不受影响（下面所有规则都带 body.portrait-mode 前缀，
+ * 特异性高于上面的 @media 窄屏规则，能覆盖它）。
+ * ============================================================ */
+body.portrait-mode #deck {
+  display: flex; flex-direction: column;
+  padding: 6px 8px 8px; gap: 5px;
+}
+/* 顶栏：竖向两行按钮，标题与卡组名一行，5 个按钮一行 */
+body.portrait-mode .dk-top {
+  flex-direction: column; align-items: stretch;
+  gap: 4px; padding: 0 0 5px;
+}
+body.portrait-mode .dk-title { font-size: calc(15px * var(--fs, 1)); letter-spacing: 2px; }
+body.portrait-mode .dk-namebtn { width: 100%; font-size: calc(13px * var(--fs, 1)); padding: 4px 6px; }
+/* 5 个按钮排成一行，按钮均分宽度 */
+body.portrait-mode .dk-top .dk-actions {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
+}
+body.portrait-mode .dk-top .dk-actions .pxbtn {
+  padding: 7px 1px; font-size: calc(11.5px * var(--fs, 1));
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+body.portrait-mode .dk-count, body.portrait-mode .dk-msg { font-size: calc(11px * var(--fs, 1)); }
+/* 已存卡组标签：压成一行横向滚动，别把卡池挤掉 */
+body.portrait-mode .dk-tabs {
+  flex-direction: row; align-items: center; flex-wrap: nowrap;
+  gap: 4px; padding: 0; overflow-x: auto; overflow-y: hidden;
+}
+body.portrait-mode .dk-tab { flex: 0 0 auto; padding: 3px 8px; font-size: calc(12px * var(--fs, 1)); }
+body.portrait-mode .dk-tablabel { margin: 0; flex: 0 0 auto; }
+/* 筛选行：类型下拉 + 搜索框各占一半，占满一行 */
+body.portrait-mode .dk-filters { padding-bottom: 4px; gap: 5px; flex-wrap: nowrap; }
+body.portrait-mode .dk-select { flex: 0 0 42%; max-width: none; font-size: calc(12px * var(--fs, 1)); }
+body.portrait-mode .dk-search { flex: 1 1 auto; width: auto; font-size: calc(12px * var(--fs, 1)); }
+body.portrait-mode .dk-hint { display: none; }
+
+/* 主体：单栏，卡池占满 */
+body.portrait-mode .dk-body { position: relative; flex-direction: column; gap: 6px; min-height: 0; }
+/* ⚠ 必须显式 min-height:0 —— flex 项的自动最小尺寸是 min-content，
+   卡池（可滚动的 grid）不置 0 的话 .dk-left 不会缩，把 .dk-right 顶到屏幕外（切卡组时看不见）。 */
+body.portrait-mode .dk-left { flex: 1 1 auto; min-height: 0; }
+/* 卡池列数按宽度自适应，缩略卡最小 68px */
+body.portrait-mode .dk-pool {
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  gap: 5px; padding-right: 4px;
+}
+/* 卡组栏：竖屏默认隐藏，点 #dkToggle 才显示（单栏没地方并排放两张列表） */
+body.portrait-mode .dk-right { display: none; }
+body.portrait-mode #deck.show-deck .dk-right {
+  display: flex; flex: 0 0 44%; width: auto; max-width: none; min-height: 0;
+}
+/* 切换按钮：竖屏才显示，贴在右侧竖着写 */
+body.portrait-mode .dk-toggle {
+  display: block; position: absolute; top: 40%; right: 0;
+  writing-mode: vertical-rl; text-orientation: upright;
+  padding: 12px 5px; font-size: calc(13px * var(--fs, 1));
+  background: var(--panel); color: var(--gold);
+  border: 2px solid var(--line); border-right: none;
+  border-radius: 6px 0 0 6px; cursor: pointer; z-index: 3;
+}
+body.portrait-mode .dk-toggle:hover { border-color: var(--gold); }
+body.portrait-mode #deck.show-deck .dk-toggle { writing-mode: vertical-rl; }
+/* 竖屏下「对面那栏换详情」不适用（只有一栏），统一走 #dkFloat 浮层 */
+body.portrait-mode #dkDetail, body.portrait-mode #dkPoolDetail { display: none !important; }
+
+/* 详情浮层：body 级 fixed 浮层，贴所看卡牌的另一半屏；pointer-events:none 不挡操作 */
+.dk-float {
+  position: fixed; left: 4%; width: 92%; z-index: 60;
+  max-height: 46vh; overflow: hidden;   /* 不滚动：内容经 .pv-fit 整体缩放进框（用户要求全貌可见） */
+  padding: 8px 10px 10px; border-radius: 8px;
+  background: rgba(10, 12, 16, .96);
+  border: 2px solid var(--gold);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, .65);
+  pointer-events: none;
+}
+.dk-float.hidden { display: none; }
+.dk-float .pv-title { font-size: calc(15px * var(--fs, 1)); color: var(--gold); margin-bottom: 4px; }
+.dk-float .pv-img { display: block; width: 100%; height: auto; max-height: 22vh; object-fit: contain; margin: 4px auto; }
+.dk-float .pv-meta { font-size: calc(11.5px * var(--fs, 1)); color: var(--dim); margin-bottom: 5px; line-height: 1.5; }
+.dk-float .pv-effect { font-size: calc(12.5px * var(--fs, 1)); color: var(--text); line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
+.dk-float .pv-awaken { margin-top: 7px; padding-top: 6px; border-top: 1px dashed var(--line); font-size: calc(11.5px * var(--fs, 1)); color: var(--blue); line-height: 1.5; }
+.dk-float .pv-aw-h { color: var(--gold); margin-bottom: 3px; }
+.dk-float .dk-detailfoot { margin-top: 7px; text-align: center; font-size: calc(11px * var(--fs, 1)); color: var(--dim); opacity: .8; }

@@ -94,9 +94,13 @@ const server = http.createServer((req, res) => {
       return;
     }
     const ext = path.extname(f).toLowerCase();
-    // 页面类不缓存（改了立刻生效）；其它静态资源（卡图 / js / css / 字体）长缓存 + ETag。
-    // 有了 ETag，浏览器下次只发一个 If-None-Match，命中就回 304 —— 一个字节都不重传。
-    const noCache = (ext === '.html' || ext === '.webmanifest');
+    /* ★ 这个 node 只给「桌面版 / 本地自测」发文件（线上的静态资源由 Apache 发）。
+     *   以前 js/css 给的是 `public, max-age=2592000`（30 天强缓存）——
+     *   桌面版重打包时如果没换 ?v=，Chromium 会直接吃磁盘缓存里的旧 net.js：
+     *   表现就是"新安装的包，行为还是旧的"（断网都显示已连接，因为它连的是自己）。
+     *   现在统一 no-cache + ETag：每次只回 304，既不会吃旧文件，也不会慢。
+     *   （桌面版缓存目录在 %APPDATA%\dungeon-duelist\Cache，卸载安装包不会清。） */
+    const noCache = true;
     const etag = '"' + st.size.toString(16) + '-' + Math.floor(st.mtimeMs).toString(16) + '"';
     const headers = {
       'Content-Type': MIME[ext] || 'application/octet-stream',
@@ -216,14 +220,52 @@ function mkRoom(code, pass) {
  * 分数存在客户端（存档里），服务端只做 clamp 与结算 —— 与项目现有"进度存本地"的策略一致。
  */
 const RANK_QUEUE = new Map();                                  // sess.id → { sess, score, since }
-const RANK_RANGE = 10;                                         // 分差 ≤ 10（约一个段位）
+const RANK_RANGE = 10;                                         // 基础分差（约一个段位）
+/* ★ 匹配放宽阶梯：等得越久，允许的分差越大，最后干脆不看段位。
+ * 起因：人少时段位差会把玩家永远卡在"匹配中"——宁可打一场实力悬殊的，也别让他一直等着。
+ * 取值按"两人中等待更久的那个"算（等 40 秒的人有资格被任何人匹配到）。 */
+const RANK_RELAX_SCALE = Number(process.env.RANK_RELAX_SCALE || 1);   // 测试用：把放宽阶梯整体缩放（0.02 → 40 秒变 0.8 秒）
+const RANK_RANGE_STEPS = [
+  [0, 10],          // 刚进队：正常一个段位
+  [12000, 25],      // 等 12 秒：放宽到两个半段位
+  [25000, 55],      // 等 25 秒：几乎不限
+  [40000, Infinity] // 等 40 秒：完全不看段位
+].map(function (x) { return [Math.round(x[0] * RANK_RELAX_SCALE), x[1]]; });
+function rankRangeFor(waitedMs) {
+  const w = Math.max(0, waitedMs || 0);
+  let r = RANK_RANGE;
+  for (let i = 0; i < RANK_RANGE_STEPS.length; i++) {
+    if (w >= RANK_RANGE_STEPS[i][0]) r = RANK_RANGE_STEPS[i][1];
+  }
+  return r;
+}
 const RANK_TURN_MS = Number(process.env.RANK_TURN_MS || 80000); // 回合计时（测试可用环境变量缩短）
+/* 好友房的"待决弹窗"兜底时限。
+   为什么好友房也需要：新卡引入了多段交互（矮人术士 4 次点击、混沌元素选卡、
+   火/冰元素让**对手**选牌），只要有一方发呆不点弹窗，对局就永久僵死
+   —— 以前只有排位房计时，好友房完全没有兜底（引擎的 AI 自动决策在 PvP 里是关掉的）。
+   好友房只用来"把弹窗替他点掉"，不替他结束回合（见 onRankTimeout）。 */
+const FRIENDLY_PENDING_MS = Number(process.env.FRIENDLY_PENDING_MS || 120000);
 
 /* 排位赛卡组校验：必须**恰好 DECK_START(20) 张**的合法卡组（大卡组 20~40 张一律拒绝）。
  * 客户端组卡器用的是 storage.js 的 DeckRules，但**服务端沙箱没有加载 storage.js**，
  * 所以这里用沙箱里的 CARDS + Rules 自己复算一遍（懒创建一个 ctx 复用，别每局都 new）。 */
 let DECK_CTX = null;
 function deckCtx() { if (!DECK_CTX) DECK_CTX = createSandbox(); return DECK_CTX; }
+/* 卡表指纹：把整张 CARD_LIST 序列化后做 djb2 哈希。
+ * 目的：让客户端能发现"我的卡表和服务器不是同一份" —— 这正是低版本客户端
+ * 连高版本服务器（或反之）时所有怪现象的根源（显示不一致、动作用不了、甚至渲染崩）。
+ * 客户端 js/net.js 里用同一算法算本地指纹做比对，算法必须保持一致。 */
+let CARDS_SIG = null;
+function cardsSig() {
+  if (CARDS_SIG) return CARDS_SIG;
+  let s = '';
+  try { s = JSON.stringify(deckCtx().CARD_LIST || []); } catch (e) { s = 'err'; }
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+  CARDS_SIG = (h >>> 0).toString(16);
+  return CARDS_SIG;
+}
 function checkRankedDeck(ids) {
   const ctx = deckCtx();
   const need = (ctx.Rules && ctx.Rules.DECK_START) || 20;
@@ -253,7 +295,7 @@ function clearRankTimer(room) {
 /* 每个"新回合"挂一次 80 秒计时：同一回合内的动作不重置计时，
  * 否则玩家只要不停操作就能无限拖时间。 */
 function armRankTimer(room) {
-  if (!room || room.mode !== 'ranked') return;
+  if (!room || (room.mode !== 'ranked' && room.mode !== 'friendly')) return;
   const g = room.game;
   if (!g) { clearRankTimer(room); return; }
   const st = g.engine.state;
@@ -270,8 +312,9 @@ function armRankTimer(room) {
   clearRankTimer(room);
   room.rankTag = tag;
   room.rankWho = who;
-  room.rankDeadline = Date.now() + RANK_TURN_MS;
-  room.rankTimer = setTimeout(() => onRankTimeout(room), RANK_TURN_MS);
+  const ms = (room.mode === 'ranked') ? RANK_TURN_MS : FRIENDLY_PENDING_MS;
+  room.rankDeadline = Date.now() + ms;
+  room.rankTimer = setTimeout(() => onRankTimeout(room), ms);
 }
 function onRankTimeout(room) {
   room.rankTimer = null;
@@ -279,12 +322,33 @@ function onRankTimeout(room) {
   if (!g) return;
   let st = g.engine.state;
   if (st.winner) { clearRankTimer(room); sendState(room, false); return; }
+  const who = room.rankWho;                         // 这次超时算在谁头上
+  const hadPending = !!st.pending;
   // 超时时若还挂着一个"待决选择"（弃牌/选目标），自动按默认处理，否则 END_TURN 会被拒
   if (st.pending) {
     try { g.engine.resolvePrompt(); } catch (e) { }
     st = g.engine.state;
   }
   if (st.winner) { clearRankTimer(room); sendState(room, false); return; }
+
+  /* ★ 惩罚错人修复：待决弹窗属于**对手**时（例：我用火元素/冰霜元素攻击 → 由对手弃牌），
+     超时只该"替他做完选择"，绝不能顺手把**当前回合方**的回合结束掉 ——
+     旧实现无条件 END_TURN，等于对手挂机反而罚我。 */
+  if (hadPending && who && who !== st.active) {
+    room.rankStall = 0;
+    sendState(room, false);
+    armRankTimer(room);
+    return;
+  }
+  /* 好友房：兜底只负责把弹窗点掉，不替玩家做"结束回合"的决策；
+     连续多次都推不动（双方都挂机）才强制推进，避免房间永久僵死。 */
+  if (room.mode !== 'ranked') {
+    if (hadPending) { room.rankStall = 0; sendState(room, false); armRankTimer(room); return; }
+    room.rankStall = (room.rankStall || 0) + 1;
+    if (room.rankStall < 3) { sendState(room, false); armRankTimer(room); return; }
+    room.rankStall = 0;
+  }
+
   let r = null;
   try { r = g.engine.tryAction({ type: 'END_TURN' }); } catch (e) { }
   if (r && r.ok) { sendState(room, false); return; }
@@ -358,6 +422,8 @@ function startRankedMatch(a, b) {
 
 function doRankedQueue(sess, m) {
   const score = rankClamp(m && m.score);
+  // ★ 版本闸门：旧版本客户端连排位都进不去（排位要求双端规则完全一致）
+  if (isOutdated(sess)) { rejectOutdated(sess); return; }
   // ★ 排位赛只接受 20 张的合法卡组（大卡组一律拒绝）—— 在入队前就挡掉
   const deckWhy = checkRankedDeck(sess.profile && sess.profile.deckIds);
   if (deckWhy) { sendMsg(sess, deckWhy); return; }
@@ -365,11 +431,14 @@ function doRankedQueue(sess, m) {
   if (sess.room) leaveRoom(sess, false);          // 排位不接受手动房间：先退房再匹配
   RANK_QUEUE.delete(sess.id);
   let best = null;
+  const now0 = Date.now();
   RANK_QUEUE.forEach((e) => {
     if (!e || !e.sess || e.sess.id === sess.id) return;
     if (!e.sess.conn) return;
     const d = Math.abs(e.score - score);
-    if (d > RANK_RANGE) return;
+    // 放宽额度按"两人中等待更久的那个"算：老玩家等够了就有资格被任何人接走
+    const allow = rankRangeFor(Math.max(now0 - (e.since || now0), 0));
+    if (d > allow) return;
     if (!best || d < best.d) best = { e: e, d: d };
   });
   if (best) {
@@ -377,9 +446,42 @@ function doRankedQueue(sess, m) {
     startRankedMatch(best.e.sess, sess);
     return;
   }
-  RANK_QUEUE.set(sess.id, { sess: sess, score: score, since: Date.now() });
-  send(sess, { t: 'ranked-wait', score: score, queue: RANK_QUEUE.size, range: RANK_RANGE });
+  RANK_QUEUE.set(sess.id, { sess: sess, score: score, since: now0 });
+  send(sess, { t: 'ranked-wait', score: score, queue: RANK_QUEUE.size, range: rankRangeFor(0) });
+  ensureRankScan();                                      // 没人再进来时，靠扫描让等待者逐步放宽直到配对
   logLine('ranked', sess.id.slice(0, 6) + ' 进入匹配队列（' + score + ' 分，队列 ' + RANK_QUEUE.size + '）');
+}
+
+/* 队列扫描：只在"有人排队"时存在。每隔几秒用**当前**放宽规则重试配对 ——
+ * 否则两个人入队时分差太大没配上，之后又没人再入队，就会一直等到天荒地老。 */
+let rankScanTimer = null;
+function ensureRankScan() {
+  if (rankScanTimer) return;
+  rankScanTimer = setInterval(() => {
+    if (RANK_QUEUE.size === 0) {
+      clearInterval(rankScanTimer); rankScanTimer = null; return;
+    }
+    if (RANK_QUEUE.size < 2) return;
+    const arr = [];
+    RANK_QUEUE.forEach((e) => { if (e && e.sess && e.sess.conn) arr.push(e); });
+    const now = Date.now();
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = i + 1; j < arr.length; j++) {
+        const a = arr[i], b = arr[j];
+        const d = Math.abs((a.score || 0) - (b.score || 0));
+        const waited = Math.max(now - (a.since || now), now - (b.since || now), 0);
+        if (d <= rankRangeFor(waited)) {
+          RANK_QUEUE.delete(a.sess.id);
+          RANK_QUEUE.delete(b.sess.id);
+          logLine('ranked', '放宽后配对：' + (a.score || 0) + ' 分 vs ' + (b.score || 0) +
+            ' 分（分差 ' + d + '，等待 ' + Math.round(waited / 1000) + 's）');
+          startRankedMatch(a.sess, b.sess);
+          return;
+        }
+      }
+    }
+  }, 4000);
+  if (rankScanTimer.unref) rankScanTimer.unref();
 }
 function doRankedCancel(sess) {
   RANK_QUEUE.delete(sess.id);
@@ -666,7 +768,7 @@ function onConn(conn) {
   CONNS.add(sess);
   // ranked: 服务端是否支持排位（旧服务端没有这个字段 → 客户端据此提示"服务端版本过旧"）
   // n: 当前在线人数，连上就立刻告诉客户端（不用等下一次广播）
-  conn.sendJSON({ t: 'hello', id: sess.id, ranked: true, n: CONNS.size });
+  conn.sendJSON({ t: 'hello', id: sess.id, ranked: true, n: CONNS.size, cards: cardsSig(), build: serverVer(), url: DOWNLOAD_URL });
   bindConn(sess);
   broadcastOnline();                             // 有人连上 → 广播最新在线人数
 }
@@ -691,7 +793,7 @@ function doResume(newSess, oldId) {
   CONNS.delete(newSess);
   CONNS.add(old);
   bindConn(old);
-  old.conn.sendJSON({ t: 'hello', id: old.id, resumed: true, ranked: true, n: CONNS.size });
+  old.conn.sendJSON({ t: 'hello', id: old.id, resumed: true, ranked: true, n: CONNS.size, cards: cardsSig(), build: serverVer(), url: DOWNLOAD_URL });
   const room = old.room && ROOMS.get(old.room);
   if (room) {
     broadcastRoom(room);
@@ -750,6 +852,8 @@ function handle(sess, m) {
     case 'begin': beginBattle(sess, m); break;
     case 'act': doAct(sess, m.a); break;
     case 'prompt': doPrompt(sess, m.v); break;
+    case 'ver': sess.buildVer = parseVer(m.build); break;  // 客户端上报自己的版本（开局前会被校验）
+    case 'emote': handleEmote(sess, m); break;           // PVP 快捷对话（只转发白名单格式的 id）
     case 'ranked': doRankedQueue(sess, m); break;        // 排位赛：开始匹配
     case 'ranked-cancel': doRankedCancel(sess); break;   // 排位赛：取消匹配
     default: break;
@@ -989,6 +1093,66 @@ function doSwapAnswer(sess, ok) {
   console.log('[room ' + room.code + '] ' + pa.id + ' 与 ' + pb.id + ' 交换席位成功');
 }
 
+/* PVP 快捷对话：只转发**格式合法**的 id（'greet.0' / 'salute.3' / 'taunt.4'），
+ * 不接受自由文本 —— 否则等于给所有人一个无过滤的聊天框，刷屏/辱骂无法管控。
+ * 具体文案在各客户端自己的表里，服务端不认识也不需要认识。 */
+const EMOTE_RE = /^(greet|salute|taunt)\.([0-8])$/;
+const EMOTE_CD_MS = 2500;                          // 每人每 2.5 秒最多 1 条，防刷屏
+function handleEmote(sess, m) {
+  const room = ROOMS.get(sess.room);
+  if (!room) return;
+  const id = m && typeof m.id === 'string' ? m.id : '';
+  if (!EMOTE_RE.test(id)) return;                  // 非法 id 直接丢弃（不报错，避免被探测）
+  const seat = seatOfPlayer(room, sess.id);
+  if (!seat || !seat.player) return;
+  const now = Date.now();
+  if (sess._emoteAt && now - sess._emoteAt < EMOTE_CD_MS) return;
+  sess._emoteAt = now;
+  const name = seat.player.name || '';
+  // 广播给房间内所有人（含发送者本人）→ 客户端按 from 判断从哪个名字弹出
+  room.seats.forEach((s) => {
+    if (s.player && s.player.sess) s.player.sess.conn.sendJSON({ t: 'emote', from: sess.id, name: name, id: id });
+  });
+}
+
+/* ================= 客户端版本闸门 =================
+ * 低于服务端版本的客户端**不允许开战**。
+ * 为什么必须拦：新版加了 10 张卡、改了装备等级上限等规则，旧客户端连上来会出现
+ * 卡表认不出、数值不一致、甚至渲染崩（详见 cardsSig 那段）。与其打到一半出错，
+ * 不如开局前就拒掉，并直接把下载地址给玩家。
+ * 版本号从 Rules.BUILD 里的 `vNN` 提取 —— 服务端和客户端读的是同一份 rules.js，
+ * 所以「服务端更新了但玩家没刷新」这种情况一定能被识别出来。 */
+const DOWNLOAD_URL = process.env.DOWNLOAD_URL || 'https://dms.spldream.com';
+let SERVER_VER = null;
+function serverVer() {
+  if (SERVER_VER == null) {
+    let b = '';
+    try { b = (deckCtx().Rules || {}).BUILD || ''; } catch (e) { }
+    const m = /v(\d+)/.exec(String(b));
+    SERVER_VER = m ? Number(m[1]) : 0;
+  }
+  return SERVER_VER;
+}
+function parseVer(build) {
+  const m = /v(\d+)/.exec(String(build || ''));
+  return m ? Number(m[1]) : 0;
+}
+/* 这条连接是否过旧（未上报版本的老客户端也算过旧） */
+function isOutdated(sess) {
+  const need = serverVer();
+  if (!need) return false;                       // 服务端自己取不到版本号 → 不拦（防御）
+  return (sess.buildVer || 0) < need;
+}
+/* 统一拒绝：下发改版提示 + 可读原因。客户端据此弹「去下载」的框。 */
+function rejectOutdated(sess) {
+  const need = serverVer();
+  const mine = sess.buildVer || 0;
+  send(sess, { t: 'need-update', yours: mine, latest: need, url: DOWNLOAD_URL });
+  sendMsg(sess, '你的游戏版本（' + (mine ? 'v' + mine : '未知') + '）低于服务器版本（v' + need +
+    '），无法开始对局。请刷新页面（Ctrl+F5）；若仍提示，请到 ' + DOWNLOAD_URL + ' 下载最新版。');
+  logLine('version', sess.id.slice(0, 6) + ' 版本过低（' + (mine || '?') + ' < ' + need + '），拒绝开战');
+}
+
 function beginBattle(sess, m) {
   const room = ROOMS.get(sess.room);
   if (!room) return;
@@ -999,6 +1163,41 @@ function beginBattle(sess, m) {
   if (fs2.length !== 2) { sendMsg(sess, '需要两名对战玩家（房主 + 一名对手）'); return; }
   if (!fs2.every((s) => s.player.ready)) { sendMsg(sess, '双方都点「准备」后才能开始'); return; }
   if (!fs2[0].player.deckIds.length || !fs2[1].player.deckIds.length) { sendMsg(sess, '有玩家的卡组是空的'); return; }
+  /* ★ 版本闸门：任何一方客户端低于服务端版本 → 直接拒绝开战（给出下载地址） */
+  const outdated = fs2.filter((s) => isOutdated(s.player.sess));
+  if (outdated.length) {
+    fs2.forEach((s) => {
+      if (isOutdated(s.player.sess)) rejectOutdated(s.player.sess);
+      else sendMsg(s.player.sess, '对手的客户端版本过低，无法开始对局（已提示对方更新）');
+    });
+    return;
+  }
+  /* ★ 好友房也要校验卡组里的卡 id 是否存在（以前只有排位路径校验）。
+     为什么必须有：客户端与服务端卡表版本不一致时（例如客户端更新了、服务端没重启），
+     引擎的 makePlayer 只存 id、不查卡表，于是 newGame 能过；
+     但第一次用到那张卡时 cardOf() 返回 undefined，抛异常被 handle 的 catch 吞成
+     「服务器处理出错」，双方都收不到 battle 状态 —— 玩家看到的就是"点了开始没反应"。
+     这里提前拦下来，给出能看懂的原因。 */
+  const ctx0 = deckCtx();
+  const badIds = [];
+  [fs2[0].player, fs2[1].player].forEach((pl) => {
+    pl.deckIds.forEach((id) => {
+      if (!ctx0.CARDS[id] && badIds.indexOf(id) < 0) badIds.push(id);
+    });
+  });
+  if (badIds.length) {
+    const msg = '卡组里有服务器不认识的卡：' + badIds.slice(0, 3).join('、')
+      + (badIds.length > 3 ? ' 等 ' + badIds.length + ' 张' : '')
+      + '（服务器可能是旧版本，需要更新并重启；或你的页面缓存了旧卡表，请硬刷新）';
+    fs2.forEach((s) => sendMsg(s.player.sess, msg));
+    console.log('[room ' + room.code + '] 卡表不一致，拒绝开局: ' + badIds.join(','));
+    return;
+  }
+  /* 单卡张数上限的拦截放在**客户端各入口**（组卡器保存/使用、跑图、大赛、晋升之路、
+     联机面板准备），服务端好友房这里只查"卡 id 是否存在"。
+     为什么不在服务端拦：好友房允许玩家自定义卡组，历史上从未校验张数上限；
+     真在这里加，任何用它开房的旧客户端/调试脚本都会被拒（把既有联机流程一起打挂）。
+     排位赛那条路仍然有完整的上限校验（见 checkRankedDeck）。 */
 
   const A = fs2[0].player, B = fs2[1].player;
   const ctx = createSandbox();

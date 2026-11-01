@@ -1,1 +1,247 @@
-#master{z-index:40;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:var(--bg,#14141a);padding:26px 18px 36px;position:fixed;inset:0;overflow-y:auto}.ms-wrap{max-width:880px;margin:0 auto}.ms-title{text-align:center;color:var(--gold,#e8c86a);letter-spacing:4px;margin:10px 0 6px;font-size:30px}.ms-sub{text-align:center;color:#9a94a6;font-size:calc(15px * var(--fs,1));margin:0 0 22px}.ms-code{color:#ffd166;letter-spacing:6px;font-size:28px}.ms-net{text-align:center;font-size:calc(12px * var(--fs,1));color:#9a94a6;border:1px dashed var(--line,#3a3444);max-width:560px;margin:-12px auto 14px;padding:6px 10px}.ms-net.on{color:#7fd08a;background:#50a05a1a;border-color:#3f6b4a}.ms-net:not(.on){cursor:pointer}.ms-net:not(.on):hover{border-color:var(--gold-dim,#8a7638);color:#b9b3c4}.ms-net b{color:#7fc8e8}.ms-me{background:var(--panel,#1a1a20);border:2px solid var(--line,#3a3444);align-items:center;gap:14px;max-width:560px;margin:0 auto 22px;padding:14px 18px;display:flex}.ms-ava img{width:54px;height:54px;image-rendering:pixelated;border:2px solid var(--line,#3a3444);background:#0e0e13;display:block}.ms-ava.sm img{width:38px;height:38px}.ms-ava.big img{width:96px;height:96px}.ms-pl{flex-direction:column;min-width:0;line-height:1.4;display:flex}.ms-pl b{color:var(--text,#e8e6ee);font-size:calc(18px * var(--fs,1))}.ms-pl em{color:#8b8598;font-size:calc(14px * var(--fs,1));font-style:normal}.ms-deck{color:#7fc8e8;font-size:calc(14px * var(--fs,1))}.ms-menu{flex-direction:column;gap:14px;max-width:560px;margin:0 auto;display:flex}.ms-item{text-align:left;cursor:pointer;background:var(--panel,#1a1a20);border:2px solid var(--line,#3a3444);color:var(--text,#e8e6ee);padding:18px 20px;position:relative;box-shadow:3px 3px #000}.ms-item:hover{border-color:var(--gold-dim,#8a7638)}.ms-item b{font-size:calc(22px * var(--fs,1));letter-spacing:3px;color:var(--gold,#e8c86a);display:block}.ms-item .ms-desc{color:#9a94a6;font-size:calc(14px * var(--fs,1));margin-top:6px;display:block}.ms-item.is-dev{opacity:.55;cursor:not-allowed}.ms-item.is-dev b{color:#b9b3c4}.ms-tag{font-size:calc(12px * var(--fs,1));color:#ffd166;background:#4a3a20;border:1px solid #7a6330;padding:2px 8px;position:absolute;top:10px;right:10px}.ms-join{align-items:stretch;gap:10px;display:flex}.ms-input{min-width:0;color:var(--text,#e8e6ee);border:2px solid var(--line,#3a3444);font-size:calc(18px * var(--fs,1));letter-spacing:5px;text-align:center;background:#0e0e13;flex:1;padding:12px 14px}.ms-seats{grid-template-columns:1fr 1fr;gap:14px;max-width:680px;margin:0 auto 20px;display:grid}.ms-seat{background:var(--panel,#1a1a20);border:2px solid var(--line,#3a3444);min-height:128px;padding:14px 16px;position:relative}.ms-seat.fight{border-color:#6a5a2a}.ms-seat.me{border-color:#7fc8e8}.ms-seat.empty{opacity:.6;border-style:dashed}.ms-seat-tag{font-size:calc(12px * var(--fs,1));color:#b9b3c4;background:#2a2a34;padding:2px 8px;position:absolute;top:-1px;right:-1px}.ms-seat.fight .ms-seat-tag{color:#ffd166;background:#4a3a20}.ms-seat .ms-pl b{font-size:calc(17px * var(--fs,1))}.ms-wait{color:#6f6b7a;font-size:calc(15px * var(--fs,1));text-align:center;padding-top:18px}.ms-ready{font-size:calc(14px * var(--fs,1));color:#8b8598;margin-top:8px}.ms-ready.on{color:#7fd08a}.ms-ready.watch{color:#7fc8e8}.ms-rule-wrap{text-align:center;max-width:680px;margin:0 auto 20px}.ms-rule-t{color:#b9b3c4;font-size:calc(15px * var(--fs,1));margin-bottom:8px}.ms-rules{flex-wrap:wrap;justify-content:center;gap:10px;display:flex}.ms-chip{font-size:calc(15px * var(--fs,1));cursor:pointer;background:var(--panel2,#20202a);color:var(--text,#e8e6ee);border:2px solid var(--line,#3a3444);padding:9px 18px}.ms-chip.on{border-color:var(--gold,#e8c86a);color:#ffd166}.ms-chip[disabled]{opacity:.6;cursor:default}.ms-actions{flex-wrap:wrap;justify-content:center;gap:12px;margin:20px 0 10px;display:flex}.ms-online{text-align:center;color:var(--dim,#8f8b80);font-size:calc(12px * var(--fs,1));letter-spacing:.5px;margin:-6px 0 12px}.ms-online:before{content:"●";color:var(--green,#7ec850);vertical-align:1px;margin-right:6px;font-size:.9em}.ms-rank{background:var(--panel,#232323);border:2px solid var(--line,#3d3d3d);text-align:center;border-radius:10px;max-width:420px;margin:0 auto 18px;padding:14px 18px}.ms-rank-tier{color:var(--gold,#d8b04a);font-size:calc(20px * var(--fs,1));letter-spacing:2px}.ms-rank-score{color:var(--text,#d6d2c4);font-size:calc(13px * var(--fs,1));margin-top:6px}.ms-rank-score b{color:var(--gold,#d8b04a);font-size:calc(17px * var(--fs,1))}.ms-rank-next{color:var(--dim,#8f8b80);font-size:calc(11px * var(--fs,1));margin-top:4px}.ms-wait{text-align:center;color:var(--text,#d6d2c4);font-size:calc(13px * var(--fs,1));margin:6px 0 4px}.ms-wait #msWaitTxt:before{content:"●";color:var(--green,#7ec850);margin-right:7px;animation:.9s ease-in-out infinite msDot}@keyframes msDot{0%,to{opacity:1}50%{opacity:.25}}.ms-note{color:#9a94a6;font-size:calc(15px * var(--fs,1));align-self:center}.ms-hint{text-align:center;color:#8b8598;font-size:calc(14px * var(--fs,1));min-height:22px}.ms-vs{justify-content:center;align-items:stretch;gap:18px;max-width:720px;margin:0 auto;display:flex}.ms-vs-side{flex:1 1 0;min-width:0}.ms-vs-mid{color:var(--gold,#e8c86a);letter-spacing:3px;align-self:center;font-size:30px}.ms-sidecard{text-align:center;background:var(--panel,#1a1a20);border:2px solid var(--line,#3a3444);padding:18px 16px}.ms-sidecard.me{border-color:#7fc8e8}.ms-sidecard .ms-ava{display:inline-block}.ms-sidename{font-size:calc(21px * var(--fs,1));color:var(--text,#e8e6ee);margin-top:10px}.ms-sidetitle{color:#9a94a6;font-size:calc(14px * var(--fs,1));margin-top:4px}.ms-sidedeck{color:#7fc8e8;font-size:calc(14px * var(--fs,1));margin-top:10px}.ms-sideready{font-size:calc(14px * var(--fs,1));color:#8b8598;margin-top:8px}.ms-sideready.on{color:#7fd08a}.ms-scorebar{justify-content:center;align-items:center;gap:12px;margin:16px 0 8px;font-size:34px;display:flex}.ms-score.me{color:#7fc8e8}.ms-score.opp{color:#e08a8a}.ms-score-sep{color:#6f6b7a}.ms-info2{text-align:center;color:#b9b3c4;font-size:calc(15px * var(--fs,1))}.ms-recs{flex-direction:column;gap:10px;max-width:700px;margin:0 auto;display:flex}.ms-rec{background:var(--panel,#1a1a20);border:2px solid var(--line,#3a3444);grid-template-columns:42px 46px 1fr auto auto;align-items:center;gap:12px;padding:12px 14px;display:grid}.ms-rec-res{text-align:center;font-size:calc(18px * var(--fs,1))}.ms-rec-res.win{color:#7fd08a}.ms-rec-res.lose{color:#e08a8a}.ms-rec-main{flex-direction:column;min-width:0;display:flex}.ms-rec-main b{font-size:calc(17px * var(--fs,1));color:var(--text,#e8e6ee)}.ms-rec-main em{font-style:normal;font-size:calc(13px * var(--fs,1));color:#8b8598}.ms-rec-score{color:var(--gold,#e8c86a);font-size:calc(19px * var(--fs,1))}.ms-rec-dim{color:#8b8598;font-size:calc(13px * var(--fs,1));text-align:right;line-height:1.4}.ms-norec{text-align:center;color:#9a94a6;font-size:calc(15px * var(--fs,1));padding:40px 0;line-height:1.9}.ms-deckbtn{cursor:pointer}.ms-deckbtn:hover{color:#a8e0ff;text-decoration:underline dotted #7fc8e899}.ms-deckpick .ms-dplist{overscroll-behavior:contain;text-align:left;max-height:min(46vh,320px);margin:10px 0 4px;overflow-y:auto}.ms-dprow{background:var(--panel2,#20202a);border:2px solid var(--line,#3a3444);cursor:pointer;align-items:center;gap:10px;min-height:48px;margin-bottom:8px;padding:12px 14px;display:flex}.ms-dprow:hover{border-color:var(--gold-dim,#8a7638)}.ms-dprow.cur{border-color:var(--gold,#e8c86a)}.ms-dpn{min-width:0;color:var(--text,#e8e6ee);font-size:calc(16px * var(--fs,1));text-overflow:ellipsis;white-space:nowrap;flex:1;overflow:hidden}.ms-dpc{color:#9a94a6;font-size:calc(13px * var(--fs,1));white-space:nowrap}.ms-dpb{color:var(--gold,#e8c86a);font-size:calc(13px * var(--fs,1));white-space:nowrap}.cc-list{flex-direction:column;gap:14px;margin:18px 0 8px;display:flex}.cc-card{text-align:left;cursor:pointer;background:var(--panel2,#20202a);border:2px solid var(--line,#3a3444);min-width:300px;color:var(--text,#e8e6ee);padding:18px 20px;position:relative;box-shadow:3px 3px #000}.cc-card:hover{border-color:var(--gold,#e8c86a)}.cc-card b{font-size:calc(22px * var(--fs,1));letter-spacing:4px;color:var(--gold,#e8c86a);display:block}.cc-desc{color:#9a94a6;font-size:calc(14px * var(--fs,1));margin-top:6px;display:block}.cc-badge{font-size:calc(12px * var(--fs,1));border:1px solid;padding:2px 9px;position:absolute;top:12px;right:12px}.cc-badge.pve{color:#7fd08a;background:#1d2a20;border-color:#3f6b4a}.cc-badge.pvp{color:#ff9f7a;background:#2a1d17;border-color:#7a4a30}@media (height<=620px),(pointer:coarse),(width<=1100px){#master{padding:8px 10px 14px}.ms-title{font-size:calc(18px * var(--fs,1));letter-spacing:2px;margin:0 0 2px}.ms-sub{font-size:calc(11px * var(--fs,1));margin-bottom:8px}.ms-code{font-size:calc(20px * var(--fs,1))}.ms-net{font-size:calc(11px * var(--fs,1));margin:-6px auto 8px;padding:4px 8px}.ms-me{gap:8px;margin-bottom:8px;padding:6px 10px}.ms-ava img{width:30px;height:30px}.ms-ava.sm img{width:26px;height:26px}.ms-ava.big img{width:52px;height:52px}.ms-pl b{font-size:calc(14px * var(--fs,1))}.ms-pl em,.ms-deck{font-size:calc(11px * var(--fs,1))}.ms-menu{gap:6px}.ms-item{padding:8px 11px}.ms-item b{font-size:calc(14px * var(--fs,1))}.ms-item .ms-desc{font-size:calc(11px * var(--fs,1));margin-top:2px}.ms-tag{font-size:calc(11px * var(--fs,1));padding:1px 6px}.ms-input{font-size:calc(15px * var(--fs,1));padding:9px 12px}.ms-seats{gap:6px;margin-bottom:8px}.ms-seat{min-height:64px;padding:6px 9px}.ms-seat .ms-pl b{font-size:calc(13px * var(--fs,1))}.ms-seat-tag{font-size:calc(11px * var(--fs,1));padding:1px 6px}.ms-ready{font-size:calc(12px * var(--fs,1));margin-top:4px}.ms-wait{font-size:calc(13px * var(--fs,1));padding-top:10px}.ms-rule-wrap{margin-bottom:8px}.ms-rule-t{font-size:calc(12px * var(--fs,1));margin-bottom:4px}.ms-chip{font-size:calc(12px * var(--fs,1));padding:5px 10px}.ms-actions{gap:6px;margin:8px 0 4px}.ms-actions .pxbtn{font-size:calc(12px * var(--fs,1));letter-spacing:1px;padding:7px 12px}.ms-sidecard{padding:6px}.ms-sidename{font-size:calc(13px * var(--fs,1));margin-top:4px}.ms-sidetitle{font-size:calc(11px * var(--fs,1))}.ms-sidedeck{font-size:calc(11px * var(--fs,1));margin-top:3px}.ms-sideready{font-size:calc(12px * var(--fs,1));margin-top:3px}.ms-scorebar{font-size:calc(18px * var(--fs,1));margin:6px 0 2px}.ms-info2{font-size:calc(12px * var(--fs,1))}.ms-hint{font-size:calc(11px * var(--fs,1))}.ms-rec{grid-template-columns:28px 30px 1fr auto auto;gap:8px;padding:5px 8px}.ms-rec-res,.ms-rec-main b{font-size:calc(14px * var(--fs,1))}.ms-rec-main em{font-size:calc(11px * var(--fs,1))}.ms-rec-score{font-size:calc(15px * var(--fs,1))}.ms-rec-dim{font-size:calc(10px * var(--fs,1))}.ms-dprow{min-height:44px;margin-bottom:6px;padding:10px 12px}.ms-dpn{font-size:calc(14px * var(--fs,1))}.ms-deckpick .ms-dplist{max-height:40vh}.cc-list{gap:8px;width:78vw;margin:10px 0 4px}.cc-card{width:100%;min-width:0;padding:12px 14px}.cc-card b{font-size:calc(16px * var(--fs,1));letter-spacing:2px}.cc-desc{font-size:calc(11px * var(--fs,1));margin-top:3px}.cc-badge{font-size:calc(11px * var(--fs,1));padding:1px 6px;top:8px;right:8px}}
+/* ============================================================
+ * 大师赛（联机）· 样式   master.css
+ *   入口分流弹窗（联盟赛 / 大师赛）、大师赛面板、房间席位、
+ *   准备面板（双方资料对位）、赛事纪录、卡组选择弹窗
+ *   桌面字号偏小已整体放大；手机横屏由文件末尾的媒体查询覆盖成紧凑版。
+ * ============================================================ */
+
+#master {
+  position: fixed; inset: 0; z-index: 40; overflow-y: auto;
+  overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  background: var(--bg, #14141a); padding: 26px 18px 36px;
+}
+.ms-wrap { max-width: 880px; margin: 0 auto; }
+
+.ms-title { text-align: center; color: var(--gold, #e8c86a); font-size: 30px; letter-spacing: 4px; margin: 10px 0 6px; }
+.ms-sub { text-align: center; color: #9a94a6; font-size: calc(15px * var(--fs, 1)); margin: 0 0 22px; }
+.ms-code { color: #ffd166; font-size: 28px; letter-spacing: 6px; }
+
+/* ---- 联机连接状态 ---- */
+.ms-net {
+  text-align: center; font-size: calc(12px * var(--fs, 1)); color: #9a94a6; max-width: 560px;
+  margin: -12px auto 14px; padding: 6px 10px; border: 1px dashed var(--line, #3a3444);
+}
+.ms-net.on { color: #7fd08a; border-color: #3f6b4a; background: rgba(80, 160, 90, .10); }
+.ms-net:not(.on) { cursor: pointer; }
+.ms-net:not(.on):hover { border-color: var(--gold-dim, #8a7638); color: #b9b3c4; }
+.ms-net b { color: #7fc8e8; }
+
+/* ---- 玩家资料条 ---- */
+.ms-me {
+  display: flex; align-items: center; gap: 14px; padding: 14px 18px; margin: 0 auto 22px;
+  background: var(--panel, #1a1a20); border: 2px solid var(--line, #3a3444); max-width: 560px;
+}
+.ms-ava img {
+  width: 54px; height: 54px; display: block; image-rendering: pixelated;
+  border: 2px solid var(--line, #3a3444); background: #0e0e13;
+}
+.ms-ava.sm img { width: 38px; height: 38px; }
+.ms-ava.big img { width: 96px; height: 96px; }
+.ms-pl { display: flex; flex-direction: column; line-height: 1.4; min-width: 0; }
+.ms-pl b { color: var(--text, #e8e6ee); font-size: calc(18px * var(--fs, 1)); }
+.ms-pl em { color: #8b8598; font-size: calc(14px * var(--fs, 1)); font-style: normal; }
+.ms-deck { color: #7fc8e8; font-size: calc(14px * var(--fs, 1)); }
+
+/* ---- 三个入口 ---- */
+.ms-menu { display: flex; flex-direction: column; gap: 14px; max-width: 560px; margin: 0 auto; }
+.ms-item {
+  position: relative; text-align: left; padding: 18px 20px; cursor: pointer;
+  background: var(--panel, #1a1a20); border: 2px solid var(--line, #3a3444);
+  color: var(--text, #e8e6ee); box-shadow: 3px 3px 0 #000;
+}
+.ms-item:hover { border-color: var(--gold-dim, #8a7638); }
+.ms-item b { display: block; font-size: calc(22px * var(--fs, 1)); letter-spacing: 3px; color: var(--gold, #e8c86a); }
+.ms-item .ms-desc { display: block; color: #9a94a6; font-size: calc(14px * var(--fs, 1)); margin-top: 6px; }
+.ms-item.is-dev { opacity: .55; cursor: not-allowed; }
+.ms-item.is-dev b { color: #b9b3c4; }
+.ms-tag {
+  position: absolute; top: 10px; right: 10px; padding: 2px 8px; font-size: calc(12px * var(--fs, 1));
+  background: #4a3a20; color: #ffd166; border: 1px solid #7a6330;
+}
+
+/* ---- 加入房间 ---- */
+.ms-join { display: flex; gap: 10px; align-items: stretch; }
+.ms-input {
+  flex: 1; min-width: 0; padding: 12px 14px; background: #0e0e13; color: var(--text, #e8e6ee);
+  border: 2px solid var(--line, #3a3444); font-size: calc(18px * var(--fs, 1)); letter-spacing: 5px; text-align: center;
+}
+
+/* ---- 房间席位（2 对战 + 2 观战）---- */
+.ms-seats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 680px; margin: 0 auto 20px; }
+.ms-seat {
+  position: relative; padding: 14px 16px; min-height: 128px;
+  background: var(--panel, #1a1a20); border: 2px solid var(--line, #3a3444);
+}
+.ms-seat.fight { border-color: #6a5a2a; }
+.ms-seat.me { border-color: #7fc8e8; }
+.ms-seat.empty { opacity: .6; border-style: dashed; }
+.ms-seat-tag { position: absolute; top: -1px; right: -1px; font-size: calc(12px * var(--fs, 1)); padding: 2px 8px; background: #2a2a34; color: #b9b3c4; }
+.ms-seat.fight .ms-seat-tag { background: #4a3a20; color: #ffd166; }
+.ms-seat .ms-pl b { font-size: calc(17px * var(--fs, 1)); }
+.ms-wait { color: #6f6b7a; font-size: calc(15px * var(--fs, 1)); padding-top: 18px; text-align: center; }
+.ms-ready { margin-top: 8px; font-size: calc(14px * var(--fs, 1)); color: #8b8598; }
+.ms-ready.on { color: #7fd08a; }
+.ms-ready.watch { color: #7fc8e8; }
+
+/* ---- 胜负规则 ---- */
+.ms-rule-wrap { max-width: 680px; margin: 0 auto 20px; text-align: center; }
+.ms-rule-t { color: #b9b3c4; font-size: calc(15px * var(--fs, 1)); margin-bottom: 8px; }
+.ms-rules { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.ms-chip {
+  padding: 9px 18px; font-size: calc(15px * var(--fs, 1)); cursor: pointer;
+  background: var(--panel2, #20202a); color: var(--text, #e8e6ee); border: 2px solid var(--line, #3a3444);
+}
+.ms-chip.on { border-color: var(--gold, #e8c86a); color: #ffd166; }
+.ms-chip[disabled] { opacity: .6; cursor: default; }
+
+/* ---- 动作区 ---- */
+.ms-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 20px 0 10px; }
+
+/* 在线人数（大师赛入口） */
+.ms-online {
+  text-align: center; color: var(--dim, #8f8b80);
+  font-size: calc(12px * var(--fs, 1));
+  letter-spacing: .5px; margin: -6px 0 12px;
+}
+.ms-online::before { content: '●'; color: var(--green, #7ec850); margin-right: 6px; font-size: .9em; vertical-align: 1px; }
+
+/* ---------------- 排名赛：段位/积分卡 + 匹配中 ---------------- */
+.ms-rank {
+  max-width: 420px; margin: 0 auto 18px; padding: 14px 18px;
+  background: var(--panel, #232323); border: 2px solid var(--line, #3d3d3d);
+  border-radius: 10px; text-align: center;
+}
+.ms-rank-tier { color: var(--gold, #d8b04a); font-size: calc(20px * var(--fs, 1)); letter-spacing: 2px; }
+.ms-rank-score { color: var(--text, #d6d2c4); font-size: calc(13px * var(--fs, 1)); margin-top: 6px; }
+.ms-rank-score b { color: var(--gold, #d8b04a); font-size: calc(17px * var(--fs, 1)); }
+.ms-rank-next { color: var(--dim, #8f8b80); font-size: calc(11px * var(--fs, 1)); margin-top: 4px; }
+.ms-wait { text-align: center; color: var(--text, #d6d2c4); font-size: calc(13px * var(--fs, 1)); margin: 6px 0 4px; }
+.ms-wait #msWaitTxt::before {
+  content: '●'; color: var(--green, #7ec850); margin-right: 7px;
+  animation: msDot .9s ease-in-out infinite;
+}
+@keyframes msDot { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+.ms-note { color: #9a94a6; font-size: calc(15px * var(--fs, 1)); align-self: center; }
+.ms-hint { text-align: center; color: #8b8598; font-size: calc(14px * var(--fs, 1)); min-height: 22px; }
+
+/* ---- 准备面板 ---- */
+.ms-vs { display: flex; align-items: stretch; justify-content: center; gap: 18px; max-width: 720px; margin: 0 auto; }
+.ms-vs-side { flex: 1 1 0; min-width: 0; }
+.ms-vs-mid { align-self: center; color: var(--gold, #e8c86a); font-size: 30px; letter-spacing: 3px; }
+.ms-sidecard { text-align: center; padding: 18px 16px; background: var(--panel, #1a1a20); border: 2px solid var(--line, #3a3444); }
+.ms-sidecard.me { border-color: #7fc8e8; }
+.ms-sidecard .ms-ava { display: inline-block; }
+.ms-sidename { margin-top: 10px; font-size: calc(21px * var(--fs, 1)); color: var(--text, #e8e6ee); }
+.ms-sidetitle { color: #9a94a6; font-size: calc(14px * var(--fs, 1)); margin-top: 4px; }
+.ms-sidedeck { color: #7fc8e8; font-size: calc(14px * var(--fs, 1)); margin-top: 10px; }
+.ms-sideready { margin-top: 8px; font-size: calc(14px * var(--fs, 1)); color: #8b8598; }
+.ms-sideready.on { color: #7fd08a; }
+.ms-scorebar { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0 8px; font-size: 34px; }
+.ms-score.me { color: #7fc8e8; }
+.ms-score.opp { color: #e08a8a; }
+.ms-score-sep { color: #6f6b7a; }
+.ms-info2 { text-align: center; color: #b9b3c4; font-size: calc(15px * var(--fs, 1)); }
+
+/* ---- 赛事纪录 ---- */
+.ms-recs { display: flex; flex-direction: column; gap: 10px; max-width: 700px; margin: 0 auto; }
+.ms-rec {
+  display: grid; grid-template-columns: 42px 46px 1fr auto auto; gap: 12px; align-items: center;
+  padding: 12px 14px; background: var(--panel, #1a1a20); border: 2px solid var(--line, #3a3444);
+}
+.ms-rec-res { text-align: center; font-size: calc(18px * var(--fs, 1)); }
+.ms-rec-res.win { color: #7fd08a; }
+.ms-rec-res.lose { color: #e08a8a; }
+.ms-rec-main { display: flex; flex-direction: column; min-width: 0; }
+.ms-rec-main b { font-size: calc(17px * var(--fs, 1)); color: var(--text, #e8e6ee); }
+.ms-rec-main em { font-style: normal; font-size: calc(13px * var(--fs, 1)); color: #8b8598; }
+.ms-rec-score { color: var(--gold, #e8c86a); font-size: calc(19px * var(--fs, 1)); }
+.ms-rec-dim { color: #8b8598; font-size: calc(13px * var(--fs, 1)); text-align: right; line-height: 1.4; }
+.ms-norec { text-align: center; color: #9a94a6; font-size: calc(15px * var(--fs, 1)); padding: 40px 0; line-height: 1.9; }
+
+/* ---- 可点击的卡组名（房间内切卡组）---- */
+.ms-deckbtn { cursor: pointer; }
+.ms-deckbtn:hover { color: #a8e0ff; text-decoration: underline dotted rgba(127, 200, 232, .6); }
+
+/* ---- 卡组选择弹窗 ---- */
+.ms-deckpick .ms-dplist {
+  max-height: min(46vh, 320px); overflow-y: auto; overscroll-behavior: contain;
+  margin: 10px 0 4px; text-align: left;
+}
+.ms-dprow {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px; min-height: 48px;
+  background: var(--panel2, #20202a); border: 2px solid var(--line, #3a3444); margin-bottom: 8px; cursor: pointer;
+}
+.ms-dprow:hover { border-color: var(--gold-dim, #8a7638); }
+.ms-dprow.cur { border-color: var(--gold, #e8c86a); }
+.ms-dpn { flex: 1; min-width: 0; color: var(--text, #e8e6ee); font-size: calc(16px * var(--fs, 1)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ms-dpc { color: #9a94a6; font-size: calc(13px * var(--fs, 1)); white-space: nowrap; }
+.ms-dpb { color: var(--gold, #e8c86a); font-size: calc(13px * var(--fs, 1)); white-space: nowrap; }
+
+/* ---- 入口分流弹窗（联盟赛 / 大师赛）---- */
+.cc-list { display: flex; flex-direction: column; gap: 14px; margin: 18px 0 8px; }
+.cc-card {
+  position: relative; text-align: left; padding: 18px 20px; min-width: 300px; cursor: pointer;
+  background: var(--panel2, #20202a); border: 2px solid var(--line, #3a3444);
+  color: var(--text, #e8e6ee); box-shadow: 3px 3px 0 #000;
+}
+.cc-card:hover { border-color: var(--gold, #e8c86a); }
+.cc-card b { display: block; font-size: calc(22px * var(--fs, 1)); letter-spacing: 4px; color: var(--gold, #e8c86a); }
+.cc-desc { display: block; color: #9a94a6; font-size: calc(14px * var(--fs, 1)); margin-top: 6px; }
+.cc-badge { position: absolute; top: 12px; right: 12px; font-size: calc(12px * var(--fs, 1)); padding: 2px 9px; border: 1px solid; }
+.cc-badge.pve { color: #7fd08a; border-color: #3f6b4a; background: #1d2a20; }
+.cc-badge.pvp { color: #ff9f7a; border-color: #7a4a30; background: #2a1d17; }
+
+/* ---- 手机横屏 / 窄视口：整体压缩，保证操作按钮落在首屏 ---- */
+@media (max-height: 620px), (pointer: coarse), (max-width: 1100px) {
+  #master { padding: 8px 10px 14px; }
+  .ms-title { font-size: calc(18px * var(--fs, 1)); letter-spacing: 2px; margin: 0 0 2px; }
+  .ms-sub { font-size: calc(11px * var(--fs, 1)); margin-bottom: 8px; }
+  .ms-code { font-size: calc(20px * var(--fs, 1)); }
+  .ms-net { margin: -6px auto 8px; padding: 4px 8px; font-size: calc(11px * var(--fs, 1)); }
+  .ms-me { padding: 6px 10px; margin-bottom: 8px; gap: 8px; }
+  .ms-ava img { width: 30px; height: 30px; }
+  .ms-ava.sm img { width: 26px; height: 26px; }
+  .ms-ava.big img { width: 52px; height: 52px; }
+  .ms-pl b { font-size: calc(14px * var(--fs, 1)); }
+  .ms-pl em { font-size: calc(11px * var(--fs, 1)); }
+  .ms-deck { font-size: calc(11px * var(--fs, 1)); }
+  .ms-menu { gap: 6px; }
+  .ms-item { padding: 8px 11px; }
+  .ms-item b { font-size: calc(14px * var(--fs, 1)); }
+  .ms-item .ms-desc { font-size: calc(11px * var(--fs, 1)); margin-top: 2px; }
+  .ms-tag { font-size: calc(11px * var(--fs, 1)); padding: 1px 6px; }
+  .ms-input { padding: 9px 12px; font-size: calc(15px * var(--fs, 1)); }
+  .ms-seats { gap: 6px; margin-bottom: 8px; }
+  .ms-seat { min-height: 64px; padding: 6px 9px; }
+  .ms-seat .ms-pl b { font-size: calc(13px * var(--fs, 1)); }
+  .ms-seat-tag { font-size: calc(11px * var(--fs, 1)); padding: 1px 6px; }
+  .ms-ready { margin-top: 4px; font-size: calc(12px * var(--fs, 1)); }
+  .ms-wait { font-size: calc(13px * var(--fs, 1)); padding-top: 10px; }
+  .ms-rule-wrap { margin-bottom: 8px; }
+  .ms-rule-t { font-size: calc(12px * var(--fs, 1)); margin-bottom: 4px; }
+  .ms-chip { padding: 5px 10px; font-size: calc(12px * var(--fs, 1)); }
+  .ms-actions { gap: 6px; margin: 8px 0 4px; }
+  .ms-actions .pxbtn { padding: 7px 12px; font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; }
+  .ms-sidecard { padding: 6px; }
+  .ms-sidename { font-size: calc(13px * var(--fs, 1)); margin-top: 4px; }
+  .ms-sidetitle { font-size: calc(11px * var(--fs, 1)); }
+  .ms-sidedeck { font-size: calc(11px * var(--fs, 1)); margin-top: 3px; }
+  .ms-sideready { margin-top: 3px; font-size: calc(12px * var(--fs, 1)); }
+  .ms-scorebar { font-size: calc(18px * var(--fs, 1)); margin: 6px 0 2px; }
+  .ms-info2 { font-size: calc(12px * var(--fs, 1)); }
+  .ms-hint { font-size: calc(11px * var(--fs, 1)); }
+  .ms-rec { grid-template-columns: 28px 30px 1fr auto auto; gap: 8px; padding: 5px 8px; }
+  .ms-rec-res { font-size: calc(14px * var(--fs, 1)); }
+  .ms-rec-main b { font-size: calc(14px * var(--fs, 1)); }
+  .ms-rec-main em { font-size: calc(11px * var(--fs, 1)); }
+  .ms-rec-score { font-size: calc(15px * var(--fs, 1)); }
+  .ms-rec-dim { font-size: calc(10px * var(--fs, 1)); }
+  .ms-dprow { padding: 10px 12px; min-height: 44px; margin-bottom: 6px; }
+  .ms-dpn { font-size: calc(14px * var(--fs, 1)); }
+  .ms-deckpick .ms-dplist { max-height: 40vh; }
+  .cc-list { width: 78vw; gap: 8px; margin: 10px 0 4px; }
+  .cc-card { min-width: 0; width: 100%; padding: 12px 14px; }
+  .cc-card b { font-size: calc(16px * var(--fs, 1)); letter-spacing: 2px; }
+  .cc-desc { font-size: calc(11px * var(--fs, 1)); margin-top: 3px; }
+  .cc-badge { font-size: calc(11px * var(--fs, 1)); padding: 1px 6px; top: 8px; right: 8px; }
+}

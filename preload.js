@@ -22,12 +22,12 @@ window.addEventListener('load', () => {
             next();
         };
 
-        // 先下缩略卡 (并发30，瞬间下完)
-        runQueue(window.CARD_THUMBS, 30, () => {
-            // 缩略卡全下完，再慢悠悠下高清卡 (并发30，不抢带宽)
-            runQueue(window.CARD_HD, 30, () => {
+        // 先下缩略卡 (并发50，瞬间下完)
+        runQueue(window.CARD_THUMBS, 50, () => {
+            // 缩略卡全下完，再慢悠悠下高清卡 (并发50，不抢带宽)
+            runQueue(window.CARD_HD, 50, () => {
                 console.log('全部卡牌预加载完毕！');
             });
         });
-    }, 1000); // 页面加载完等 2 秒再开始偷下
+    }, 500); // 页面加载完等0.5秒再开始偷下
 });

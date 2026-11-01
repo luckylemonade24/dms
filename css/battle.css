@@ -1,1 +1,815 @@
-.topbar{height:46px;padding:0 max(14px, env(safe-area-inset-right,0px)) 0 max(14px, env(safe-area-inset-left,0px));border-bottom:2px solid var(--line);background:#18181ae6;flex:0 0 46px;align-items:center;gap:8px;display:flex}.topbar .tb-title{color:var(--gold);letter-spacing:2px;margin-right:8px}.topbar .tb-spacer{flex:1}.topbar .tb-seed{color:var(--dim);font-size:calc(12px * var(--fs,1));margin-right:8px}.relicBar{align-items:center;gap:6px;display:flex}.relic{border:2px solid var(--gold-dim);background:#1a1a1a;width:34px;height:34px}.relic img{object-fit:cover;width:100%;height:100%}.relic-btn{cursor:pointer}.relic-btn:hover{border-color:var(--gold);transform:scale(1.12)}.relic.relic-cd{filter:grayscale(.75);opacity:.7}.relic-alert{animation:1.1s ease-in-out infinite relicAlarm;border-color:#ff4d4d!important}@keyframes relicAlarm{0%,to{box-shadow:0 0 6px 1px #ff3c3c8c}50%{box-shadow:0 0 13px 3px #ff3c3cf2}}.main{flex:1;min-height:0;display:flex}.battlecol{flex-direction:column;flex:1;min-width:0;display:flex;position:relative}.sidebar{border-left:2px solid var(--line);background:#121214eb;flex-direction:column;flex:0 0 320px;width:320px;display:flex;position:relative}#preview{border-bottom:2px solid var(--line);text-align:center;flex-direction:column;flex:0 0 384px;align-items:center;padding:10px;display:flex;overflow:hidden}#preview .pv-title{color:var(--gold);font-size:calc(15px * var(--fs,1));flex:none;margin-bottom:6px}#preview .pv-img{object-fit:contain;image-rendering:auto;flex:1 1 0;width:auto;max-width:100%;min-height:0;max-height:none}#preview .pv-owner{color:var(--dim);font-size:calc(12px * var(--fs,1));flex:none;margin-bottom:4px}#preview .pv-meta{color:var(--blue);font-size:calc(12px * var(--fs,1));flex:none;margin:6px 0 4px}#preview .pv-effect{color:var(--text);font-size:calc(12px * var(--fs,1));text-align:left;flex:none;max-height:42%;line-height:1.5;overflow-y:auto}#preview .pv-extra{color:var(--green);font-size:calc(12px * var(--fs,1));margin-top:4px}.logbox{font-size:calc(12px * var(--fs,1));flex:1;padding:8px 10px;line-height:1.6;overflow-y:auto}.logline{color:var(--dim)}.logline.hl{color:var(--gold)}.logline.phase{color:var(--green)}.logline.dmg{color:#e88a7a}.logline.heal{color:#8ee07a}.logline.eff{color:var(--purple)}.logline.attack{color:#e8b060}.logline.death{color:#d85a4a}.logline.summon{color:var(--blue)}.inforow{font-size:calc(13px * var(--fs,1));align-items:center;gap:12px;padding:4px 12px;display:flex}.inforow .nm{color:var(--gold);min-width:130px}.hpwrap{border:1px solid var(--line);background:#000;width:150px;height:14px;position:relative}.hpwrap .hpbar{background:linear-gradient(#e05a4a,#a02a1a);width:100%;transition:width .3s;position:absolute;inset:0}.hpwrap .hptxt{z-index:2;font-size:calc(11px * var(--fs,1));text-align:center;line-height:calc(12px * var(--fs,1));position:relative}.hpwrap .hptxt.neg{color:#ff5a4a;text-shadow:0 0 4px #ff3c28cc;font-weight:700}.stat{color:var(--dim)}.stat b{color:var(--text)}.statusbar{gap:6px;display:flex}.chip{font-size:calc(11px * var(--fs,1));border:1px solid var(--line);border-radius:3px;padding:0 6px;display:inline-block}.chip.poison{color:#9fd06a;border-color:#5c7f4a}.chip.acid{color:#d8d06a;border-color:#8a8234}.chip.rot{color:#b08a5a;border-color:#6a4a2a}.chip.shield{color:#8fd0ff;border-color:#4a7186}.chip.unt{color:#c0a0e0;border-color:#6a4a86}#stattip{z-index:9999;max-width:300px;font-size:calc(12px * var(--fs,1));color:#e8e4dc;pointer-events:none;background:#121018f5;border:1px solid #4a4458;border-radius:6px;padding:8px 10px;line-height:1.65;position:fixed;box-shadow:0 6px 20px #0000008c}#stattip.hidden{display:none}#stattip .st-h{color:#ffd24a;margin-bottom:4px;font-weight:700}#stattip p{margin:0 0 4px}#stattip p:last-child{margin-bottom:0}#stattip .dim{color:#9a94a8}#stattip b{color:#fff}.board{justify-content:center;gap:14px;padding:8px 12px;display:flex}.cell{background:#ffffff05;border:2px dashed #78787859;justify-content:center;align-items:center;width:150px;height:118px;display:flex;position:relative}.cell.empty .slotlabel{color:#a0a0a066;font-size:calc(12px * var(--fs,1))}.cell.droppable{border-color:var(--green);background:#7ec8501f}.board[data-drop].droppable{outline:2px solid var(--red);outline-offset:-4px}.monster{cursor:grab;border:2px solid var(--line);background:#1a1a1c;width:146px;height:114px;position:relative;overflow:hidden}.monster.foe{cursor:default}.monster.active{border-color:var(--gold)}.monster.used{border-color:#3c3c3c}.monster.used:after{content:"已攻击";font-size:calc(12px * var(--fs,1));letter-spacing:2px;color:#ff9a86;text-shadow:1px 1px #000;pointer-events:none;z-index:3;background:#0000009e;border:1px solid #7a3a2a;padding:1px 7px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)rotate(-8deg)}.monster.droppable{border-color:var(--green);box-shadow:0 0 8px var(--green)}.monster .portrait{position:absolute;inset:0}.monster .portrait img{object-fit:cover;object-position:center 20%;opacity:.95;width:100%;height:100%}.monster .mstats{font-size:calc(15px * var(--fs,1));z-index:2;background:linear-gradient(#000000d1,#00000059 70%,#0000);justify-content:space-between;align-items:center;padding:3px 6px 10px;font-weight:700;display:flex;position:absolute;top:0;left:0;right:0}.monster .mstats .hp{color:#ff4a3a;text-shadow:1px 1px #000,-1px -1px #000,1px -1px #000,-1px 1px #000,2px 2px #000,0 0 6px #ff4a3ae6}.monster .mstats .atk{color:#ffd21f;text-shadow:1px 1px #000,-1px -1px #000,1px -1px #000,-1px 1px #000,2px 2px #000,0 0 6px #ffd21fe6}.monster .mname{font-size:calc(12px * var(--fs,1));color:#fff;background:linear-gradient(#0000,#000000e6);align-items:center;gap:4px;padding:2px 4px;display:flex;position:absolute;bottom:0;left:0;right:0}.monster .meq{font-size:calc(15px * var(--fs,1));flex-direction:column;gap:2px;display:flex;position:absolute;top:28px;right:4px}.monster .meq span{text-shadow:1px 1px #000,2px 2px #000;border-radius:3px;padding:1px 3px;display:inline-block;position:relative}.monster .meq span:hover{background:#ffffff29}.monster .meq .w{color:#ffd21f}.monster .meq .a{color:#7fd0ff}.monster .meq .eq i{font-style:normal;font-size:calc(11px * var(--fs,1));color:var(--gold);text-shadow:1px 1px #000,0 0 4px #000;margin-left:1px;font-weight:700}.monster .mchips{gap:3px;display:flex;position:absolute;bottom:18px;left:3px}.tier{font-size:calc(11px * var(--fs,1));border:1px solid;border-radius:2px;padding:0 4px}.targetable{cursor:pointer;outline:2px solid var(--green)!important;box-shadow:0 0 10px var(--green)!important}#myHand .card.targetable{transform:translateY(-10px)}.t-C{color:#9fd88a}.t-B{color:#7fc8e8}.t-A{color:#d8a85a}.t-S{color:#e8c85a}.center-zone{flex-wrap:wrap;justify-content:center;align-items:center;gap:14px;padding:6px;display:flex;position:relative}.banner{font-size:calc(15px * var(--fs,1));letter-spacing:2px;border:2px solid var(--line);white-space:nowrap;flex:none;padding:6px 22px}.banner.prep{color:var(--green);border-color:#4a6a34}.banner.battle{color:var(--red);border-color:#7a3a2a}.banner.opp{color:var(--dim)}.banner.over{color:var(--gold);border-color:var(--gold-dim)}#endBtn{background:var(--gold-dim);color:#151515;border:2px solid var(--gold);font-size:calc(15px * var(--fs,1));letter-spacing:2px;padding:8px 26px;box-shadow:3px 3px #000}#endBtn:hover{background:var(--gold)}#endBtn.disabled{opacity:.4;pointer-events:none}#centerZone{min-height:44px}#centerZone.droppable{outline:2px solid var(--green)}.handrow{justify-content:center;align-items:flex-end;gap:2px;min-height:122px;padding:6px 10px;display:flex}.hand-opp{align-items:center;min-height:66px}.cardback{border:1px solid #000;width:40px;height:56px;margin-left:-14px}.cardback img{object-fit:cover;width:100%;height:100%}.card{cursor:grab;flex:none;width:86px;height:120px;margin-left:-18px;transition:transform .12s;position:relative}.card:hover{z-index:20;transform:translateY(-16px)}.card .thumb{object-fit:contain;width:100%;height:100%}.card .tier{background:#000000b3;position:absolute;top:2px;left:2px}.card .cname{font-size:calc(10px * var(--fs,1));text-align:center;color:#fff;background:#000c;padding:1px 0;position:absolute;bottom:0;left:0;right:0}.card .lv{color:var(--gold);font-size:calc(11px * var(--fs,1));border:1px solid var(--gold-dim);text-shadow:2px 2px #000;background:#000000e0;border-radius:2px;padding:0 3px;position:absolute;top:2px;right:2px;box-shadow:0 0 4px #d8b04a80}.card.droppable{filter:drop-shadow(0 0 6px var(--green))}.card.valid{outline:2px solid var(--green)}.wandwrap{align-items:center;gap:8px;display:flex}#wandSlot{cursor:pointer;background:#ffffff05;border:2px dashed #78787866;justify-content:center;align-items:center;width:56px;height:72px;display:flex;position:relative}#wandSlot.droppable{border-color:var(--green);background:#7ec8501f}#wandSlot .wandcard{width:100%;height:100%;position:relative}#wandSlot .wandcard img{object-fit:contain;width:100%;height:100%}#wandSlot .wl{font-size:calc(11px * var(--fs,1));color:var(--gold);text-shadow:2px 2px #000;position:absolute;top:0;right:0}.stat.link{cursor:pointer;border-bottom:1px dashed #8f8b808c}.stat.link:hover{color:var(--gold);border-bottom-color:var(--gold)}.globalchips{flex-wrap:wrap;justify-content:center;align-items:center;gap:5px;max-width:560px;min-height:20px;display:flex}.gchip{font-size:calc(11px * var(--fs,1));border:1px solid var(--line);white-space:nowrap;border-radius:3px;padding:1px 6px;animation:1.4s ease-in-out infinite gPulse}.gchip.sleep{color:#b9a8ff;border-color:#6a5a9a}.gchip.bomb{color:#ff8a6a;border-color:#8a3a2a}.gchip.ice{color:#8fd0ff;border-color:#3a6a8a}.gchip.warn{color:#ffb45a;border-color:#8a6a2a}@keyframes gPulse{0%,to{opacity:.6}50%{opacity:1}}#playFeed{z-index:60;pointer-events:none;flex-direction:column;align-items:center;gap:6px;display:flex;position:absolute;top:132px;left:50%;transform:translate(-50%)}.pfc{background:#101012f2;border:2px solid #7a3a2a;align-items:center;gap:10px;padding:5px 14px 5px 5px;animation:.26s ease-out pfIn;display:flex;box-shadow:4px 4px #000}.pfc.mine{border-color:var(--gold-dim)}.pfc img{object-fit:contain;width:46px;height:64px}.pfc .pf-txt{font-size:calc(14px * var(--fs,1));color:var(--text);white-space:nowrap}.pfc .pf-txt b{color:var(--gold)}.pfc.out{animation:.3s ease-in forwards pfOut}@keyframes pfIn{0%{opacity:0;transform:translateY(-18px)scale(.9)}to{opacity:1;transform:none}}@keyframes pfOut{to{opacity:0;transform:translateY(-14px)}}#fxLayer{pointer-events:none;z-index:55;position:absolute;inset:0}.atkline{fill:none;stroke:#e8b060;stroke-width:5px;stroke-linecap:round;filter:drop-shadow(0 0 6px #e8b060f2)}.atkhead{fill:#e8b060;filter:drop-shadow(0 0 6px #e8b060f2)}.fx-fade{animation:.35s ease-in .45s forwards fxFade}@keyframes fxFade{to{opacity:0}}.cell.bomb-threat{background:#ff5a3a1a;animation:.75s steps(2,end) infinite bombFlash;border-color:#ff5a3a!important}.cell.bomb-threat:before{content:"💣";font-size:calc(18px * var(--fs,1));z-index:5;filter:drop-shadow(0 0 4px #ff3a1a);position:absolute;top:2px;left:4px}.cell.bomb-self{background:#ff9a3a14;animation:.95s steps(2,end) infinite bombFlash;border-color:#ff9a3a!important}.cell.bomb-self:after{content:"💥";font-size:calc(15px * var(--fs,1));z-index:5;filter:drop-shadow(0 0 4px #ff9a3a);position:absolute;top:2px;right:4px}@keyframes bombFlash{0%{box-shadow:0 0 #ff5a3a00}to{box-shadow:0 0 15px 2px #ff5a3ad9}}.monster .msleep{font-size:calc(24px * var(--fs,1));z-index:4;filter:drop-shadow(0 0 5px #7a6ad8);animation:1.7s ease-in-out infinite zzz;position:absolute;top:2px;left:50%;transform:translate(-50%)}@keyframes zzz{0%,to{opacity:.8;transform:translate(-50%)scale(1)}50%{opacity:1;transform:translate(-50%,-5px)scale(1.1)}}.chip.poison{animation:1.3s ease-in-out infinite chipPulse}.chip.unt{animation:1.7s ease-in-out infinite gPulse}@keyframes chipPulse{0%,to{box-shadow:none}50%{box-shadow:0 0 9px #9fd06ad9}}#summonInfo.ice{color:#8fd0ff;text-shadow:0 0 8px #4aa8ffe6;animation:.55s steps(2,end) 5 iceFlash}@keyframes iceFlash{0%{opacity:.45}to{opacity:1}}.monster.spawn-in{animation:.34s ease-out spawnIn}@keyframes spawnIn{0%{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}.monster.hitflash{animation:.34s ease-out hitFlash}@keyframes hitFlash{0%{filter:brightness(2.4)saturate(.3)}to{filter:none}}#viewer{z-index:6;background:#101012fb;padding:8px 10px;position:absolute;inset:384px 0 0;overflow-y:auto}#viewer .vw-card{width:45px}#viewer .vw-card .vc-name{font-size:calc(9px * var(--fs,1))}.vw-title{color:var(--gold);font-size:calc(14px * var(--fs,1))}.vw-tabs{gap:4px;margin-left:auto;display:flex}.vw-tab{background:var(--panel2);color:var(--text);border:1px solid var(--line);font-size:calc(12px * var(--fs,1));padding:2px 8px}.vw-tab.on{border-color:var(--gold);color:var(--gold)}.vw-x{color:var(--dim);font-size:calc(14px * var(--fs,1));background:0 0;border:none;padding:2px 4px}.vw-x:hover{color:var(--red)}.vw-hint{color:var(--dim);font-size:calc(11px * var(--fs,1));margin:2px 0 6px}#viewer .vw-head{align-items:center;gap:6px;display:flex}#viewer .vw-grid{background:0 0;border:none;max-height:none;padding:0}.pxbtn.on{background:var(--gold);color:#151515;border-color:#fff2c0}.trapflash{animation:.5s steps(2,end) 3 trapFlash}@keyframes trapFlash{0%{color:#ff5a3a;border-color:#ff5a3a;box-shadow:0 0 14px #ff5a3ae6}to{box-shadow:none}}.viewer{text-align:left;max-width:1000px}.vw-head{flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px;display:flex}.vw-head h3{margin:0}.vw-grid{border:1px solid var(--line);background:#00000040;flex-wrap:wrap;gap:6px;max-height:400px;padding:4px;display:flex;overflow-y:auto}.vw-card{width:64px;position:relative}.vw-card img{width:100%;display:block}.vw-card .vc-name{font-size:calc(10px * var(--fs,1));text-align:center;color:var(--dim)}.vw-card .vc-n{border:1px solid var(--gold-dim);color:var(--gold);font-size:calc(12px * var(--fs,1));background:#000000e0;padding:0 4px;position:absolute;top:15px;right:1px}.vw-card .vc-ord{color:#8fd0ff;font-size:calc(11px * var(--fs,1));background:#000000d9;padding:0 3px;position:absolute;top:1px;left:1px}.vw-empty{color:var(--dim);padding:16px}.vw-page{justify-content:center;align-items:center;gap:10px;margin-top:8px;display:flex}@media (height<=620px){.logbox{font-size:calc(16px * var(--fs,1));padding:6px 10px}.inforow{font-size:calc(16px * var(--fs,1));gap:10px}.inforow .nm{min-width:118px}.hpwrap{height:16px}.hpwrap .hptxt{font-size:calc(13px * var(--fs,1));line-height:calc(15px * var(--fs,1))}.monster .mstats{font-size:calc(19px * var(--fs,1))}.monster .mname{font-size:calc(15px * var(--fs,1))}.monster .meq{font-size:calc(17px * var(--fs,1))}.monster .meq .eq i{font-size:calc(12px * var(--fs,1))}.monster.used:after{font-size:calc(15px * var(--fs,1))}.cell.empty .slotlabel{font-size:calc(14px * var(--fs,1))}.banner{font-size:calc(18px * var(--fs,1));padding:6px 18px}#endBtn{font-size:calc(18px * var(--fs,1))}.card .cname,.card .lv,.tier{font-size:calc(13px * var(--fs,1))}.chip{font-size:calc(12px * var(--fs,1))}.topbar .tb-title{font-size:calc(17px * var(--fs,1))}.topbar .tb-seed{font-size:calc(14px * var(--fs,1))}#battleSetBtn,#battleAutoBtn,#battleFsBtn{font-size:calc(15px * var(--fs,1))}#preview .pv-title{font-size:calc(17px * var(--fs,1))}#preview .pv-img{max-height:none}#preview .pv-owner,#preview .pv-meta,#preview .pv-effect,#preview .pv-extra{font-size:calc(13.5px * var(--fs,1))}}#stage.phone .main{flex:1;grid-template-rows:minmax(120px,1fr) auto minmax(120px,1fr) auto;grid-template-columns:196px minmax(0,1fr) 252px;min-height:0;display:grid}#stage.phone .battlecol{display:contents}#stage.phone .sidebar{grid-area:1/3/-1;width:auto;min-width:0}#stage.phone #oppInfo{grid-area:1/1;align-self:start}#stage.phone #oppHand{grid-area:2/1}#stage.phone #myInfo{grid-area:3/1/span 2;align-self:end}#stage.phone #oppBoard{grid-area:1/2}#stage.phone #centerZone{grid-area:2/2}#stage.phone #myBoard{grid-area:3/2}#stage.phone #myHand{grid-area:4/2}#stage.phone .inforow{border:1px solid var(--line);background:#141416c2;border-radius:4px;flex-wrap:wrap;align-items:center;gap:3px 8px;padding:5px 7px}#stage.phone .inforow .nm{flex:100%;min-width:0}#stage.phone .inforow .hpwrap{width:100%}#stage.phone .inforow .statusbar{flex-wrap:wrap}#stage.phone #oppHand{flex-wrap:wrap;justify-content:flex-start;min-height:0;padding:2px 5px;overflow:hidden}#stage.phone #oppHand .cardback{width:34px;height:48px;margin-left:-12px}#stage.phone .board{align-items:center;gap:8px;height:100%;padding:4px 6px}#stage.phone .cell{flex:1 1 0;max-width:190px;height:100%}#stage.phone .monster{width:100%;height:100%}#stage.phone .topbar{flex:0 0 40px;height:40px}#stage.phone #centerZone{min-height:40px;padding:4px}#stage.phone .main{padding-left:max(20px, env(safe-area-inset-left,0px));padding-right:max(20px, env(safe-area-inset-right,0px));padding-bottom:max(12px, env(safe-area-inset-bottom,0px))}#stage.phone .topbar{padding-left:max(24px, env(safe-area-inset-left,0px));padding-right:max(56px, env(safe-area-inset-right,0px))}#stage.phone #preview{min-height:0;max-height:calc(var(--ph,500px) - 136px);flex:none;padding:7px 8px}#stage.phone #preview .pv-title{font-size:calc(16px * var(--fs,1));margin-bottom:3px}#stage.phone #preview .pv-img{width:100%;max-width:100%;height:auto;min-height:0;max-height:calc(var(--ph,500px) - 230px);flex:0 auto}#stage.phone #preview .pv-effect{max-height:96px}#stage.phone .logbox{flex:auto;min-height:96px;padding:4px 8px}#stage.phone #viewer{top:0}#stage.phone #tutPanel{width:300px;max-height:420px;font-size:calc(13px * var(--fs,1))}#turnBanner{letter-spacing:10px;color:var(--gold,#d8b04a);text-shadow:4px 4px #000,0 0 30px #000000e6;opacity:0;pointer-events:none;z-index:60;white-space:nowrap;font-size:44px;font-weight:700;position:absolute;top:44%;left:50%;transform:translate(-50%,-50%)}#turnBanner.show{animation:1.5s ease-out forwards turnRoll}@keyframes turnRoll{0%{opacity:0;transform:translate(-50%,-50%)translateY(24px)scale(.84)}20%{opacity:1;transform:translate(-50%,-50%)translateY(0)scale(1)}72%{opacity:1;transform:translate(-50%,-50%)translateY(0)scale(1.02)}to{opacity:0;transform:translate(-50%,-50%)translateY(-20px)scale(1.06)}}#netPing{z-index:60;font-size:calc(11px * var(--fs,1));letter-spacing:.5px;color:var(--dim);border:1px solid var(--line);pointer-events:none;user-select:none;background:#0000008c;border-radius:6px;padding:2px 7px;position:absolute;top:8px;right:10px}#netPing.ok{color:var(--green);border-color:#7ec85080}#netPing.mid{color:var(--gold);border-color:#d8b04a80}#netPing.bad{color:var(--red);border-color:#d85a4a80}#rankTimer{z-index:60;font-size:calc(12px * var(--fs,1));letter-spacing:.5px;color:var(--text);border:1px solid var(--line);pointer-events:none;user-select:none;background:#0000008c;border-radius:6px;padding:2px 7px;position:absolute;top:34px;right:10px}#rankTimer.warn{color:var(--gold);border-color:#d8b04a99}#rankTimer.danger{color:var(--red);border-color:#d85a4ab3;animation:.9s ease-in-out infinite rankPulse}@keyframes rankPulse{0%,to{opacity:1}50%{opacity:.45}}
+/* ============================================================
+ * 对战界面布局  battle.css（设计基准 1280×720，见策划案 10.2）
+ * ========================================================== */
+
+/* 顶部遗物栏 */
+.topbar {
+  height: 46px; flex: 0 0 46px; display: flex; align-items: center; gap: 8px;
+  /* 最右一个按钮是「设置」，手机上容易被屏幕圆角/挖孔挡住点不到 → 右侧留白带上安全区
+     （env() 在无安全区的设备上为 0，桌面端仍是原来的 14px，无变化） */
+  padding: 0 max(14px, env(safe-area-inset-right, 0px)) 0 max(14px, env(safe-area-inset-left, 0px));
+  background: rgba(24,24,26,.9); border-bottom: 2px solid var(--line);
+}
+.topbar .tb-title { color: var(--gold); letter-spacing: 2px; margin-right: 8px; }
+.topbar .tb-spacer { flex: 1; }
+.topbar .tb-seed { color: var(--dim); font-size: calc(12px * var(--fs, 1)); margin-right: 8px; }
+.relicBar { display: flex; gap: 6px; align-items: center; }
+.relic { width: 34px; height: 34px; border: 2px solid var(--gold-dim); background: #1a1a1a; }
+.relic img { width: 100%; height: 100%; object-fit: cover; }
+.relic-btn { cursor: pointer; }
+.relic-btn:hover { border-color: var(--gold); transform: scale(1.12); }
+/* 时光沙漏冷却中：遗物图标置灰 */
+.relic.relic-cd { filter: grayscale(.75); opacity: .7; }
+/* 先见护符：对方手牌含陷阱卡时的红光提示 */
+.relic-alert { border-color: #ff4d4d !important; animation: relicAlarm 1.1s ease-in-out infinite; }
+@keyframes relicAlarm {
+  0%, 100% { box-shadow: 0 0 6px 1px rgba(255, 60, 60, .55); }
+  50%      { box-shadow: 0 0 13px 3px rgba(255, 60, 60, .95); }
+}
+
+/* 主体：战斗列 + 右侧数据栏 */
+.main { flex: 1; display: flex; min-height: 0; }
+.battlecol { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
+.sidebar {
+  width: 320px; flex: 0 0 320px; display: flex; flex-direction: column; position: relative;
+  background: rgba(18,18,20,.92); border-left: 2px solid var(--line);
+}
+/* ⚠ #myInfo 不能设 overflow：对话面板是 absolute 挂在它上面的，
+   一旦裁剪（auto/hidden），面板会被整块切掉 —— 表现为"点了对话按钮什么都没弹"。 */
+#preview {
+  flex: 0 0 384px; padding: 10px; border-bottom: 2px solid var(--line); overflow: hidden; text-align: center;
+  display: flex; flex-direction: column; align-items: center;   /* 高清图弹性占满剩余高度：能多大就多大 */
+}
+#preview .pv-title { color: var(--gold); font-size: calc(15px * var(--fs, 1)); margin-bottom: 6px; flex: 0 0 auto; }
+/* 详情图：吃掉标题/数值/效果文字之外的全部高度（flex-basis 必须为 0：否则会按原图自然尺寸算基准，
+ * 把外层面板/网格行一起撑高。object-fit: contain 保证等比、不裁切、不变形） */
+#preview .pv-img { max-width: 100%; max-height: none; flex: 1 1 0; min-height: 0; width: auto; object-fit: contain; image-rendering: auto; }
+/* 高清卡源图是 1300×1818 插画，这里只显示到 250px 高；全局 img 的 image-rendering:pixelated 是给
+   像素小图/字体用的，套在"大图缩小"上会按最近邻丢像素（每轴丢约 80%）→ 看起来比源文件还模糊，故此处改回平滑缩放 */
+#preview .pv-owner { color: var(--dim); font-size: calc(12px * var(--fs, 1)); margin-bottom: 4px; flex: 0 0 auto; }
+#preview .pv-meta { color: var(--blue); font-size: calc(12px * var(--fs, 1)); margin: 6px 0 4px; flex: 0 0 auto; }
+/* 效果文字：给图让位，最多占 42% 高度，超长时在本区内滚动 */
+#preview .pv-effect { color: var(--text); font-size: calc(12px * var(--fs, 1)); line-height: 1.5; text-align: left; flex: 0 0 auto; max-height: 42%; overflow-y: auto; }
+#preview .pv-extra { color: var(--green); font-size: calc(12px * var(--fs, 1)); margin-top: 4px; }
+.logbox { flex: 1; overflow-y: auto; padding: 8px 10px; font-size: calc(12px * var(--fs, 1)); line-height: 1.6; }
+.logline { color: var(--dim); }
+.logline.hl { color: var(--gold); }
+.logline.phase { color: var(--green); }
+.logline.dmg { color: #e88a7a; }
+.logline.heal { color: #8ee07a; }
+.logline.eff { color: var(--purple); }
+.logline.attack { color: #e8b060; }
+.logline.death { color: #d85a4a; }
+.logline.summon { color: var(--blue); }
+/* 警告类（例如"手牌已满，衍生失败"）：必须一眼看见，否则玩家会以为卡没生效 */
+.logline.warn { color: #ffb347; font-weight: 600; }
+
+/* 信息行 */
+.inforow { display: flex; align-items: center; gap: 12px; padding: 4px 12px; font-size: calc(13px * var(--fs, 1)); position: relative; }
+.inforow .nm { color: var(--gold); min-width: 130px; }
+.hpwrap { width: 150px; height: 14px; background: #000; border: 1px solid var(--line); position: relative; }
+.hpwrap .hpbar { position: absolute; inset: 0; width: 100%; background: linear-gradient(#e05a4a,#a02a1a); transition: width .3s; }
+.hpwrap .hptxt { position: relative; z-index: 2; font-size: calc(11px * var(--fs, 1)); text-align: center; line-height: calc(12px * var(--fs, 1)); }
+/* 学院考核：血量可为负（血量无下限），用红色标出 */
+.hpwrap .hptxt.neg { color: #ff5a4a; font-weight: bold; text-shadow: 0 0 4px rgba(255, 60, 40, .8); }
+.stat { color: var(--dim); }
+.stat b { color: var(--text); }
+.statusbar { display: flex; gap: 6px; }
+.chip { display: inline-block; padding: 0 6px; font-size: calc(11px * var(--fs, 1)); border: 1px solid var(--line); border-radius: 3px; }
+.chip.poison { color: #9fd06a; border-color: #5c7f4a; }
+.chip.acid { color: #d8d06a; border-color: #8a8234; }
+.chip.rot { color: #b08a5a; border-color: #6a4a2a; }
+.chip.shield { color: #8fd0ff; border-color: #4a7186; }
+.chip.unt { color: #c0a0e0; border-color: #6a4a86; }
+
+/* 状态说明浮窗（悬停 / 按住状态标签时出现，见 tooltip.js 的 StatTip） */
+#stattip {
+  position: fixed; z-index: 9999; max-width: 300px;
+  padding: 8px 10px; font-size: calc(12px * var(--fs, 1)); line-height: 1.65;
+  background: rgba(18, 16, 24, .96); color: #e8e4dc;
+  border: 1px solid #4a4458; border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .55);
+  pointer-events: none;                 /* ★ 必须：否则浮窗会接住鼠标，mouseout 不触发 → 浮窗粘住不消失 */
+}
+#stattip.hidden { display: none; }
+#stattip .st-h { color: #ffd24a; font-weight: 700; margin-bottom: 4px; }
+#stattip p { margin: 0 0 4px; }
+#stattip p:last-child { margin-bottom: 0; }
+#stattip .dim { color: #9a94a8; }
+#stattip b { color: #fff; }
+
+/* 怪物区 */
+.board { display: flex; gap: 14px; padding: 8px 12px; justify-content: center; }
+.board.foe { }
+.cell {
+  width: 150px; height: 118px; border: 2px dashed rgba(120,120,120,.35);
+  display: flex; align-items: center; justify-content: center; position: relative;
+  background: rgba(255,255,255,.02);
+}
+.cell.empty .slotlabel { color: rgba(160,160,160,.4); font-size: calc(12px * var(--fs, 1)); }
+.cell.droppable { border-color: var(--green); background: rgba(126,200,80,.12); }
+.board[data-drop].droppable { outline: 2px solid var(--red); outline-offset: -4px; }
+
+.monster {
+  width: 146px; height: 114px; position: relative; cursor: grab;
+  border: 2px solid var(--line); background: #1a1a1c; overflow: hidden;
+}
+.monster.foe { cursor: default; }
+.monster.active { border-color: var(--gold); }
+/* 攻击次数用尽：只换边框并加"已攻击"角标，本体与血量/攻击角标不变暗 */
+.monster.used { border-color: #3c3c3c; }
+.monster.used::after {
+  content: '已攻击'; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  font-size: calc(12px * var(--fs, 1)); letter-spacing: 2px; color: #ff9a86;
+  background: rgba(0, 0, 0, .62); border: 1px solid #7a3a2a;
+  padding: 1px 7px; text-shadow: 1px 1px 0 #000; pointer-events: none; z-index: 3;
+}
+.monster.droppable { border-color: var(--green); box-shadow: 0 0 8px var(--green); }
+.monster .portrait { position: absolute; inset: 0; }
+.monster .portrait img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; opacity: .95; }
+.monster .mstats {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: calc(15px * var(--fs, 1)); font-weight: bold; padding: 3px 6px 10px;
+  background: linear-gradient(rgba(0, 0, 0, .82), rgba(0, 0, 0, .35) 70%, rgba(0, 0, 0, 0));
+  z-index: 2;
+}
+.monster .mstats .hp {
+  color: #ff4a3a;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 2px 2px 0 #000, 0 0 6px rgba(255, 74, 58, .9);
+}
+.monster .mstats .atk {
+  color: #ffd21f;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 2px 2px 0 #000, 0 0 6px rgba(255, 210, 31, .9);
+}
+.monster .mname {
+  position: absolute; bottom: 0; left: 0; right: 0; padding: 2px 4px; font-size: calc(12px * var(--fs, 1));
+  background: linear-gradient(transparent, rgba(0,0,0,.9)); color: #fff; display: flex; align-items: center; gap: 4px;
+}
+.monster .meq { position: absolute; top: 28px; right: 4px; font-size: calc(15px * var(--fs, 1)); display: flex; flex-direction: column; gap: 2px; }
+.monster .meq span { position: relative; display: inline-block; text-shadow: 1px 1px 0 #000, 2px 2px 0 #000; padding: 1px 3px; border-radius: 3px; }
+.monster .meq span:hover { background: rgba(255, 255, 255, .16); }   /* 装备图标可悬停查看详情 → 给点反馈 */
+.monster .meq .w { color: #ffd21f; }
+.monster .meq .a { color: #7fd0ff; }
+/* 装备等级角标（⚔2 / 🛡1）：内联上标，避免被 .monster 的 overflow:hidden 裁掉 */
+.monster .meq .eq i {
+  font-style: normal; font-size: calc(11px * var(--fs, 1)); font-weight: bold; color: var(--gold);
+  margin-left: 1px; text-shadow: 1px 1px 0 #000, 0 0 4px #000;
+}
+.monster .mchips { position: absolute; bottom: 18px; left: 3px; display: flex; gap: 3px; }
+
+.tier { padding: 0 4px; font-size: calc(11px * var(--fs, 1)); border: 1px solid currentColor; border-radius: 2px; }
+
+/* 目标选择模式下的合法目标 */
+.targetable { outline: 2px solid var(--green) !important; box-shadow: 0 0 10px var(--green) !important; cursor: pointer; }
+/* 目标选择时的上浮同样改用 translate（否则会被 3D 倾斜的 transform 覆盖掉） */
+#myHand .card.targetable { translate: 0 -10px; }
+.t-C { color: #9fd88a; } .t-B { color: #7fc8e8; } .t-A { color: #d8a85a; } .t-S { color: #e8c85a; }
+
+/* 中央交互带 */
+.center-zone { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 6px; position: relative; flex-wrap: wrap; }
+.banner { padding: 6px 22px; font-size: calc(15px * var(--fs, 1)); letter-spacing: 2px; border: 2px solid var(--line); white-space: nowrap; flex: 0 0 auto; }
+.banner.prep { color: var(--green); border-color: #4a6a34; }
+.banner.battle { color: var(--red); border-color: #7a3a2a; }
+.banner.opp { color: var(--dim); }
+.banner.over { color: var(--gold); border-color: var(--gold-dim); }
+#endBtn {
+  padding: 8px 26px; background: var(--gold-dim); color: #151515; border: 2px solid var(--gold);
+  font-size: calc(15px * var(--fs, 1)); letter-spacing: 2px; box-shadow: 3px 3px 0 #000;
+}
+#endBtn:hover { background: var(--gold); }
+#endBtn.disabled { opacity: .4; pointer-events: none; }
+/* 中央交互带本身作为"无目标道具"的落点（不再使用绝对定位遮罩，避免挡住按钮点击） */
+#centerZone { min-height: 44px; }
+#centerZone.droppable { outline: 2px solid var(--green); }
+
+/* 手牌 */
+.handrow { display: flex; align-items: flex-end; justify-content: center; gap: 2px; padding: 6px 10px; min-height: 122px; }
+.hand-opp { min-height: 66px; align-items: center; }
+.cardback { width: 40px; height: 56px; margin-left: -14px; border: 1px solid #000; }
+.cardback img { width: 100%; height: 100%; object-fit: cover; }
+.card {
+  width: 86px; height: 120px; position: relative; cursor: grab; flex: 0 0 auto;
+  margin-left: -18px;
+  /* 伪 3D：**抬升走 translate、倾斜走 transform** —— 两个属性互相独立、不会覆盖，
+     所以既能保留原来的 hover 上浮，又能让卡面跟着指针倾斜。
+     （若两者都写在 transform 里，后写的会把先写的顶掉。） */
+  translate: 0 0;
+  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: translate .12s ease, transform .09s linear, box-shadow .12s ease;
+  will-change: transform;
+}
+.card:hover { translate: 0 -16px; z-index: 20; }
+/* 倾斜时给一点投影，卡面才有"离开桌面"的立体感 */
+.card.c3d-on { box-shadow: 0 12px 26px rgba(0, 0, 0, .6), 0 2px 0 rgba(255, 255, 255, .06) inset; }
+/* 跟手高光：--gx / --gy 由 js/card3d.js 按指针在卡面内的相对位置写入 */
+.card::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 3;
+  border-radius: 2px; opacity: 0;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(255, 255, 255, .5), rgba(255, 255, 255, .1) 38%, rgba(255, 255, 255, 0) 62%);
+  mix-blend-mode: screen;
+  transition: opacity .12s ease;
+}
+.card.c3d-on::after { opacity: 1; }
+/* 触屏设备（没有 hover）完全关掉 3D：手指在拖牌，再叠倾斜既没意义又费合成层。
+   手机上保持纯 2D，零额外开销。 */
+@media (hover: none) {
+  .card { transform: none; transform-style: flat; will-change: auto; }
+  .card::after { display: none; }
+}
+.card .thumb { width: 100%; height: 100%; object-fit: contain; }
+.card .tier { position: absolute; top: 2px; left: 2px; background: rgba(0,0,0,.7); }
+.card .cname {
+  position: absolute; bottom: 0; left: 0; right: 0; font-size: calc(10px * var(--fs, 1)); text-align: center;
+  background: rgba(0,0,0,.8); color: #fff; padding: 1px 0;
+}
+/* 手牌等级角标：加底色描边，避免压在卡图上被忽略 */
+.card .lv {
+  position: absolute; top: 2px; right: 2px; color: var(--gold); font-size: calc(11px * var(--fs, 1));
+  background: rgba(0, 0, 0, .88); border: 1px solid var(--gold-dim); border-radius: 2px;
+  padding: 0 3px; text-shadow: 2px 2px 0 #000; box-shadow: 0 0 4px rgba(216, 176, 74, .5);
+}
+.card.droppable { filter: drop-shadow(0 0 6px var(--green)); }
+.card.valid { outline: 2px solid var(--green); }
+
+/* 法杖栏 */
+.wandwrap { display: flex; align-items: center; gap: 8px; }
+#wandSlot {
+  width: 56px; height: 72px; border: 2px dashed rgba(120,120,120,.4); display: flex;
+  align-items: center; justify-content: center; cursor: pointer; position: relative; background: rgba(255,255,255,.02);
+}
+#wandSlot.droppable { border-color: var(--green); background: rgba(126,200,80,.12); }
+#wandSlot .wandcard { width: 100%; height: 100%; position: relative; }
+#wandSlot .wandcard img { width: 100%; height: 100%; object-fit: contain; }
+#wandSlot .wl { position: absolute; top: 0; right: 0; font-size: calc(11px * var(--fs, 1)); color: var(--gold); text-shadow: 2px 2px 0 #000; }
+
+/* ============================================================
+   表现层：可点信息、出牌动画、攻击箭头、干扰效果提示
+   ============================================================ */
+
+/* 可点击查看（牌库 / 弃牌堆） */
+.stat.link { cursor: pointer; border-bottom: 1px dashed rgba(143, 139, 128, .55); }
+.stat.link:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* 中央全局效果提示条 */
+.globalchips { display: flex; gap: 5px; align-items: center; min-height: 20px; flex-wrap: wrap; max-width: 560px; justify-content: center; }
+.gchip {
+  font-size: calc(11px * var(--fs, 1)); padding: 1px 6px; border: 1px solid var(--line); border-radius: 3px;
+  white-space: nowrap; animation: gPulse 1.4s ease-in-out infinite;
+}
+.gchip.sleep { color: #b9a8ff; border-color: #6a5a9a; }
+.gchip.bomb { color: #ff8a6a; border-color: #8a3a2a; }
+.gchip.ice { color: #8fd0ff; border-color: #3a6a8a; }
+.gchip.warn { color: #ffb45a; border-color: #8a6a2a; }
+@keyframes gPulse { 0%, 100% { opacity: .6; } 50% { opacity: 1; } }
+
+/* 出牌横幅：告知玩家"谁打出了哪张牌" */
+#playFeed {
+  position: absolute; left: 50%; top: 132px; transform: translateX(-50%); z-index: 60;
+  pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+/* 竖屏 720×1280：top:132px 会落在对手手牌/怪物区上，改贴到中央交互带附近 */
+#stage.portrait #playFeed { top: auto; bottom: calc(var(--handH, 214px) + 240px); }
+.pfc {
+  display: flex; align-items: center; gap: 10px; background: rgba(16, 16, 18, .95);
+  border: 2px solid #7a3a2a; padding: 5px 14px 5px 5px; box-shadow: 4px 4px 0 #000;
+  animation: pfIn .26s ease-out;
+}
+.pfc.mine { border-color: var(--gold-dim); }
+.pfc img { width: 46px; height: 64px; object-fit: contain; }
+.pfc .pf-txt { font-size: calc(14px * var(--fs, 1)); color: var(--text); white-space: nowrap; }
+.pfc .pf-txt b { color: var(--gold); }
+.pfc.out { animation: pfOut .3s ease-in forwards; }
+@keyframes pfIn { from { transform: translateY(-18px) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pfOut { to { transform: translateY(-14px); opacity: 0; } }
+
+/* 攻击连线 */
+#fxLayer { position: absolute; inset: 0; pointer-events: none; z-index: 55; }
+.atkline { fill: none; stroke: #e8b060; stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 0 6px rgba(232, 176, 96, .95)); }
+.atkhead { fill: #e8b060; filter: drop-shadow(0 0 6px rgba(232, 176, 96, .95)); }
+.fx-fade { animation: fxFade .35s ease-in .45s forwards; }
+@keyframes fxFade { to { opacity: 0; } }
+
+/* 炸弹：覆盖格闪红（十字）/ 己方同列会自伤 */
+.cell.bomb-threat { border-color: #ff5a3a !important; background: rgba(255, 90, 58, .10); animation: bombFlash .75s steps(2, end) infinite; }
+.cell.bomb-threat::before {
+  content: '💣'; position: absolute; top: 2px; left: 4px; font-size: calc(18px * var(--fs, 1)); z-index: 5;
+  filter: drop-shadow(0 0 4px #ff3a1a);
+}
+.cell.bomb-self { border-color: #ff9a3a !important; background: rgba(255, 154, 58, .08); animation: bombFlash .95s steps(2, end) infinite; }
+.cell.bomb-self::after {
+  content: '💥'; position: absolute; top: 2px; right: 4px; font-size: calc(15px * var(--fs, 1)); z-index: 5;
+  filter: drop-shadow(0 0 4px #ff9a3a);
+}
+@keyframes bombFlash {
+  0% { box-shadow: 0 0 0 rgba(255, 90, 58, 0); }
+  100% { box-shadow: 0 0 15px 2px rgba(255, 90, 58, .85); }
+}
+
+/* 催眠卷轴：全场怪物 💤 */
+.monster .msleep {
+  position: absolute; top: 2px; left: 50%; transform: translateX(-50%); font-size: calc(24px * var(--fs, 1)); z-index: 4;
+  filter: drop-shadow(0 0 5px #7a6ad8); animation: zzz 1.7s ease-in-out infinite;
+}
+@keyframes zzz {
+  0%, 100% { transform: translate(-50%, 0) scale(1); opacity: .8; }
+  50% { transform: translate(-50%, -5px) scale(1.1); opacity: 1; }
+}
+
+/* 状态标记脉冲 */
+.chip.poison { animation: chipPulse 1.3s ease-in-out infinite; }
+.chip.unt { animation: gPulse 1.7s ease-in-out infinite; }
+@keyframes chipPulse {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: 0 0 9px rgba(159, 208, 106, .85); }
+}
+
+/* 冰霜药水：召唤次数闪蓝 */
+#summonInfo.ice { color: #8fd0ff; text-shadow: 0 0 8px rgba(74, 168, 255, .9); animation: iceFlash .55s steps(2, end) 5; }
+@keyframes iceFlash { 0% { opacity: .45; } 100% { opacity: 1; } }
+
+/* 入场 / 受击 */
+.monster.spawn-in { animation: spawnIn .34s ease-out; }
+@keyframes spawnIn { from { transform: scale(.55); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.monster.hitflash { animation: hitFlash .34s ease-out; }
+@keyframes hitFlash { 0% { filter: brightness(2.4) saturate(.3); } 100% { filter: none; } }
+
+/* 牌库 / 弃牌堆查看器（右栏面板，不遮挡战场） */
+#viewer {
+  position: absolute; left: 0; right: 0; top: 384px; bottom: 0; z-index: 6;
+  overflow-y: auto; padding: 8px 10px;
+  background: rgba(16,16,18,.985);
+}
+/* z-index:6 + top:384px 让它盖住整条右栏下半部分（含「日志｜己方信息」那条），
+   打开查看器时信息栏不会在面板上面飘着。 */
+#viewer .vw-card { width: 45px; }
+#viewer .vw-card .vc-name { font-size: calc(9px * var(--fs, 1)); }
+.vw-title { color: var(--gold); font-size: calc(14px * var(--fs, 1)); }
+.vw-tabs { margin-left: auto; display: flex; gap: 4px; }
+.vw-tab {
+  background: var(--panel2); color: var(--text); border: 1px solid var(--line);
+  font-size: calc(12px * var(--fs, 1)); padding: 2px 8px;
+}
+.vw-tab.on { border-color: var(--gold); color: var(--gold); }
+.vw-x { background: transparent; color: var(--dim); border: none; font-size: calc(14px * var(--fs, 1)); padding: 2px 4px; }
+.vw-x:hover { color: var(--red); }
+.vw-hint { color: var(--dim); font-size: calc(11px * var(--fs, 1)); margin: 2px 0 6px; }
+#viewer .vw-head { display: flex; align-items: center; gap: 6px; }
+#viewer .vw-grid { max-height: none; border: none; background: transparent; padding: 0; }
+
+/* 设置按钮：自动跳过开启时高亮 */
+.pxbtn.on { background: var(--gold); color: #151515; border-color: #fff2c0; }
+/* 陷阱发动时中央横幅闪红 */
+.trapflash { animation: trapFlash .5s steps(2, end) 3; }
+@keyframes trapFlash {
+  0% { color: #ff5a3a; border-color: #ff5a3a; box-shadow: 0 0 14px rgba(255, 90, 58, .9); }
+  100% { box-shadow: none; }
+}
+
+.viewer { text-align: left; max-width: 1000px; }
+.vw-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.vw-head h3 { margin: 0; }
+.vw-grid { display: flex; flex-wrap: wrap; gap: 6px; max-height: 400px; overflow-y: auto; padding: 4px; border: 1px solid var(--line); background: rgba(0, 0, 0, .25); }
+.vw-card { position: relative; width: 64px; }
+.vw-card img { width: 100%; display: block; }
+.vw-card .vc-name { font-size: calc(10px * var(--fs, 1)); text-align: center; color: var(--dim); }
+.vw-card .vc-n {
+  position: absolute; right: 1px; top: 15px; background: rgba(0, 0, 0, .88);
+  border: 1px solid var(--gold-dim); color: var(--gold); font-size: calc(12px * var(--fs, 1)); padding: 0 4px;
+}
+.vw-card .vc-ord {
+  position: absolute; left: 1px; top: 1px; background: rgba(0, 0, 0, .85); color: #8fd0ff;
+  font-size: calc(11px * var(--fs, 1)); padding: 0 3px;
+}
+.vw-empty { color: var(--dim); padding: 16px; }
+.vw-page { display: flex; align-items: center; gap: 10px; justify-content: center; margin-top: 8px; }
+
+/* ============================================================
+ * 手机横屏（视口偏矮）字号加大
+ * 舞台按屏高等比缩放：手机横屏屏高只有 ~390px → 缩放仅 0.44~0.55，
+ * 12px 的字实际只有 5~6px，非常费眼。这里在"视口高度不足"时把战斗界面的
+ * 关键字号放大 ~35%（等效于手机上看清），桌面/平板视口够高，完全不受影响。
+ * 配合顶部「全屏」按钮（地址栏消失后屏高变大）效果最好。
+ * ========================================================== */
+@media (max-height: 620px) {
+  /* 日志 / 信息行：最常读的文字 */
+  .logbox { font-size: calc(16px * var(--fs, 1)); padding: 6px 10px; }
+  .inforow { font-size: calc(16px * var(--fs, 1)); gap: 10px; }
+  .inforow .nm { min-width: 118px; }
+  .hpwrap { height: 16px; }
+  .hpwrap .hptxt { font-size: calc(13px * var(--fs, 1)); line-height: calc(15px * var(--fs, 1)); }
+
+  /* 场上怪物：血量/攻击/名字/装备角标 */
+  .monster .mstats { font-size: calc(19px * var(--fs, 1)); }
+  .monster .mname { font-size: calc(15px * var(--fs, 1)); }
+  .monster .meq { font-size: calc(17px * var(--fs, 1)); }
+  .monster .meq .eq i { font-size: calc(12px * var(--fs, 1)); }
+  .monster.used::after { font-size: calc(15px * var(--fs, 1)); }
+  .cell.empty .slotlabel { font-size: calc(14px * var(--fs, 1)); }
+
+  /* 中央横幅 / 结束回合按钮 / 手牌卡名 */
+  .banner { font-size: calc(18px * var(--fs, 1)); padding: 6px 18px; }
+  #endBtn { font-size: calc(18px * var(--fs, 1)); }
+  .card .cname { font-size: calc(13px * var(--fs, 1)); }
+  .card .lv { font-size: calc(13px * var(--fs, 1)); }
+  .tier { font-size: calc(13px * var(--fs, 1)); }
+  .chip { font-size: calc(12px * var(--fs, 1)); }
+
+  /* 顶部栏（遗物 / 设置 / 全屏） */
+  .topbar .tb-title { font-size: calc(17px * var(--fs, 1)); }
+  .topbar .tb-seed { font-size: calc(14px * var(--fs, 1)); }
+  #battleSetBtn, #battleAutoBtn, #battleFsBtn { font-size: calc(15px * var(--fs, 1)); }
+
+  /* 右栏预览：字放大，图仍然弹性占满剩余高度（不设上限） */
+  #preview .pv-title { font-size: calc(17px * var(--fs, 1)); }
+  #preview .pv-img { max-height: none; }
+  #preview .pv-owner, #preview .pv-meta, #preview .pv-effect, #preview .pv-extra { font-size: calc(13.5px * var(--fs, 1)); }
+}
+
+/* ============================================================
+ * 手机横屏「紧凑布局」 #stage.phone（由 ui.js 的 fitScreen 判定/加类，条件：横屏且视口高 ≤620px）
+ *  - 玩家 / 对手信息栏 + 对手手牌 挪到左侧独立一列（原来是横在战场上下、占竖直空间的两条）
+ *  - 中间那列只留：对手怪物区 · 中央交互带 · 己方怪物区 · 手牌
+ *  - 舞台设计高度随之压到与屏幕比例一致（~500），缩放从 0.44 升到 0.64 上下 → 所有 UI 放大约 45%
+ *  - 怪物区吃满中间列的宽与高 → 怪卡也变大
+ * ========================================================== */
+#stage.phone .main {
+  flex: 1; min-height: 0;
+  display: grid;
+  grid-template-columns: 196px minmax(0, 1fr) 252px;
+  /* 两个怪物区各占 1fr（下限 120px，不会被右栏内容"顶高"导致舞台溢出） */
+  grid-template-rows: minmax(120px, 1fr) auto minmax(120px, 1fr) auto;
+}
+#stage.phone .battlecol { display: contents; }          /* 子元素直接参与上面的栅格 */
+#stage.phone .sidebar { width: auto; min-width: 0; grid-column: 3; grid-row: 1 / -1; }
+/* 右栏内部保持竖排：高清详情 → 日志（与原先完全一致，己方信息栏在左列，不在这里） */
+#stage.phone .logbox { flex: 1 1 auto; min-height: 60px; }
+
+#stage.phone #oppInfo    { grid-column: 1; grid-row: 1; align-self: start; }
+#stage.phone #oppHand    { grid-column: 1; grid-row: 2; }
+/* 己方信息栏：左列下半部分（与对手信息同列，`align-self:end` 贴底），左列只放双方信息 + 对手手牌 */
+#stage.phone #myInfo     { grid-column: 1; grid-row: 3 / span 2; align-self: end; }
+#stage.phone #oppBoard   { grid-column: 2; grid-row: 1; }
+#stage.phone #centerZone { grid-column: 2; grid-row: 2; }
+#stage.phone #myBoard    { grid-column: 2; grid-row: 3; }
+#stage.phone #myHand     { grid-column: 2; grid-row: 4; }
+
+/* 左列信息栏：横排改为"自动换行"的紧凑块（名字 / 血条占整行，数字与状态标签自动折行） */
+#stage.phone .inforow {
+  flex-wrap: wrap; align-items: center; gap: 3px 8px; padding: 5px 7px;
+  background: rgba(20,20,22,.76); border: 1px solid var(--line); border-radius: 4px;
+}
+#stage.phone .inforow .nm { min-width: 0; flex: 1 1 100%; }
+#stage.phone .inforow .hpwrap { width: 100%; }
+#stage.phone .inforow .statusbar { flex-wrap: wrap; }
+#stage.phone #oppHand {
+  justify-content: flex-start; min-height: 0; padding: 2px 5px; flex-wrap: wrap; overflow: hidden;
+}
+#stage.phone #oppHand .cardback { width: 34px; height: 48px; margin-left: -12px; }
+
+/* 怪物区：吃满中间列的宽与高（怪卡随之变大） */
+#stage.phone .board { height: 100%; align-items: center; padding: 4px 6px; gap: 8px; }
+#stage.phone .cell { flex: 1 1 0; max-width: 190px; height: 100%; }
+#stage.phone .monster { width: 100%; height: 100%; }
+
+/* 顶栏 / 中央带压薄，把高度让给两片怪物区 */
+#stage.phone .topbar { height: 40px; flex: 0 0 40px; }
+#stage.phone #centerZone { min-height: 40px; padding: 4px; }
+
+/* 两侧安全边距：手机圆角/挖孔（全屏、刘海横置）会压住贴边的 UI（顶栏按钮、左列信息栏、右栏高清图/日志）。
+ * 20px 设计px ≈ 屏幕 13px，配合 env(safe-area-inset-*)（有挖孔时会更大）兜底。 */
+#stage.phone .main {
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));   /* 下方圆角也会切到左列信息栏 / 日志底部 */
+}
+#stage.phone .topbar {
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  /* 24 → 56：整排按钮再往左让出约 32 设计px（屏幕上约 20px），
+     避免最右的「设置」被手机屏幕圆角/挖孔压住点不到 */
+  padding-right: max(56px, env(safe-area-inset-right, 0px));
+}
+
+/* 右栏：高清图优先 —— 预览区取"内容自然高度"（图铺满整栏宽度 = 该栏能做到的最大尺寸），
+ * 但空间紧时可被压缩（不溢出舞台）；剩余高度全部给日志，日志可滚动 */
+/* 上限 = 舞台高 − 顶栏 40 − 日志至少 96（日志能显示约 3~4 行，不至于只剩一条） */
+#stage.phone #preview { flex: 0 0 auto; min-height: 0; max-height: calc(var(--ph, 500px) - 136px); padding: 7px 8px; }
+#stage.phone #preview .pv-title { font-size: calc(16px * var(--fs, 1)); margin-bottom: 3px; }
+/* 图高上限 = 舞台高 - 174px（顶栏 40 + 日志最少 60 + 标题/数值/效果/内边距 74）：
+ * 既让图铺满整栏宽度（能多大就多大），又保证预览+日志不会撑高外层面板导致溢出舞台 */
+#stage.phone #preview .pv-img { width: 100%; height: auto; flex: 0 1 auto; min-height: 0; max-width: 100%; max-height: calc(var(--ph, 500px) - 230px); }
+#stage.phone #preview .pv-effect { max-height: 96px; }   /* 面板高度由内容决定，百分比限高失效 → 用像素上限 */
+#stage.phone .logbox { flex: 1 1 auto; min-height: 96px; padding: 4px 8px; }   /* 手机日志：至少约 3~4 行 */
+#stage.phone #viewer { top: 0; }                        /* 牌库/弃牌堆查看器铺满整条右栏 */
+/* 教程面板：原 max-height 560px 在压矮后的舞台里会被切顶 */
+#stage.phone #tutPanel { width: 300px; max-height: 420px; font-size: calc(13px * var(--fs, 1)); }
+/* 竖屏：720×1280 的舞台里，贴在右下角会正压住己方手牌（占底部 214px）和「日志｜信息」条。
+   改成一条通栏横条，贴在底条**上方** —— 只盖己方战场下部的空白，不遮任何可操作区。 */
+#stage.portrait #tutPanel {
+  left: 3%; right: 3%; width: auto; top: auto;
+  bottom: calc(var(--handH, 214px) + 146px); max-height: 240px;
+}
+#stage.portrait #tutPanel.tut-left { left: 3%; right: 3%; }
+
+/* ============================================================
+ * 回合提示：每回合开始在中屏淡入淡出显示"第 x 回合"
+ * （ui.js showTurnBanner 加 .show 触发；pointer-events:none，不挡点击）
+ * ========================================================== */
+#turnBanner {
+  /* left/top 由 ui.js 按"两块怪物区的外框中心"算（桌面端右栏占 320px、手机端左栏占 196px，
+     直接居中到舞台会偏右）；这里的值只是取不到布局时的兜底 */
+  position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%);
+  font-size: 44px; font-weight: bold; letter-spacing: 10px; color: var(--gold, #d8b04a);
+  text-shadow: 4px 4px 0 #000, 0 0 30px rgba(0, 0, 0, .9);
+  opacity: 0; pointer-events: none; z-index: 60; white-space: nowrap;
+}
+#turnBanner.show { animation: turnRoll 1.5s ease-out forwards; }
+@keyframes turnRoll {
+  0%   { opacity: 0; transform: translate(-50%, -50%) translateY(24px) scale(.84); }
+  20%  { opacity: 1; transform: translate(-50%, -50%) translateY(0) scale(1); }
+  72%  { opacity: 1; transform: translate(-50%, -50%) translateY(0) scale(1.02); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translateY(-20px) scale(1.06); }
+}
+
+/* ---------------- 联机延迟（顶栏右侧一行） ----------------
+ * 只有连上服务器、且处于对局中才显示（ui.js renderPing 控制显隐）。
+ * 配色随延迟变化：<80ms 绿 / <180ms 黄 / 其余红。
+ * ⚠ 它是 .topbar 的 flex 项（position:static）—— 以前是 absolute 右上角，
+ *    正好压在「设置」按钮和种子信息上；改成流式项后永不遮挡，且手机/竖屏自动适配。 */
+#netPing {
+  flex: 0 0 auto; font-size: calc(11px * var(--fs, 1)); letter-spacing: .5px;
+  padding: 2px 7px; border-radius: 6px;
+  color: var(--dim); background: rgba(0, 0, 0, .55);
+  border: 1px solid var(--line);
+  pointer-events: none; user-select: none;
+}
+#netPing.ok  { color: var(--green); border-color: rgba(126, 200, 80, .5); }
+#netPing.mid { color: var(--gold);  border-color: rgba(216, 176, 74, .5); }
+#netPing.bad { color: var(--red);   border-color: rgba(216, 90, 74, .5); }
+
+/* 排位赛回合计时：紧挨在延迟标签右边，只有排位房才显示 */
+#rankTimer {
+  flex: 0 0 auto; font-size: calc(12px * var(--fs, 1)); letter-spacing: .5px;
+  padding: 2px 7px; border-radius: 6px;
+  color: var(--text); background: rgba(0, 0, 0, .55);
+  border: 1px solid var(--line);
+  pointer-events: none; user-select: none;
+}
+#rankTimer.warn   { color: var(--gold); border-color: rgba(216, 176, 74, .6); }
+#rankTimer.danger { color: var(--red);  border-color: rgba(216, 90, 74, .7); animation: rankPulse .9s ease-in-out infinite; }
+@keyframes rankPulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+
+/* ================= PVP 快捷对话 =================
+ * 按钮与面板都在 #myInfo 里。#myInfo 现在搬到了右栏底部（与日志并排的一条窄栏），
+ * 所以按钮改成**撑满窄栏的一行**，面板从按钮上方展开、右对齐贴着信息栏，
+ * 不会伸到战场中间去。 */
+#emoteBtn {
+  position: static; width: 100%; margin-top: 4px; z-index: 62;
+  /* 尺寸是刻意放大的：最初用 pxbtn.small 只有 30×16，在缩放后的舞台上几乎看不见，
+     玩家反馈"找不到发对话的按钮"。这里加图标 + 更大内边距 + 金色描边，保证一眼能看到、手能点到。 */
+  /* ⚠ 这里刻意**不乘 --fs**：舞台整体还有 transform:scale(k)（手机横屏 k≈0.55），
+     再叠一层 --fs 会让按钮缩到 16px 高、根本点不到。用固定设计像素，缩放后仍约 22px 高。 */
+  /* 用 max() 兜底：既参与 --fs 参数化（审计要求），又保证缩放后不低于可读/可点的 13px */
+  font-size: max(13px, calc(17px * var(--fs, 1)));
+  padding: 9px 10px;
+  line-height: 1.2;
+  min-width: 0;
+  min-height: 48px;
+  color: var(--gold);
+  border: 1px solid rgba(216, 176, 74, .75);
+  border-radius: 8px;
+  background: rgba(12, 14, 18, .92);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .55);
+  letter-spacing: .5px;
+}
+#emoteBtn:hover { background: rgba(216, 176, 74, .18); border-color: var(--gold); }
+#emoteBtn:active { transform: translateY(1px); }
+
+/* 面板：从按钮上方展开，右对齐（贴着信息栏右沿），三档 + 文案列表
+   ⚠ max-height 用**设计像素**而不是 vh：面板在 #stage 里，舞台整体被 transform:scale(k)
+   缩放（手机横屏 k≈0.55），52vh 换算成设计像素会超过整个舞台高度 → 一弹就盖住大半个战场。 */
+#emotePanel {
+  /* 与按钮同坐标系（相对 .inforow），向按钮上方展开 */
+  position: absolute; right: 0; bottom: calc(100% + 6px); z-index: 63;
+  width: min(320px, 78vw); max-height: 320px; overflow: auto;
+  padding: 8px; border-radius: 10px;
+  background: rgba(12, 14, 18, .96);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, .55);
+  font-size: calc(13px * var(--fs, 1));
+}
+#emotePanel.hidden { display: none; }
+#emotePanel .emote-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+#emotePanel .emote-tabs button { flex: 1; }
+#emotePanel .emote-tabs button.on { color: var(--gold); border-color: var(--gold); background: rgba(216, 176, 74, .12); }
+#emotePanel .emote-list { display: flex; flex-direction: column; gap: 6px; }
+#emotePanel .emote-list button {
+  text-align: left; padding: 6px 9px; border-radius: 8px;
+  background: rgba(255, 255, 255, .05); border: 1px solid var(--line);
+  color: var(--text); cursor: pointer; font: inherit;
+}
+#emotePanel .emote-list button:hover { background: rgba(255, 255, 255, .12); border-color: var(--gold); }
+#emotePanel .emote-list button:active { transform: translateY(1px); }
+
+/* 气泡层：满屏但不吃点击 */
+#bubbleLayer { position: fixed; inset: 0; z-index: 61; pointer-events: none; }.bubble {
+  position: absolute; max-width: 240px;
+  padding: 7px 11px; border-radius: 12px;
+  font-size: calc(13px * var(--fs, 1)); line-height: 1.35;
+  color: #12161c; background: #f2ead6;
+  border: 1px solid rgba(0, 0, 0, .25);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+  /* 从名字处"冒出来"→ 停留 → 淡出上浮 */
+  animation: bubblePop 3.4s ease-out forwards;
+  transform-origin: 0 100%;
+  white-space: pre-wrap; word-break: break-word;
+}
+.bubble::after {   /* 小尾巴指向人物名称 */
+  content: ''; position: absolute; left: 14px; bottom: -7px;
+  width: 12px; height: 12px; background: inherit;
+  border-right: 1px solid rgba(0, 0, 0, .25);
+  border-bottom: 1px solid rgba(0, 0, 0, .25);
+  transform: rotate(45deg);
+}
+.bubble.foe { background: #dfe6f2; }
+@keyframes bubblePop {
+  0%   { opacity: 0; transform: translateY(6px) scale(.86); }
+  10%  { opacity: 1; transform: translateY(0) scale(1); }
+  78%  { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-10px) scale(.98); }
+}
+
+/* ================= PVP 快捷对话：触屏（手机横屏）定位 =================
+   桌面版按钮固定在战场左下角；触屏设备改成贴「己方信息框」左上角，
+   面板也从左下方贴近底部展开，避免挡住中间的手牌与战场。 */
+@media (hover: none) {
+  #myInfo { position: relative; }
+  /* 触屏：按钮仍是撑满信息栏的一行（不再绝对定位到信息框外） */
+  #emoteBtn { position: static; width: 100%; }
+  #emotePanel { right: 0; bottom: calc(100% + 6px); width: min(240px, 86vw); max-height: 300px; }
+  #emotePanel .emote-tabs button { font-size: calc(12px * var(--fs, 1)); padding: 5px 4px; }
+  #emotePanel .emote-list button { padding: 7px 9px; }
+}
+
+/* ============================================================
+   竖屏模式：战斗界面（#stage.portrait）
+   ------------------------------------------------------------
+   舞台宽高由 ui.js 的 fitScreen 内联设成 720×1280（宽高互换）。
+   布局目标（用户要求）：顶部双方信息 → 中间战场 → 底部手牌。
+   桌面横屏排版完全不受影响（只在 .portrait 下生效）。
+   ============================================================ */
+#stage.portrait .main {
+  display: flex; flex-direction: column;
+  height: 100%; box-sizing: border-box;
+  padding: 4px 8px 8px; gap: 4px;
+  position: relative;
+}
+#stage.portrait .battlecol {
+  display: flex; flex-direction: column;
+  flex: 1 1 auto; min-height: 0; gap: 4px;
+}
+/* 竖屏 720×1280 比 16:9 高得多：两块战场用 flex:1 吃掉多出来的竖向空间，
+   怪物在各自战场里**垂直居中**（align-items:center），空白就均摊在战场上下，
+   不会全堆成一块大黑区，也不会出现某一段被撑变形。 */
+#stage.portrait #oppBoard,
+#stage.portrait #myBoard { flex: 1 1 0; min-height: 0; }
+#stage.portrait .board { align-items: center; }
+/* 顺序重排（己方信息栏已搬到右栏，这里只剩对手信息在顶部） */
+#stage.portrait #oppInfo   { order: 1; flex: 0 0 auto; }
+#stage.portrait #oppHand   { order: 3; flex: 0 0 78px; }
+#stage.portrait #oppBoard  { order: 4; }
+#stage.portrait #centerZone{ order: 5; flex: 0 0 auto; min-height: 54px; }
+#stage.portrait #myBoard   { order: 6; }
+#stage.portrait #myHand    { order: 7; flex: 0 0 var(--handH, 214px); }
+
+/* 顶部信息行在窄栏里会挤：允许横向滚动，别换行把高度撑爆 */
+#stage.portrait .inforow {
+  overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+  padding: 5px 6px; gap: 8px;
+  font-size: calc(14px * var(--fs, 1));
+}
+#stage.portrait .inforow .nm { min-width: 0; }
+#stage.portrait .hpwrap { width: 170px; height: 17px; }
+#stage.portrait .hpwrap .hptxt { font-size: calc(12px * var(--fs, 1)); line-height: calc(15px * var(--fs, 1)); }
+
+/* 对手手牌：竖屏里牌背放大一点，看得清还剩几张牌 */
+#stage.portrait .hand-opp { min-height: 74px; }
+#stage.portrait .cardback { width: 52px; height: 72px; margin-left: -18px; }
+
+/* 手牌：竖屏很宽但只有一行，超出就横向滚动（不要缩成看不见）；卡放大到 ~120×168 */
+#stage.portrait .handrow {
+  overflow-x: auto; overflow-y: hidden;
+  justify-content: center; gap: 4px;
+  min-height: calc(var(--handH, 214px) - 8px); padding: 6px 8px;
+}
+#stage.portrait .handrow .card { width: 116px; height: 162px; margin-left: -22px; }
+#stage.portrait #myHand .card { flex: 0 0 auto; }
+
+/* 战场：3 列在 720 宽里放得下 200px 的格子（3×200 + 间距），比横屏大一圈，竖屏才看得清 */
+#stage.portrait .board { gap: 8px; padding: 6px 8px; justify-content: center; align-items: center; }
+#stage.portrait .cell  { width: 204px; height: 160px; }
+#stage.portrait .monster { width: 198px; height: 154px; }
+#stage.portrait .monster .mstats { font-size: calc(15px * var(--fs, 1)); }
+#stage.portrait .monster .mname { font-size: calc(12px * var(--fs, 1)); }
+
+/* 右栏（详情/日志/己方信息/查看器）在竖屏没有独立位置：
+   .sidebar 用 display:contents 把自己"摊开"，子元素直接挂在 .main 上各自定位。 */
+#stage.portrait .sidebar {
+  display: contents; padding: 0; margin: 0;
+  background: none; border: 0;
+}
+/* 竖屏底部一条「日志 ｜ 己方信息」：两者各自绝对定位拼成并排（左 44% / 右 56%），
+   贴在己方手牌上方。竖屏里己方信息也不放顶部，只留对手信息在顶。 */
+#stage.portrait .logbox {
+  position: absolute; left: 8px; right: calc(64% + 4px); z-index: 30;
+  bottom: calc(var(--handH, 214px) + 8px); height: 132px;
+  pointer-events: auto;
+  padding: 6px 8px;
+  background: rgba(8, 10, 12, .84);
+  border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+  font-size: calc(11px * var(--fs, 1)); line-height: 1.45;
+}
+#stage.portrait .logbox .logline { font-size: calc(11px * var(--fs, 1)); }
+/* 己方信息栏：横排换行（窄高比下横排更省高度，也放得下法杖栏与对话按钮）。
+   同样不能设 overflow —— 会切掉对话面板。所以宁可加宽 + 缩小单项，也不能让它溢出。 */
+#stage.portrait #myInfo {
+  position: absolute; right: 8px; width: 64%; z-index: 30;
+  bottom: calc(var(--handH, 214px) + 8px); height: 132px;
+  flex-direction: row; flex-wrap: wrap; align-items: center; align-content: center;
+  gap: 3px 5px;
+  padding: 5px 7px; overflow: visible; pointer-events: auto;
+  background: rgba(8, 10, 12, .84);
+  border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+  font-size: calc(10px * var(--fs, 1));
+}
+#stage.portrait #myInfo .nm { flex: 0 1 auto; min-width: 0; }
+#stage.portrait #myInfo .hpwrap { flex: 0 0 96px; width: 96px; height: 12px; }
+#stage.portrait #myInfo .hpwrap .hptxt { font-size: calc(9.5px * var(--fs, 1)); line-height: calc(11px * var(--fs, 1)); }
+#stage.portrait #myInfo .stat { flex: 0 0 auto; white-space: nowrap; font-size: calc(10px * var(--fs, 1)); }
+#stage.portrait #myInfo .statusbar { flex: 0 1 auto; flex-wrap: wrap; }
+#stage.portrait #myInfo .wandwrap { flex: 0 0 auto; gap: 4px; }
+#stage.portrait #myInfo #wandSlot { width: 34px; height: 44px; font-size: calc(10px * var(--fs, 1)); }
+/* 对话按钮排在信息栏最后（order:9）并放大 —— 之前 34px 高、缩放到手机上只有 20px 出头，
+   用户根本找不到。手机触控目标至少给到 ~26 CSS px（设计 44px）。 */
+#stage.portrait #emoteBtn {
+  order: 9; width: auto; margin-left: auto;
+  min-height: 44px; min-width: 92px; padding: 6px 12px;
+  font-size: max(13px, calc(15px * var(--fs, 1)));
+}
+#stage.portrait #emotePanel { width: min(300px, 72vw); max-height: 260px; }
+/* 查看器（牌库/弃牌堆）：竖屏没有右栏，改成整屏浮层盖在战场上，点关闭按钮退出 */
+#stage.portrait #viewer {
+  display: block; position: absolute; inset: 4% 6%; z-index: 40;
+  overflow-y: auto; pointer-events: auto;
+  border: 2px solid var(--line); border-radius: 8px;
+  background: rgba(12, 12, 14, .97);
+}
+#stage.portrait #preview { display: none; }
+/* 详情浮层（竖屏 / 手机横屏紧凑布局都用）：
+ * 位置 = **指针所在的另一半屏**（悬停对手场 → 落下方；悬停己方场 → 落上方）。
+ * ⚠ 高度必须给定值再用 flex 分配：以前只写 `max-height: 42%`，而浮层高度是 auto，
+ *   百分比不可解析 → 被忽略 → 1300×1818 的卡图按固有宽度铺开，撑成一屏多高、只能看到上半截。
+ *   z-index 50 低于 #fxLayer(55)，保证攻击连线/箭头永远画在浮层之上。 */
+#stage.portrait #preview.on {
+  display: flex; flex-direction: column; align-items: center;
+  position: absolute; left: 50%; top: 4%; transform: translateX(-50%);
+  width: min(460px, 92%); height: 490px; max-height: 44%;
+  overflow: hidden; pointer-events: none;
+  padding: 8px 10px; border-radius: 10px;
+  background: rgba(8, 10, 14, .96);
+  border: 2px solid var(--gold);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .6);
+  font-size: calc(12px * var(--fs, 1));
+  z-index: 50;
+}
+/* 指针在下半屏 → 浮层落上方（不盖己方场）。
+   指针在上半屏（悬停对手场）→ 浮层落下方：底边贴底条上沿，高度压到 300，
+   顶边才落在舞台中线以下 —— 否则 490 高的浮层顶边会回到上半屏、把自己的怪遮掉一半。 */
+#stage.portrait #preview.on.on-my {
+  top: auto; bottom: calc(var(--handH, 214px) + 146px);
+  height: 300px;
+  width: min(340px, 88%);     /* 下半屏可用高度小，宽度也收窄，免得变成一块大黑 */
+}
+#stage.portrait #preview.on.on-my .pv-effect { max-height: 26%; }
+/* 卡图吃掉标题/数值/效果之外的全部高度，等比缩放，绝不撑爆 */
+#stage.portrait #preview.on .pv-img {
+  flex: 1 1 0; min-height: 0;
+  width: auto; max-width: 100%; max-height: none;
+  object-fit: contain; margin: 4px auto; display: block;
+}
+#stage.portrait #preview.on .pv-title { font-size: calc(14px * var(--fs, 1)); flex: 0 0 auto; }
+#stage.portrait #preview.on .pv-meta { flex: 0 0 auto; margin: 4px 0 3px; }
+#stage.portrait #preview.on .pv-effect {
+  flex: 0 1 auto; max-height: 32%; overflow-y: auto; text-align: left;
+}
+
+/* 竖屏下顶部工具条（设置/全屏/自动战斗）保留，右栏状态标签不需要额外处理 */
+#stage.portrait .topbar { padding: 2px 6px; }
+/* 回合横幅：竖屏下坐标由 bannerAnchor 按实际舞台宽度算（见 ui.js），
+   这里只需把字号压到 720 宽放得下的尺寸 */
+body.portrait-mode #turnBanner { font-size: 34px; letter-spacing: 6px; text-shadow: 3px 3px 0 #000, 0 0 24px rgba(0,0,0,.9); }
