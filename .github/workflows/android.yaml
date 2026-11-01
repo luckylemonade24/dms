@@ -1,0 +1,60 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js (用于 sharp 生成图标)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: 安装依赖 (sharp)
+        run: npm install
+
+      - name: 生成安卓图标
+        run: node gen-android-icon.js
+
+      - name: 设置 JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 设置 Gradle 缓存
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 准备本地前端资源到 assets
+        run: |
+          mkdir -p android/app/src/main/assets/www
+          rsync -av --exclude='.git' --exclude='node_modules' --exclude='.github' \
+            --exclude='android' --exclude='package.json' --exclude='main.js' --exclude='server' \
+            ./ android/app/src/main/assets/www/
+
+      - name: 赋予 gradlew 执行权限并构建
+        run: |
+          cd android
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          gradle wrapper --gradle-version 8.5
+          chmod +x gradlew
+          ./gradlew assembleRelease
+
+      - name: 上传 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DungeonDuelist-Android
+          path: android/app/build/outputs/apk/release/app-release.apk
