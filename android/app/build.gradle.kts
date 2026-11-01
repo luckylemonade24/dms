@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.ddm.jn"
+    namespace = "com.ddm.jn1"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.ddm.jn"
+        applicationId = "com.ddm.jn1"
         minSdk = 24
         targetSdk = 34 // 降级到当前最稳定的 34，防闪退
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.ddm.jn;
+package com.ddm.jn1;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
