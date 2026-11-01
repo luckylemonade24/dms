@@ -21,36 +21,32 @@ jobs:
           rsync -av --exclude='.git' --exclude='node_modules' --exclude='.github' --exclude='android' --exclude='dist' ./ dist/
           cd dist
 
-      - name: 合并并压缩 CSS
+      - name: 合并并压缩 CSS (仅限 css/ 和 add/)
         run: |
           cd dist
-          # 1. 把 css 文件夹里所有的 css 合并（保留在 css 目录下，保证相对路径不错位）
-          cat css/*.css > css/all.css
-          # 2. 压缩
-          lightningcss --minify css/all.css -o css/all.css
-          # 3. 删掉 HTML 里原来的 css 引入
-          sed -i 's|<link rel="stylesheet" href="css/.*">||g' index.html
-          # 4. 插入新的合并版 css
-          sed -i 's|</head>|<link rel="stylesheet" href="css/all.css">\n</head>|' index.html
+          # 1. 提取 html 中所有前缀为 css/ 或 add/ 的样式
+          grep -oP '(?<=<link rel="stylesheet" href=")[^"]+' index.html | grep -E '^(css/|add/)' | sed 's/?[^ ]*//g' > css_list.txt
+          # 2. 按顺序合并
+          cat $(cat css_list.txt) > all.css
+          # 3. 压缩
+          lightningcss --minify all.css -o all.css
+          # 4. 清理 HTML 并插入 all.css
+          sed -i 's|<link rel="stylesheet" href="[^"]*">||g' index.html
+          sed -i 's|</head>|<link rel="stylesheet" href="all.css">\n</head>|' index.html
+          rm css_list.txt
 
-      - name: 合并并压缩 JS
+      - name: 合并并压缩 JS (仅限 js/ 和 add/)
         run: |
           cd dist
-          # 1. 提取所有带 src 的 script，排除 atlas-hook.js
-          grep -oP '(?<=<script src=")[^"]+' index.html | sed 's/?[^ ]*//g' | sed 's|^/||' | grep -v 'atlas-hook' > js_list.txt
-          # 2. 合并到一个文件（不放闭包内，确保内联脚本能访问全局变量 UI 等）
-          cat $(cat js_list.txt) > js/all.js
-          
-          # 3. 开启极限混淆压缩（Terser 默认不混淆全局作用域变量，非常安全）
-          terser js/all.js -c -m -o js/all.js
-          
-          # 4. 删掉 HTML 里原来的 js 引入，但千万保留 /atlas-hook.js 和你的内联脚本
-          sed -i 's|<script src="js/.*"></script>||g' index.html
-          sed -i 's|<script src="/preload.*"></script>||g' index.html
-          
-          # 5. 把合并后的 js/all.js 插到 atlas-hook.js 之后（保证顺序不出错）
-          sed -i 's|<script src="/atlas-hook.js"></script>|<script src="/atlas-hook.js"></script>\n<script src="js/all.js"></script>|' index.html
-          
+          # 1. 提取 html 中所有前缀为 js/ 或 add/ 的脚本
+          grep -oP '(?<=<script src=")[^"]+' index.html | grep -E '^(js/|add/)' | sed 's/?[^ ]*//g' > js_list.txt
+          # 2. 按顺序合并
+          cat $(cat js_list.txt) > all.js
+          # 3. 开启极限混淆压缩（保护常用全局变量）
+          terser all.js -c drop_console=true -m reserved=['UI','Engine','SaveData','AI','Sfx','CardTip','StatTip','Net','RunManager','RunData','RunUI','DeckBuilder','Tournament','TourUI','Academy','AcademyUI','BossMode','BossUI','Tutorial','TutorialUI','ProfileUI','Community','Achievements'] -o all.js
+          # 4. 清理 HTML 并插入 all.js
+          sed -i 's|<script src="[^"]*"></script>||g' index.html
+          sed -i 's|</body>|<script src="all.js"></script>\n</body>|' index.html
           rm js_list.txt
 
       - name: 上传前端打包产物
