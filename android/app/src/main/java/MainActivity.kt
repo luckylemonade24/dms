@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Build
@@ -20,12 +21,25 @@ import androidx.webkit.WebViewAssetLoader
 class MainActivity : Activity() {
 
     private lateinit var webView: WebView
+    private var filePathCallback: ValueCallback<Array<Uri>>? = null
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. 完美全屏沉浸
+        // 【新增】动态申请存储权限（针对 Android 10 以下的手机）
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                    arrayOf(
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE
+                    ), 101
+                )
+            }
+        }
+
+        // 全屏沉浸
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
             window.insetsController?.let {
@@ -49,7 +63,6 @@ class MainActivity : Activity() {
         webView.setBackgroundColor(android.graphics.Color.BLACK)
         setContentView(webView)
 
-        // 2. WebView 设置
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -59,63 +72,103 @@ class MainActivity : Activity() {
             mediaPlaybackRequiresUserGesture = false
             allowFileAccess = true
             allowContentAccess = true
-            // 允许混合内容 (防止部分外网 HTTP 资源被拦截)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             }
         }
 
-        // 3. 核心：绝对路径图片重定向
         val assetLoader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
-            // 如果前端请求 /images/a.png，去 assets/www/images/a.png 找
-            .addPathHandler("/", object : WebViewAssetLoader.PathHandler {
-                override fun handle(path: String): WebResourceResponse? {
-                    return WebViewAssetLoader.AssetsPathHandler(this@MainActivity).handle("www/$path")
-                }
-            })
             .build()
 
         webView.webViewClient = object : WebViewClient() {
             override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
-                return assetLoader.shouldInterceptRequest(request!!.url)
+                val url = request?.url ?: return null
+                val urlStr = url.toString()
+                if (urlStr.startsWith("https://appassets.androidplatform.net/") && !urlStr.contains("/assets/")) {
+                    val newUrl = urlStr.replace(
+                        "https://appassets.androidplatform.net/",
+                        "https://appassets.androidplatform.net/assets/www/"
+                    )
+                    return assetLoader.shouldInterceptRequest(Uri.parse(newUrl))
+                }
+                return assetLoader.shouldInterceptRequest(url)
             }
 
-            // 4. 强制忽略 SSL 证书错误 (解决 WSS 联机握手失败)
-            override fun onReceivedSslError(view: WebView?, handler: android.webkit.SslErrorHandler?, error: SslError?) {
-                handler?.proceed() 
+            override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
+                handler?.proceed()
             }
         }
 
-        // 5. 解决存档导出 (拦截常规下载)
+        // 导入
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                webView: WebView?,
+                newFilePathCallback: ValueCallback<Array<Uri>>?,
+                fileChooserParams: FileChooserParams?
+            ): Boolean {
+                filePathCallback?.onReceiveValue(null)
+                filePathCallback = newFilePathCallback
+                try {
+                    val intent = Intent(Intent.ACTION_GET_CONTENT)
+                    intent.addCategory(Intent.CATEGORY_OPENABLE)
+                    intent.type = "*/*"
+                    startActivityForResult(Intent.createChooser(intent, "选择存档文件"), 100)
+                } catch (e: Exception) {
+                    filePathCallback = null
+                    return false
+                }
+                return true
+            }
+        }
+
+        // 导出
         webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, _ ->
             try {
                 val request = DownloadManager.Request(Uri.parse(url))
                 request.setMimeType(mimetype)
                 request.addRequestHeader("User-Agent", userAgent)
-                request.setDescription("下载文件中...")
-                request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype))
+                val fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
+                request.setTitle(fileName)
+                request.setDescription("正在保存存档...")
                 request.allowScanningByMediaScanner()
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, contentDisposition, mimetype))
                 
+                // 直接写公共的 Download 文件夹
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+
                 val dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                 dm.enqueue(request)
+                
                 runOnUiThread {
-                    android.widget.Toast.makeText(applicationContext, "开始下载...", android.widget.Toast.LENGTH_SHORT).show()
+                    android.widget.Toast.makeText(applicationContext, "开始导出！\n文件保存在手机 Download 文件夹", android.widget.Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 runOnUiThread {
-                    android.widget.Toast.makeText(applicationContext, "下载失败: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                    android.widget.Toast.makeText(applicationContext, "导出失败: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
-        // 加载页面
         webView.loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
     }
 
-    // 物理返回键处理
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == 100) {
+            if (filePathCallback == null) return
+            val results: Array<Uri>? = if (resultCode == Activity.RESULT_OK) {
+                val uri = data?.data
+                if (uri != null) arrayOf(uri) else null
+            } else {
+                null
+            }
+            filePathCallback?.onReceiveValue(results)
+            filePathCallback = null
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
             webView.goBack()
