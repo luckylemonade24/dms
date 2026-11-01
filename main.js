@@ -1,6 +1,7 @@
-const { app, BrowserWindow, Menu, dialog, protocol, net } = require('electron');
+const { app, BrowserWindow, Menu, dialog, protocol } = require('electron');
 const { autoUpdater } = require('electron-updater');
-const path = require('path');
+const fs = require('node:fs/promises');
+const path = require('node:path');
 
 let mainWindow;
 
@@ -20,10 +21,21 @@ if (!gotTheLock) {
 }
 
 // ==========================================
-// 2. 注册虚拟域名协议
+// 2. 注册 app:// 协议
+// standard: true  → 相对路径、localStorage、同源策略正常工作
+// codeCache: true → 允许 V8 字节码缓存
 // ==========================================
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'https', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }
+  {
+    scheme: 'app',
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+      codeCache: true,
+    },
+  },
 ]);
 
 // ==========================================
@@ -32,6 +44,10 @@ protocol.registerSchemesAsPrivileged([
 function setupAutoUpdater() {
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = false;
+
+  autoUpdater.on('error', (err) => {
+    console.error('Auto-update error:', err.message);
+  });
 
   autoUpdater.on('update-downloaded', (info) => {
     dialog.showMessageBox(mainWindow, {
@@ -43,44 +59,84 @@ function setupAutoUpdater() {
     });
   });
 
-  autoUpdater.checkForUpdates();
+  autoUpdater.checkForUpdates().catch((err) => {
+    console.error('Initial update check failed:', err.message);
+  });
 }
 
 // ==========================================
 // 4. 启动
 // ==========================================
 app.whenReady().then(() => {
-  Menu.setApplicationMenu(null); // 隐藏默认菜单栏
+  Menu.setApplicationMenu(null);
 
-  // 虚拟域名拦截
-  protocol.handle('https', (request) => {
+  // 本地文件服务：只接管 app://app.local/... 的请求
+  protocol.handle('app', async (request) => {
     const urlObj = new URL(request.url);
-    if (urlObj.hostname === 'app.local') {
-      let pathname = decodeURIComponent(urlObj.pathname);
-      if (pathname === '/') pathname = '/index.html';
-      const safePath = pathname.replace(/^(\.\.[\/\\])+/, '');
-      const filePath = path.join(__dirname, safePath);
-      return net.fetch(`file://${filePath}`);
+
+    if (urlObj.hostname !== 'app.local') {
+      return new Response('Not Found', { status: 404 });
     }
-    return net.fetch(request);
+
+    let pathname = decodeURIComponent(urlObj.pathname);
+    if (pathname === '/') pathname = '/index.html';
+
+    const appRoot = path.resolve(__dirname);
+    const resolved = path.resolve(appRoot, '.' + pathname);
+
+    // containment 检查：防止 ../ 逃逸
+    if (!resolved.startsWith(appRoot + path.sep) && resolved !== appRoot) {
+      return new Response('Forbidden', { status: 403 });
+    }
+
+    try {
+      const stat = await fs.stat(resolved);
+
+      if (!stat.isFile()) {
+        return new Response('Not Found', { status: 404 });
+      }
+
+      // 304 短路：浏览器拿到的仍是 200 缓存判定链，V8 字节码缓存才能持久化
+      const ims = request.headers.get('If-Modified-Since');
+      if (ims) {
+        const since = new Date(ims).getTime();
+        const mtimeSec = Math.floor(stat.mtimeMs / 1000) * 1000;
+        if (mtimeSec <= since) {
+          return new Response(null, { status: 304 });
+        }
+      }
+
+      const body = await fs.readFile(resolved);
+
+      return new Response(body, {
+        status: 200,
+        headers: {
+          'Content-Type': getMimeType(resolved),
+          // 文件名固定、整包替换更新 → 用协商缓存，每次先问一下
+          'Cache-Control': 'no-cache, must-revalidate',
+          'Last-Modified': stat.mtime.toUTCString(),
+        },
+      });
+    } catch (err) {
+      console.error('Protocol handler error:', resolved, err.message);
+      return new Response('Not Found', { status: 404 });
+    }
   });
 
   mainWindow = new BrowserWindow({
-    width: 1280, 
+    width: 1280,
     height: 720,
-    // 不使用无边框，保留原生窗口
-    autoHideMenuBar: true, 
-    webPreferences: { 
-      nodeIntegration: true, 
-      contextIsolation: false,
-      backgroundThrottling: false // 切后台不降帧
+    webPreferences: {
+      sandbox: true,
+      v8CacheOptions: 'code',
+      spellcheck: false,
+      enableWebSQL: false,
+      enableBlinkFeatures: false,
     }
   });
 
-  // 启动时直接最大化（铺满屏幕，但保留任务栏）
   mainWindow.maximize();
-
-  mainWindow.loadURL('https://app.local/index.html');
+  mainWindow.loadURL('app://app.local/index.html');
 
   mainWindow.webContents.once('did-finish-load', () => {
     if (app.isPackaged) setupAutoUpdater();
@@ -92,3 +148,24 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
+
+// ==========================================
+// 5. MIME 表
+// ==========================================
+const MIME_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js':   'text/javascript; charset=utf-8',
+  '.css':  'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg':  'image/svg+xml',
+  '.png':  'image/png',
+  '.jpg':  'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.ico':  'image/x-icon',
+  '.woff2':'font/woff2',
+};
+
+function getMimeType(filePath) {
+  return MIME_TYPES[path.extname(filePath).toLowerCase()] || 'application/octet-stream';
+}
