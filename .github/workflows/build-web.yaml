@@ -19,16 +19,25 @@ jobs:
         run: |
           mkdir -p dist
           
-          # 1. 处理 CSS（保留在 css 目录中）
+          # ==========================
+          # 处理 CSS（保留在 css 目录中）
+          # ==========================
           grep -oP '(?<=<link rel="stylesheet" href=")[^"]+' index.html | sed 's/?[^ ]*//g' | grep -E '^(css/|add/)' > css_list.txt
           if [ -s css_list.txt ]; then
             mkdir -p dist/css
             cat $(cat css_list.txt) > dist/css/all.css
+            
+            # ★ 核心修复：把所有的 ../ 路径强行改成绝对根路径 /
+            # 这样 Android 的 WebView 拦截器才能正确识别并加载背景图
+            sed -i 's|\.\./|/|g' dist/css/all.css
+            
             lightningcss --minify dist/css/all.css -o dist/css/all.css
           fi
           rm -f css_list.txt
 
-          # 2. 处理 JS（保留在 js 目录中）
+          # ==========================
+          # 处理 JS（保留在 js 目录中）
+          # ==========================
           grep -oP '(?<=<script src=")[^"]+' index.html | sed 's/?[^ ]*//g' | grep -E '^(js/|add/)' > js_list.txt
           if [ -s js_list.txt ]; then
             mkdir -p dist/js
@@ -37,14 +46,19 @@ jobs:
           fi
           rm -f js_list.txt
 
-          # 3. 修改 index.html
+          # ==========================
+          # 修改 index.html 并放入导出目录
+          # ==========================
           cp index.html dist/index.html
+          
+          # 删掉原本的 css 和 js 引入，替换为合并后的路径
           sed -i -E 's#<link rel="stylesheet" href="(css/|add/)[^"]*">##g' dist/index.html
           sed -i 's#</head>#<link rel="stylesheet" href="css/all.css">\n</head>#' dist/index.html
+          
           sed -i -E 's#<script src="(js/|add/)[^"]*"[^>]*></script>##g' dist/index.html
           sed -i 's#</body>#<script src="js/all.js"></script>\n</body>#' dist/index.html
 
-          # 4. 精准拷贝文件（不包含 server）
+          # 4. 精准拷贝文件
           cp manifest.webmanifest sw.js dist/
           rsync -av 背景 卡牌 图标 字体 dist/
 
