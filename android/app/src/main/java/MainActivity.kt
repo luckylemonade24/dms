@@ -56,8 +56,10 @@ class MainActivity : AppCompatActivity() {
             domStorageEnabled = true
             databaseEnabled = true
             mediaPlaybackRequiresUserGesture = false
-            setLayerType(View.LAYER_TYPE_HARDWARE, null)
         }
+        
+        // 修正：硬件加速是 WebView (View) 的方法，必须放在 settings 外面
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
         // 处理安卓物理返回键
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -70,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // 加载本地网页（工作流会自动把根目录的 index.html 塞进 assets/www）
+        // 加载本地网页（工作流会自动把根目录的前端文件塞进 assets/www）
         webView.loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
     }
 }
