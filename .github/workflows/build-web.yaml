@@ -15,42 +15,39 @@ jobs:
         run: |
           npm install -g terser lightningcss-cli
 
-      - name: 准备构建目录
+      - name: 提取、合并、极限压缩
         run: |
+          # 1. 准备全新的 dist 目录（不污染源码）
           mkdir -p dist
           rsync -av --exclude='.git' --exclude='node_modules' --exclude='.github' --exclude='android' --exclude='dist' ./ dist/
           cd dist
 
-      - name: 合并并压缩 CSS (仅限 css/ 和 add/)
-        run: |
-          cd dist
-          # 1. 提取 html 中所有前缀为 css/ 或 add/ 的样式
-          grep -oP '(?<=<link rel="stylesheet" href=")[^"]+' index.html | grep -E '^(css/|add/)' | sed 's/?[^ ]*//g' > css_list.txt
-          # 2. 按顺序合并
+          # ==========================
+          # 处理 CSS (只提取 css/ 和 add/ 目录)
+          # ==========================
+          grep -oP '(?<=<link rel="stylesheet" href=")[^"]+' index.html | grep -E '^(css/|add/)' | sed 's/?[^ ]*//g' | sed 's|^/||' > css_list.txt
           cat $(cat css_list.txt) > all.css
-          # 3. 压缩
           lightningcss --minify all.css -o all.css
-          # 4. 清理 HTML 并插入 all.css
           sed -i 's|<link rel="stylesheet" href="[^"]*">||g' index.html
           sed -i 's|</head>|<link rel="stylesheet" href="all.css">\n</head>|' index.html
           rm css_list.txt
 
-      - name: 合并并压缩 JS (仅限 js/ 和 add/)
-        run: |
-          cd dist
-          # 1. 提取 html 中所有前缀为 js/ 或 add/ 的脚本
-          grep -oP '(?<=<script src=")[^"]+' index.html | grep -E '^(js/|add/)' | sed 's/?[^ ]*//g' > js_list.txt
-          # 2. 按顺序合并
+          # ==========================
+          # 处理 JS (只提取 js/ 和 add/ 目录)
+          # ==========================
+          grep -oP '(?<=<script src=")[^"]+' index.html | grep -E '^(js/|add/)' | sed 's/?[^ ]*//g' | sed 's|^/||' > js_list.txt
           cat $(cat js_list.txt) > all.js
-          # 3. 开启极限混淆压缩（保护常用全局变量）
-          terser all.js -c drop_console=true -m reserved=['UI','Engine','SaveData','AI','Sfx','CardTip','StatTip','Net','RunManager','RunData','RunUI','DeckBuilder','Tournament','TourUI','Academy','AcademyUI','BossMode','BossUI','Tutorial','TutorialUI','ProfileUI','Community','Achievements'] -o all.js
-          # 4. 清理 HTML 并插入 all.js
-          sed -i 's|<script src="[^"]*"></script>||g' index.html
+          
+          # 清理 HTML 原来的标签，换成 all.js
+          sed -i -E 's|<script src="(js/|add/)[^"]*"[^>]*></script>||g' index.html
           sed -i 's|</body>|<script src="all.js"></script>\n</body>|' index.html
           rm js_list.txt
+
+          # ★ 核心：无白名单，直接开启 toplevel 极限压缩
+          terser all.js -c toplevel=true,drop_console=true -m toplevel=true -o all.js
 
       - name: 上传前端打包产物
         uses: actions/upload-artifact@v4
         with:
-          name: Web-Minified-Build
+          name: Web-Production-Build
           path: dist/
