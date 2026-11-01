@@ -15,39 +15,49 @@ jobs:
         run: |
           npm install -g terser lightningcss-cli
 
-      - name: 提取、合并、极限压缩
+      - name: 合并压缩并生成纯净导出
         run: |
+          # 1. 准备一个干净的导出目录
           mkdir -p dist
-          rsync -av --exclude='.git' --exclude='node_modules' --exclude='.github' --exclude='android' --exclude='dist' ./ dist/
-          cd dist
 
           # ==========================
-          # 处理 CSS (限定 css/ 和 add/)
+          # 处理 CSS（基于源码提取并合并）
           # ==========================
           grep -oP '(?<=<link rel="stylesheet" href=")[^"]+' index.html | sed 's/?[^ ]*//g' | grep -E '^(css/|add/)' > css_list.txt
-          
           if [ -s css_list.txt ]; then
-            cat $(cat css_list.txt) > all.css
-            lightningcss --minify all.css -o all.css
-            sed -i -E 's#<link rel="stylesheet" href="(css/|add/)[^"]*">##g' index.html
-            sed -i 's#</head>#<link rel="stylesheet" href="all.css">\n</head>#' index.html
+            cat $(cat css_list.txt) > dist/all.css
+            lightningcss --minify dist/all.css -o dist/all.css
           fi
           rm -f css_list.txt
 
           # ==========================
-          # 处理 JS (限定 js/ 和 add/)
+          # 处理 JS（基于源码提取并合并）
           # ==========================
           grep -oP '(?<=<script src=")[^"]+' index.html | sed 's/?[^ ]*//g' | grep -E '^(js/|add/)' > js_list.txt
-          
           if [ -s js_list.txt ]; then
-            cat $(cat js_list.txt) > all.js
-            sed -i -E 's#<script src="(js/|add/)[^"]*"[^>]*></script>##g' index.html
-            sed -i 's#</body>#<script src="all.js"></script>\n</body>#' index.html
-            
-            # ★ 只保留 -m，不要任何 toplevel
-            terser all.js -c drop_console=true -m -o all.js
+            cat $(cat js_list.txt) > dist/all.js
+            terser dist/all.js -c drop_console=true -m -o dist/all.js
           fi
           rm -f js_list.txt
+
+          # ==========================
+          # 修改 index.html 并放入导出目录
+          # ==========================
+          # 从源码复制一份 index.html 过来
+          cp index.html dist/index.html
+          
+          # 删掉原本的 css 和 js 引入，只留合并后的
+          sed -i -E 's#<link rel="stylesheet" href="(css/|add/)[^"]*">##g' dist/index.html
+          sed -i 's#</head>#<link rel="stylesheet" href="all.css">\n</head>#' dist/index.html
+          
+          sed -i -E 's#<script src="(js/|add/)[^"]*"[^>]*></script>##g' dist/index.html
+          sed -i 's#</body>#<script src="all.js"></script>\n</body>#' dist/index.html
+
+          # ==========================
+          # 精准拷贝你要求保留的文件和文件夹
+          # ==========================
+          cp manifest.webmanifest sw.js dist/
+          rsync -av 背景/ 卡牌/ 图标/ 字体/ dist/
 
       - name: 上传前端打包产物
         uses: actions/upload-artifact@v4
