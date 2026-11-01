@@ -57,7 +57,7 @@ public class MainActivity extends Activity {
             settings.setAllowContentAccess(true);
             settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 
-            // 核心 1：JS 接口导出
+            // 1. 导出接口
             webView.addJavascriptInterface(new Object() {
                 @android.webkit.JavascriptInterface
                 public void saveFile(String fileName, String base64Data) {
@@ -91,7 +91,7 @@ public class MainActivity extends Activity {
                 }
             }, "AndroidSaver");
 
-            // 核心 2：屏幕旋转接口，供注入的 JS 调用
+            // 2. 屏幕旋转接口
             webView.addJavascriptInterface(new Object() {
                 @android.webkit.JavascriptInterface
                 public void setLandscape() {
@@ -125,15 +125,16 @@ public class MainActivity extends Activity {
 
                 @Override
                 public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                    handler.proceed(); // WSS 联机证书放行
+                    handler.proceed();
                 }
 
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     super.onPageFinished(view, url);
-                    // 注入 JS 拦截 Blob 导出 以及 网页全屏触发转屏
+                    
+                    // 3. 注入 JS：拦截全屏 API，防止 WebView 黑屏
                     String js = "(function() {" +
-                            // 1. 拦截 Blob 导出
+                            // 拦截 Blob 导出
                             "  const originalClick = HTMLAnchorElement.prototype.click;" +
                             "  HTMLAnchorElement.prototype.click = function() {" +
                             "    if (this.download && this.href && this.href.startsWith('blob:')) {" +
@@ -151,23 +152,38 @@ public class MainActivity extends Activity {
                             "    return originalClick.apply(this, arguments);" +
                             "  };" +
                             
-                            // 2. 拦截标准全屏 API 触发转屏
-                            "  const originalRequestFullscreen = Element.prototype.requestFullscreen;" +
+                            // ★ 核心修复：劫持 requestFullscreen 避免原生全屏黑屏
+                            "  var isFakeFullscreen = false;" +
+                            "  Object.defineProperty(document, 'fullscreenElement', {" +
+                            "    get: function() { return isFakeFullscreen ? document.documentElement : null; }," +
+                            "    configurable: true" +
+                            "  });" +
+                            "  Object.defineProperty(document, 'webkitFullscreenElement', {" +
+                            "    get: function() { return isFakeFullscreen ? document.documentElement : null; }," +
+                            "    configurable: true" +
+                            "  });" +
                             "  Element.prototype.requestFullscreen = function() {" +
+                            "    isFakeFullscreen = true;" +
                             "    if (window.AndroidScreen) window.AndroidScreen.setLandscape();" +
-                            "    if(originalRequestFullscreen) return originalRequestFullscreen.apply(this, arguments);" +
+                            "    document.dispatchEvent(new Event('fullscreenchange'));" +
+                            "    document.dispatchEvent(new Event('webkitfullscreenchange'));" +
+                            "    return Promise.resolve();" +
                             "  };" +
-                            "  const originalExitFullscreen = Document.prototype.exitFullscreen;" +
-                            "  Document.prototype.exitFullscreen = function() {" +
+                            "  Element.prototype.webkitRequestFullscreen = Element.prototype.requestFullscreen;" +
+                            "  document.exitFullscreen = function() {" +
+                            "    isFakeFullscreen = false;" +
                             "    if (window.AndroidScreen) window.AndroidScreen.setPortrait();" +
-                            "    if(originalExitFullscreen) return originalExitFullscreen.apply(this, arguments);" +
+                            "    document.dispatchEvent(new Event('fullscreenchange'));" +
+                            "    document.dispatchEvent(new Event('webkitfullscreenchange'));" +
+                            "    return Promise.resolve();" +
                             "  };" +
+                            "  document.webkitExitFullscreen = document.exitFullscreen;" +
                             "})();";
                     view.evaluateJavascript(js, null);
                 }
             });
 
-            // 核心 3：监听 WebView 原生全屏回调（如视频播放）
+            // 4. 原生全屏（视频等，防报错保留）
             webView.setWebChromeClient(new WebChromeClient() {
                 @Override
                 public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> newFilePathCallback, FileChooserParams fileChooserParams) {
@@ -190,19 +206,17 @@ public class MainActivity extends Activity {
                 @Override
                 public void onShowCustomView(View view, CustomViewCallback callback) {
                     super.onShowCustomView(view, callback);
-                    // 如果网页触发原生全屏，强制横屏
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
                 }
 
                 @Override
                 public void onHideCustomView() {
                     super.onHideCustomView();
-                    // 退出全屏恢复竖屏
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 }
             });
 
-            // 兜底普通下载
+            // 5. 兜底下载
             webView.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
                 try {
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
