@@ -8,6 +8,7 @@
   "build": {
     "appId": "com.ddm.jn",
     "productName": "地牢决斗师",
+    "electronUpdaterCompatibility": ">=6",
     "electronLanguages": ["zh-CN", "en-US"],
     "artifactName": "DungeonDuelist-${version}-${ext}",
     "directories": { "output": "dist" },
@@ -50,7 +51,7 @@
     "compression": "maximum"
   },
   "dependencies": {
-    "electron-updater": "latest"
+    "electron-updater": "^6.8.11"
   },
   "devDependencies": {
     "electron": "latest",
