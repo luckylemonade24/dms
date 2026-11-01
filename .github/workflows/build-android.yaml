@@ -6,6 +6,8 @@ on:
 jobs:
   build-android:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # 必须加，否则无法发布 Release
 
     steps:
       - name: 检出代码
@@ -72,8 +74,30 @@ jobs:
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
           gradle assembleRelease
 
-      - name: 上传 APK
-        uses: actions/upload-artifact@v4
+      # ==========================================
+      # 3. 读取版本号并统一重命名 APK
+      # ==========================================
+      - name: 读取版本号
+        id: ver
+        run: |
+          V=$(jq -r '.version' package.json)
+          echo "version=$V" >> $GITHUB_OUTPUT
+
+      - name: 重命名 APK
+        run: |
+          # 把默认的 app-release.apk 改名为 DungeonDuelist-版本号.apk
+          mv android/app/build/outputs/apk/release/app-release.apk android/app/build/outputs/apk/release/DungeonDuelist-${{ steps.ver.outputs.version }}.apk
+
+      # ==========================================
+      # 4. 直接发布到 Release 草稿
+      # ==========================================
+      - name: 发布 Release 草稿
+        uses: softprops/action-gh-release@v3
         with:
-          name: DungeonDuelist-Android
-          path: android/app/build/outputs/apk/release/app-release.apk
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: v${{ steps.ver.outputs.version }}
+          draft: true
+          files: |
+            android/app/build/outputs/apk/release/DungeonDuelist-${{ steps.ver.outputs.version }}.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
