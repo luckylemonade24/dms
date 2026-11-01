@@ -28,6 +28,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # 使用最新的 Gradle 9.8.2
+      - name: 设置 Gradle 9.8.2
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 9.8.2
+
       - name: 设置 Gradle 缓存
         uses: actions/cache@v4
         with:
@@ -45,13 +51,12 @@ jobs:
             --exclude='android' --exclude='package.json' --exclude='main.js' --exclude='server' \
             ./ android/app/src/main/assets/www/
 
-      - name: 赋予 gradlew 执行权限并构建
+      - name: 构建 Android 项目
         run: |
           cd android
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-          gradle wrapper --gradle-version 8.5
-          chmod +x gradlew
-          ./gradlew assembleRelease
+          # 直接使用 Action 设置好的最新 Gradle，无需生成 wrapper
+          gradle assembleRelease
 
       - name: 上传 APK
         uses: actions/upload-artifact@v4
