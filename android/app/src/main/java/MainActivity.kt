@@ -1,3 +1,5 @@
+package com.ddm.jn
+
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
@@ -37,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         webView = WebView(this)
         setContentView(webView)
 
-        // 核心：拦截请求，把本地 assets/www 伪装成 HTTPS 服务器
         val assetLoader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
             .build()
@@ -58,10 +59,8 @@ class MainActivity : AppCompatActivity() {
             mediaPlaybackRequiresUserGesture = false
         }
         
-        // 修正：硬件加速是 WebView (View) 的方法，必须放在 settings 外面
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
-        // 处理安卓物理返回键
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (webView.canGoBack()) {
@@ -72,7 +71,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // 加载本地网页（工作流会自动把根目录的前端文件塞进 assets/www）
         webView.loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
     }
 }
