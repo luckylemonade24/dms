@@ -1,6 +1,6 @@
 {
   "name": "dungeon-duelist",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "地牢决斗师：踏上征途",
   "main": "main.js",
   "author": "下元咕",
@@ -15,7 +15,11 @@
       "**/*",
       "!**/*.log",
       "!**/.github/**",
+      "!**/server/**",
       "!**/build-exe.ps1",
+      "!**/_worker.js",
+      "!**/_headers",
+      "!**/gen-icon.js",
       "!dist/**"
     ],
     "win": {
