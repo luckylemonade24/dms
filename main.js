@@ -50,7 +50,7 @@ function setupAutoUpdater() {
 // 4. 启动
 // ==========================================
 app.whenReady().then(() => {
-  Menu.setApplicationMenu(null);
+  Menu.setApplicationMenu(null); // 隐藏默认菜单栏
 
   // 虚拟域名拦截
   protocol.handle('https', (request) => {
@@ -68,20 +68,16 @@ app.whenReady().then(() => {
   mainWindow = new BrowserWindow({
     width: 1280, 
     height: 720,
-    titleBarStyle: 'hidden', // ★ 隐藏自带的丑陋标题栏（无边框效果）
-    titleBarOverlay: {
-      color: '#141414',      // 标题栏右侧三个按钮的背景色（配合你的深色UI）
-      symbolColor: '#ffffff',// 按钮图标的颜色
-      height: 32             // 标题栏高度
-    },
+    // 不使用无边框，保留原生窗口
     autoHideMenuBar: true, 
     webPreferences: { 
       nodeIntegration: true, 
-      contextIsolation: false 
+      contextIsolation: false,
+      backgroundThrottling: false // 切后台不降帧
     }
   });
 
-  // ★ 启动直接最大化（保留右上角三个按钮）
+  // 启动时直接最大化（铺满屏幕，但保留任务栏）
   mainWindow.maximize();
 
   mainWindow.loadURL('https://app.local/index.html');
