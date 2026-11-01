@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId = "com.ddm.jn"
         minSdk = 24
-        targetSdk = 37
+        targetSdk = 34 // 降级到当前最稳定的 34，防闪退
         versionCode = 1
         versionName = "0.1.0"
 
@@ -33,6 +33,6 @@ android {
 }
 
 dependencies {
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    // 删掉了 appcompat，只用 webkit
     implementation("androidx.webkit:webkit:1.12.1")
 }
