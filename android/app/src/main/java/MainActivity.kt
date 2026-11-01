@@ -2,6 +2,7 @@ package com.ddm.jn
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.DownloadManager // 补上了这行
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -48,9 +49,7 @@ class MainActivity : Activity() {
                 mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             }
 
-            // ==========================================
             // 核心 1：原生保存接口，用于保存前端导出的存档
-            // ==========================================
             webView.addJavascriptInterface(object {
                 @JavascriptInterface
                 fun saveFile(fileName: String, base64Data: String) {
@@ -125,7 +124,7 @@ class MainActivity : Activity() {
                                             };
                                             reader.readAsDataURL(blob);
                                         });
-                                    return; // 阻断原生 WebView 的无效下载
+                                    return;
                                 }
                                 return originalClick.apply(this, arguments);
                             };
@@ -135,9 +134,7 @@ class MainActivity : Activity() {
                 }
             }
 
-            // ==========================================
             // 核心 2：导入存档
-            // ==========================================
             webView.webChromeClient = object : WebChromeClient() {
                 override fun onShowFileChooser(
                     webView: WebView?,
