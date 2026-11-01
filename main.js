@@ -1,7 +1,6 @@
 const { app, BrowserWindow, Menu, dialog, protocol, net } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
-const fs = require('fs');
 
 let mainWindow;
 
@@ -21,7 +20,7 @@ if (!gotTheLock) {
 }
 
 // ==========================================
-// 2. 注册虚拟域名协议 (必须在 app.ready 之前)
+// 2. 注册虚拟域名协议
 // ==========================================
 protocol.registerSchemesAsPrivileged([
   { scheme: 'https', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }
@@ -53,33 +52,38 @@ function setupAutoUpdater() {
 app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
 
-  // ★ 核心：拦截 https://app.local 请求，映射到本地目录
+  // 虚拟域名拦截
   protocol.handle('https', (request) => {
     const urlObj = new URL(request.url);
-    
-    // 如果是我们虚拟的本地域名，就去读文件
     if (urlObj.hostname === 'app.local') {
       let pathname = decodeURIComponent(urlObj.pathname);
       if (pathname === '/') pathname = '/index.html';
-
-      // 防止路径穿越
       const safePath = pathname.replace(/^(\.\.[\/\\])+/, '');
       const filePath = path.join(__dirname, safePath);
-
-      // 使用 Electron 的 net.fetch 返回文件，它会自动处理 MIME 类型
       return net.fetch(`file://${filePath}`);
     }
-    
-    // 其他正常的网络请求（比如联机服务器）放行
     return net.fetch(request);
   });
 
   mainWindow = new BrowserWindow({
-    width: 1280, height: 720, autoHideMenuBar: true,
-    webPreferences: { nodeIntegration: true, contextIsolation: false }
+    width: 1280, 
+    height: 720,
+    titleBarStyle: 'hidden', // ★ 隐藏自带的丑陋标题栏（无边框效果）
+    titleBarOverlay: {
+      color: '#141414',      // 标题栏右侧三个按钮的背景色（配合你的深色UI）
+      symbolColor: '#ffffff',// 按钮图标的颜色
+      height: 32             // 标题栏高度
+    },
+    autoHideMenuBar: true, 
+    webPreferences: { 
+      nodeIntegration: true, 
+      contextIsolation: false 
+    }
   });
 
-  // 加载虚拟域名，Origin 永远是 https://app.local，存档稳如泰山
+  // ★ 启动直接最大化（保留右上角三个按钮）
+  mainWindow.maximize();
+
   mainWindow.loadURL('https://app.local/index.html');
 
   mainWindow.webContents.once('did-finish-load', () => {
