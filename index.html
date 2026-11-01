@@ -25,23 +25,8 @@
 <link rel="stylesheet" href="css/tutorial.css?v=v146">
 <link rel="stylesheet" href="css/profile.css?v=v146">
 <link rel="stylesheet" href="css/community.css?v=v146">
-<link rel="stylesheet" href="css/mobile.css?v=v771">
-<style>
-  *, *::before, *::after {
-    image-rendering: -webkit-optimize-contrast !important;
-  }
-</style>
-<style>
-  .pv-img, 
-  #cardtip img {
-    width: auto !important;      
-    height: auto !important;     
-    max-width: none !important;  /* 保留您原本的 100% 限制 */
-    max-height: none !important; /* 干掉所有高度限制 */
-    object-fit: contain !important;
-  }
-</style>
-<script>window.__NET_HOST = 'dms.spldream.com';</script>
+<link rel="stylesheet" href="add/mobile.css?v=v771">
+<link rel="stylesheet" href="add/add.css">
 <meta name="google-site-verification" content="C5YsEfCjLftGuq4EOIOIvsMBAf471HGpOXP24wXtJug" />
 </head>
 <body>
@@ -289,61 +274,8 @@
 </div>
 
 <!-- ================= 脚本（顺序不可乱） ================= -->
-<script src="/atlas-hook.js"></script>
-<script>
-(function() {
-    const PREFIX = '卡牌/缩略卡/';
-    
-    // 核心替换函数
-    function fixPath(url) {
-        if (typeof url !== 'string' || !url.includes(PREFIX)) return url;
-        
-        // 提取卡名（兼容全路径和相对路径）
-        let cardName = url.split(PREFIX)[1].replace(/\.(png|webp|jpg)$/i, '');
-        
-        // 只有这两个特殊名字需要纠正
-        if (cardName === 'lingSdaincang') cardName = '澪S典藏';
-        else if (cardName === '啮齿小鼠C') cardName = '啮齿小鼠';
-        
-        // 提取原来的前缀（以防你的路径是 http://... 或是 ../ 开头）
-        let prefix = url.split(PREFIX)[0];
-        return prefix + '卡牌/高清卡/' + cardName + '详情.png';
-    }
-
-    // 1. 拦截 img.src = '...'
-    const originalSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
-    Object.defineProperty(HTMLImageElement.prototype, 'src', {
-        set: function(val) {
-            originalSrc.set.call(this, fixPath(val));
-        },
-        get: originalSrc.get
-    });
-
-    // 2. 拦截 img.setAttribute('src', '...')
-    const originalSetAttribute = Element.prototype.setAttribute;
-    Element.prototype.setAttribute = function(name, value) {
-        if (this.tagName === 'IMG' && name.toLowerCase() === 'src') {
-            value = fixPath(value);
-        }
-        originalSetAttribute.call(this, name, value);
-    };
-
-    // 3. 拦截 innerHTML = '<img src="...">' (你的项目大概率死在这里)
-    const originalInnerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
-    Object.defineProperty(Element.prototype, 'innerHTML', {
-        set: function(val) {
-            if (typeof val === 'string' && val.includes(PREFIX)) {
-                // 使用正则把 HTML 字符串里的旧路径全部替换成新路径
-                val = val.replace(/(src=["'])([^"']*?卡牌\/缩略卡\/[^"']*?)(["'])/g, function(match, p1, p2, p3) {
-                    return p1 + fixPath(p2) + p3;
-                });
-            }
-            originalInnerHTML.set.call(this, val);
-        },
-        get: originalInnerHTML.get
-    });
-})();
-</script>
+<script src="add/atlas-hook.js"></script>
+<script src="add/add-head.js"></script>
 <script src="js/rules.js?v=v146"></script>
 <script src="js/cards.js?v=v146"></script>
 <script src="js/tooltip.js?v=v146"></script>
@@ -379,45 +311,10 @@
 <!-- 社区：数据（服务器可直接替换 community_data.js）+ 界面逻辑（放在 ui.js 之后，用到 UI.toast） -->
 <script src="js/community_data.js?v=v146"></script>
 <script src="js/community.js?v=v146"></script>
-<script src="js/mobile.js?v=v146"></script>
-<script src="/preload-list.js?v=v146"></script>
-<script src="/preload.js?v=v146"></script>
-<script>
-(function() {
-    let tempPortraitActivated = false;
-    const deckEl = document.getElementById('deck');
-
-    function checkAndEnable() {
-        if (!window.UI) return;
-        // 1. 检测物理屏幕是不是竖屏（高 > 宽）
-        const isPhysicalPortrait = window.innerHeight > window.innerWidth;
-        // 2. 如果是物理竖屏，且当前没有手动开启过 portrait-mode
-        if (isPhysicalPortrait && !UI.isPortrait()) {
-            tempPortraitActivated = true;
-            UI.setPortraitMode(true, true); // 静默强制开启，不弹 toast
-        }
-    }
-
-    if (deckEl) {
-        const observer = new MutationObserver(function() {
-            // 当组卡器显示时
-            if (!deckEl.classList.contains('hidden')) {
-                checkAndEnable();
-            } 
-            // 当组卡器隐藏时
-            else {
-                // 如果刚才是由我们临时开启的竖屏，现在就关掉，恢复给 mobile.css 处理
-                if (tempPortraitActivated) {
-                    if (window.UI) UI.setPortraitMode(false, true); 
-                    tempPortraitActivated = false;
-                }
-            }
-        });
-        // 监听 #deck 元素的 class 变化
-        observer.observe(deckEl, { attributes: true, attributeFilter: ['class'] });
-    }
-})();
-</script>
+<script src="add/mobile.js?v=v146"></script>
+<script src="add/preload-list.js?v=v146"></script>
+<script src="add/preload.js?v=v146"></script>
+<script src="add/add-body.js"></script>
 <!-- PVP 快捷对话：气泡层（全屏、不挡点击）。面板不在这里 —— 它必须和按钮同在 #myInfo 内才能正确定位 -->
 <div id="bubbleLayer" aria-hidden="true"></div>
 <!-- 竖屏组卡器：卡牌详情浮层。贴在所看卡牌的「另一半屏」，保证不盖住正在看的那张卡 -->

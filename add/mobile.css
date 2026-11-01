@@ -1,0 +1,137 @@
+@media (orientation: portrait) {
+    #rotateHint { display: none !important; }
+
+    body:has(#battle:not(.hidden)) #stage {
+        width: 100vw !important; height: 100vh !important;
+        transform: none !important; left: 0 !important; top: 0 !important;
+        position: relative; display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    body:has(#battle:not(.hidden)) .main {
+        display: grid; grid-template-columns: 1fr;
+        grid-template-rows: auto 15vh auto 15vh auto 1fr;
+        gap: 2px; padding: 0; flex: 1; min-height: 0;
+        width: 100vw; box-sizing: border-box; overflow: hidden;
+    }
+
+    body:has(#battle:not(.hidden)) .battlecol, 
+    body:has(#battle:not(.hidden)) .sidebar { display: contents; }
+
+    body:has(#battle:not(.hidden)) #oppHand, 
+    body:has(#battle:not(.hidden)) #logbox { display: none; }
+
+    body:has(#battle:not(.hidden)) #oppInfo { grid-row: 1; display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; padding: 2px 4px; gap: 4px; background: #121214; width: 100%; box-sizing: border-box; }
+    body:has(#battle:not(.hidden)) #oppBoard { grid-row: 2; display: flex; justify-content: center; gap: 4px; height: 100%; width: 100%; box-sizing: border-box; overflow: hidden; }
+    body:has(#battle:not(.hidden)) #centerZone { grid-row: 3; display: flex; justify-content: center; align-items: center; padding: 4px 0; width: 100%; box-sizing: border-box; }
+    body:has(#battle:not(.hidden)) #myBoard { grid-row: 4; display: flex; justify-content: center; gap: 4px; height: 100%; width: 100%; box-sizing: border-box; overflow: hidden; }
+    body:has(#battle:not(.hidden)) #myInfo { grid-row: 5; display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; padding: 2px 4px; gap: 4px; background: #121214; width: 100%; box-sizing: border-box; }
+
+    body:has(#battle:not(.hidden)) #myHand { 
+        grid-row: 6; position: relative; display: flex; justify-content: flex-start; align-items: flex-start; 
+        overflow-x: auto !important; overflow-y: hidden; -webkit-overflow-scrolling: touch; 
+        padding: 8px 2px 26px 2px; gap: 0; width: 100%; box-sizing: border-box; 
+    }
+
+    body:has(#battle:not(.hidden)) #myHand::-webkit-scrollbar { height: 4px; display: block !important; }
+    body:has(#battle:not(.hidden)) #myHand::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+
+    body:has(#battle:not(.hidden)) #myHand::after {
+        content: '👈 左右滑动查看更多手牌 👉' !important;
+        position: fixed !important; bottom: 12vh !important; left: 50% !important; transform: translateX(-50%) !important;
+        white-space: nowrap !important; font-size: 12px !important; color: var(--gold) !important; pointer-events: none !important; z-index: 999 !important;
+        background: rgba(18, 18, 20, 0.9) !important; padding: 2px 10px !important; border-radius: 12px !important; border: 1px solid var(--gold-dim) !important;
+    }
+
+    body:has(#battle:not(.hidden)) .card { flex: 0 0 65px; width: 65px; height: 90px; margin-left: -15px; transform: none; }
+    body:has(#battle:not(.hidden)) .card:first-child { margin-left: 10px; }
+
+    body:has(#battle:not(.hidden)) .inforow { font-size: 12px; gap: 4px; }
+    body:has(#battle:not(.hidden)) .inforow .nm { min-width: 0; margin-right: 2px; font-size: 13px; }
+    body:has(#battle:not(.hidden)) .hpwrap { width: 70px; height: 12px; margin-right: 4px; }
+    body:has(#battle:not(.hidden)) .inforow .stat { font-size: 11px; }
+    body:has(#battle:not(.hidden)) .board { width: 100%; box-sizing: border-box; }
+    body:has(#battle:not(.hidden)) .cell { flex: 1; max-width: 30vw; box-sizing: border-box; }
+    body:has(#battle:not(.hidden)) .monster { width: 100%; height: 100%; }
+
+    /* ================= 牌库与弃牌堆 ================= */
+    body:has(#battle:not(.hidden)) #viewer {
+        position: absolute; top: 50vh; left: 0; width: 100vw; height: 50vh; z-index: 9998; background: #121214; pointer-events: auto; display: flex; flex-direction: column; padding: 8px; overflow-y: auto; box-sizing: border-box;
+    }
+    body:has(#battle:not(.hidden)) #viewer.hidden { display: none; }
+    body:has(#battle:not(.hidden)) #viewer .vw-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+    body:has(#battle:not(.hidden)) #viewer .vw-card { width: 30%; box-sizing: border-box; }
+    
+    /* 修复缩略图不显示：移除 background: transparent 和 object-fit，让图集背景正常渲染 */
+    body:has(#battle:not(.hidden)) #viewer .vw-card img { 
+        display: block !important;
+        width: 100% !important; 
+        height: auto !important; 
+        border: none !important; 
+    }
+
+    /* ================= 预览层 ================= */
+    body:has(#battle:not(.hidden)) #preview,
+    body:has(#battle:not(.hidden)) #cardtip {
+        position: fixed !important; 
+        left: 4% !important; width: 92% !important; z-index: 99999 !important;
+        max-height: 60vh !important; 
+        overflow: hidden !important;
+        padding: 8px 10px 10px !important; border-radius: 8px !important;
+        background: rgba(10, 12, 16, 0.96) !important;
+        border: 2px solid var(--gold) !important;
+        box-shadow: 0 8px 26px rgba(0, 0, 0, .65) !important;
+        pointer-events: none !important;
+        display: block !important; 
+        grid-template-columns: none !important;
+        grid-template-rows: none !important;
+        grid-template-areas: none !important;
+    }
+
+    body:has(#battle:not(.hidden)) #preview { display: none; }
+    body:has(#battle:not(.hidden)) #stage:has(.card:hover) #preview,
+    body:has(#battle:not(.hidden)) #stage:has(.monster:hover) #preview,
+    body:has(#battle:not(.hidden)) #stage:has(.relic:hover) #preview { display: block; }
+    
+    body:has(#battle:not(.hidden)) #cardtip:not(.hidden) { display: block; }
+    body:has(#battle:not(.hidden)) #cardtip.hidden { display: none; }
+
+    body:has(#battle:not(.hidden)) #preview,
+    body:has(#battle:not(.hidden)) #cardtip { bottom: 6px !important; top: auto !important; }
+
+    body:has(#battle:not(.hidden)):has(#myHand .card:hover) #cardtip:not(.hidden),
+    body:has(#battle:not(.hidden)):has(.vw-card:hover) #cardtip:not(.hidden),
+    body:has(#battle:not(.hidden)):has(#myHand .card:active) #cardtip:not(.hidden),
+    body:has(#battle:not(.hidden)):has(.vw-card:active) #cardtip:not(.hidden),
+    body:has(#battle:not(.hidden)) #stage:has(#myHand .card:hover) #preview,
+    body:has(#battle:not(.hidden)) #stage:has(.vw-card:hover) #preview { 
+        top: 6px !important; 
+        bottom: auto !important; 
+    }
+
+    body:has(#battle:not(.hidden)) #preview .pv-img, 
+    body:has(#battle:not(.hidden)) #cardtip img { 
+        display: block !important; 
+        width: auto !important; 
+        height: 40vh !important; 
+        max-height: 40vh !important; 
+        margin: 4px auto !important; 
+        border: none !important; 
+        box-shadow: none !important; 
+    }
+
+    body:has(#battle:not(.hidden)) #preview .pv-title,
+    body:has(#battle:not(.hidden)) #cardtip .ct-name { 
+        font-size: calc(16px * var(--fs, 1)) !important; color: var(--gold) !important; margin-bottom: 4px !important; text-align: center !important;
+    }
+    body:has(#battle:not(.hidden)) #preview .pv-meta,
+    body:has(#battle:not(.hidden)) #cardtip .ct-meta { 
+        font-size: calc(13px * var(--fs, 1)) !important; color: var(--dim) !important; margin-bottom: 5px !important; line-height: 1.5 !important; text-align: center !important;
+    }
+    body:has(#battle:not(.hidden)) #preview .pv-effect,
+    body:has(#battle:not(.hidden)) #cardtip .ct-eff { 
+        font-size: calc(13px * var(--fs, 1)) !important; color: var(--text) !important; line-height: 1.55 !important; white-space: pre-wrap !important; word-break: break-word !important; overflow-y: auto !important; max-height: 12vh !important; padding: 0 4px !important;
+    }
+    body:has(#battle:not(.hidden)) #cardtip .ct-eq {
+        font-size: calc(12.5px * var(--fs, 1)) !important; color: #e0a05a !important; margin-top: 5px !important;
+    }
+}
