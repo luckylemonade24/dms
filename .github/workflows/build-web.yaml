@@ -1,0 +1,60 @@
+name: Build Web Assets
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装官方压缩工具
+        run: |
+          npm install -g terser lightningcss-cli
+
+      - name: 准备构建目录
+        run: |
+          mkdir -p dist
+          rsync -av --exclude='.git' --exclude='node_modules' --exclude='.github' --exclude='android' --exclude='dist' ./ dist/
+          cd dist
+
+      - name: 合并并压缩 CSS
+        run: |
+          cd dist
+          # 1. 把 css 文件夹里所有的 css 合并（保留在 css 目录下，保证相对路径不错位）
+          cat css/*.css > css/all.css
+          # 2. 压缩
+          lightningcss --minify css/all.css -o css/all.css
+          # 3. 删掉 HTML 里原来的 css 引入
+          sed -i 's|<link rel="stylesheet" href="css/.*">||g' index.html
+          # 4. 插入新的合并版 css
+          sed -i 's|</head>|<link rel="stylesheet" href="css/all.css">\n</head>|' index.html
+
+      - name: 合并并压缩 JS
+        run: |
+          cd dist
+          # 1. 提取所有带 src 的 script，排除 atlas-hook.js
+          grep -oP '(?<=<script src=")[^"]+' index.html | sed 's/?[^ ]*//g' | sed 's|^/||' | grep -v 'atlas-hook' > js_list.txt
+          # 2. 合并到一个文件（不放闭包内，确保内联脚本能访问全局变量 UI 等）
+          cat $(cat js_list.txt) > js/all.js
+          
+          # 3. 开启极限混淆压缩（Terser 默认不混淆全局作用域变量，非常安全）
+          terser js/all.js -c -m -o js/all.js
+          
+          # 4. 删掉 HTML 里原来的 js 引入，但千万保留 /atlas-hook.js 和你的内联脚本
+          sed -i 's|<script src="js/.*"></script>||g' index.html
+          sed -i 's|<script src="/preload.*"></script>||g' index.html
+          
+          # 5. 把合并后的 js/all.js 插到 atlas-hook.js 之后（保证顺序不出错）
+          sed -i 's|<script src="/atlas-hook.js"></script>|<script src="/atlas-hook.js"></script>\n<script src="js/all.js"></script>|' index.html
+          
+          rm js_list.txt
+
+      - name: 上传前端打包产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: Web-Minified-Build
+          path: dist/
