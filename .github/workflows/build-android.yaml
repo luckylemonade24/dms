@@ -11,12 +11,12 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v5
 
-      # 1. 先清理：只留安卓工程、图标脚本、图标资源，以及 package.json
+      # 1. 先清理：只留安卓工程和必要脚本
       - name: 清理仓库，只保留必需文件
         run: |
-          find . -maxdepth 1 -mindepth 1 ! -name 'android' ! -name 'gen-android-icon.js' ! -name 'package.json' ! -name '图标' ! -name '.git' -exec rm -rf {} +
+          find . -maxdepth 1 -mindepth 1 ! -name 'android' ! -name 'gen-android-icon.js' ! -name 'package.json' ! -name '图标' -exec rm -rf {} +
 
-      # 2. 再拉取：直接下载到安卓的 assets/www 目录
+      # 2. 拉取前端产物到 assets/www
       - name: 下载最新的前端构建产物
         uses: dawidd6/action-download-artifact@v6
         with:

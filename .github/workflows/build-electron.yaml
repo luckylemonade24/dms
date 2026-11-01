@@ -13,14 +13,14 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v5
 
-      # 1. 先清理：只留主进程代码、配置文件、图标脚本和图标资源
+      # 1. 先清理：留下 e 骨架和源码自带的 server 文件夹
       - name: 清理仓库，只保留必需文件
         shell: pwsh
         run: |
-          $keep = @("main.js", "package.json", "gen-icon.js", "图标", ".git")
+          $keep = @("main.js", "package.json", "gen-icon.js", "图标", "server")
           Get-ChildItem -Force | Where-Object { $keep -notcontains $_.Name } | Remove-Item -Recurse -Force
 
-      # 2. 再拉取：直接把 web 产物下载到根目录
+      # 2. 拉取前端产物到根目录
       - name: 下载最新的前端构建产物
         uses: dawidd6/action-download-artifact@v6
         with:
