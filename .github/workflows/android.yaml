@@ -28,7 +28,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # 使用最新的 Gradle 9.8.2
       - name: 设置 Gradle 9.8.2
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -44,9 +43,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      # 自动整理目录（防止包名不对导致闪退）
+      - name: 自动修正 MainActivity 路径
+        run: |
+          mkdir -p android/app/src/main/java/com/ddm/jn
+          if [ -f "android/app/src/main/java/MainActivity.kt" ]; then
+            mv android/app/src/main/java/MainActivity.kt android/app/src/main/java/com/ddm/jn/MainActivity.kt
+          fi
+
       - name: 准备本地前端资源到 assets
         run: |
-          mkdir -p android/app/src/main/assets/web
+          mkdir -p android/app/src/main/assets/www
           rsync -av --exclude='.git' --exclude='node_modules' --exclude='.github' \
             --exclude='android' --exclude='package.json' --exclude='main.js' --exclude='server' \
             ./ android/app/src/main/assets/www/
@@ -55,7 +62,6 @@ jobs:
         run: |
           cd android
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-          # 直接使用 Action 设置好的最新 Gradle，无需生成 wrapper
           gradle assembleRelease
 
       - name: 上传 APK
