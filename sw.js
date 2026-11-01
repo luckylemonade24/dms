@@ -1,80 +1,28 @@
 /* ============================================================
- * PWA Service Worker - 全量预缓存版 (最终完美版)
+ * Service Worker —— 最小实现（故意的）
+ *
+ * 存在的唯一目的：让浏览器认为"这个站点可以安装到主屏"。
+ *   Chrome 的规则是「有 manifest + 有 Service Worker + SW 里有 fetch 处理」
+ *   才会触发 beforeinstallprompt（"添加到主屏幕"按钮才会出现）。
+ *   iOS Safari 的"添加到主屏幕"是浏览器菜单自带功能，不需要 SW。
+ *
+ * ★ 故意不做任何缓存：
+ *   本站是本地/自建服务器部署、资源带版本号（?v=）更新，
+ *   一旦 SW 缓存了旧文件，就会出现"改了代码但用户还是老版本"这类经典麻烦。
+ *   这里让所有请求直接走网络，只保留"可安装"这一个能力。
  * ============================================================ */
 'use strict';
 
-importScripts('./precache-manifest.js');
-
-// ⚠️ 每次更新代码，只需要把这里换成新的日期或数字！
-const CACHE_NAME = '202610231808';
-
-// 1. 安装阶段：全量下载
-self.addEventListener('install', function (e) {
-    self.skipWaiting();
-    e.waitUntil(
-        caches.open(CACHE_NAME).then(function (cache) {
-            console.log(`[SW] 开始全量缓存 ${self.PRECACHE_ASSETS.length} 个文件...`);
-            
-            // ★ 绝不乱改 URL，用 cache: 'reload' 强制去服务器拉最新文件
-            return Promise.all(
-                self.PRECACHE_ASSETS.map(function(url) {
-                    return fetch(url, { cache: 'reload' }).then(function(response) {
-                        if (!response.ok) throw new Error('下载失败: ' + url);
-                        // 用原始干净的 url 作为 Key 存入
-                        return cache.put(url, response);
-                    });
-                })
-            ).then(function() {
-                console.log('[SW] ✅ 所有资源全量缓存完成！断网可秒开。');
-            }).catch(function(err) {
-                console.error('[SW] 缓存文件失败，请检查是否有路径错误或文件缺失:', err);
-                throw err;
-            });
-        })
-    );
+self.addEventListener('install', function () {
+  self.skipWaiting();               // 新版本立即接管，不等旧页面关闭
 });
 
-// 2. 激活阶段：清理旧版本缓存
 self.addEventListener('activate', function (e) {
-    e.waitUntil(
-        caches.keys().then(function (cacheNames) {
-            return Promise.all(
-                cacheNames.map(function (cacheName) {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('[SW] 正在删除旧缓存:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(function () {
-            return self.clients.claim();
-        })
-    );
+  e.waitUntil(self.clients.claim()); // 立即接管所有已打开的页面
 });
 
-// 3. 拦截阶段：缓存优先，忽略版本号匹配
-self.addEventListener('fetch', function (e) {
-    if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) {
-        return;
-    }
-
-    // 页面导航：网络优先，保证拿到最新 HTML；断网走缓存
-    if (e.request.mode === 'navigate') {
-        e.respondWith(
-            fetch(e.request).catch(function() {
-                return caches.match(e.request);
-            })
-        );
-        return;
-    }
-
-    // 静态资源：忽略 ?v=xx 参数，匹配本地干净缓存
-    e.respondWith(
-        caches.match(e.request, { ignoreSearch: true }).then(function (cachedResponse) {
-            if (cachedResponse) {
-                return cachedResponse;
-            }
-            return fetch(e.request);
-        })
-    );
+// 有 fetch 监听是 Chrome 判定"可安装"的必要条件之一；
+// 这里什么都不做，请求照常走网络（不缓存、不改写）。
+self.addEventListener('fetch', function () {
+  /* pass-through */
 });

@@ -1,0 +1,171 @@
+﻿========================================================================
+  地牢决斗师 · 联机服务端 —— 部署说明
+========================================================================
+
+一、这是什么
+  回合制卡牌对战游戏的联机服务端。权威服务器架构：客户端只上报操作，
+  真正的结算在服务端完成（与客户端同一份引擎代码），结果回传两端各自渲染。
+  全部状态保存在内存中，无数据库、无持久化 —— 进程重启即清空，无需备份。
+
+
+二、环境要求
+  · Node.js 18 或以上（node -v 确认即可）
+  · 零依赖：只用 Node 内置模块（http / fs / os / path / vm / crypto）
+    加一个自带的 WebSocket 实现（server/ws.js）
+    ★ 没有 package.json，也没有 node_modules，不需要 npm install
+  · 需要一个可对外的 TCP 端口（默认 3000）
+
+
+三、目录说明（★ 必须保持这个结构，别拆开）
+  index.html            游戏入口页
+  manifest.webmanifest  PWA 清单
+  css/                  样式
+  js/                   前端代码
+  server/               ← 服务端本体
+      server.js         主程序（HTTP 静态托管 + WebSocket 联机）
+      ws.js             WebSocket 实现（自带，无第三方依赖）
+      start.sh          Linux / macOS 启动脚本
+      start.bat         Windows 启动脚本（会自动查找可用的 node）
+  UI/ 背景/ 图标/ 字体/ 卡牌/    静态素材（由服务端直接托管）
+
+  ⚠️ server.js 用 path.join(__dirname, '..') 作为站点根目录，
+     所以 server/ 必须与 js/、css/、index.html 位于同一层。
+     只把 server/ 单独拷走运行会导致页面 404。
+
+
+四、启动
+  cd <项目根目录>                      （能看到 index.html 的那一层）
+
+  bash server/start.sh                 # 默认端口 3000
+  PORT=8080 node server/server.js      # 指定端口
+  nohup env PORT=3000 node server/server.js > server.out 2>&1 &    # 后台常驻
+
+  Windows：
+      双击 server\start.bat                      （默认端口 3000）
+
+      ★ 想改端口：用记事本打开 server\start.bat，改最上面那一行——
+            if not defined PORT set "PORT=3000"
+        把 3000 改成你要的端口，保存，再双击即可。
+        （也可以在 CMD 里先 set PORT=8080 再运行脚本，命令行设置优先）
+
+      ★ 改完端口，Windows 防火墙和云安全组都要放行同一个端口（见第六节）。
+      ★ start.bat 会自动查找可用的 Node.js，并把当前端口打印出来，
+        看到「正在启动联机服务端...  端口 8080」即表示设置生效。
+
+
+五、环境变量（全部可选，均有默认值）
+  PORT              默认 3000      监听端口
+  HOST              默认 0.0.0.0   监听地址
+  MAX_ROOMS         默认 500       同时存在的房间数上限（防内存耗尽）
+  MSG_RATE          默认 20        每连接每秒消息配额（令牌桶回填速率）
+  MSG_BURST         默认 60        每连接消息突发上限（桶容量）
+  MSG_OVER_LIMIT    默认 300       累计超限多少次后断开该连接
+  OFFLINE_GRACE_MS  默认 60000     掉线宽限期（ms），期间保留席位等待重连
+  LOG_DIR           默认 server/logs
+  LOG_TO_FILE       设为 0 则只输出到控制台，不落文件
+
+
+六、网络
+  1) 系统防火墙放行所选端口（默认 3000/tcp）
+
+     Windows —— 用「管理员」身份打开 CMD 或 PowerShell，执行一次即可
+     （把 3000 换成实际端口；规则名随意）：
+
+         netsh advfirewall firewall add rule name="DungeonDuel-3000" dir=in action=allow protocol=TCP localport=3000
+
+     删除这条规则：
+
+         netsh advfirewall firewall delete rule name="DungeonDuel-3000"
+
+     查看已有规则：
+
+         netsh advfirewall firewall show rule name="DungeonDuel-3000"
+
+     Linux：
+
+         sudo ufw allow 3000/tcp
+         sudo firewall-cmd --add-port=3000/tcp --permanent && sudo firewall-cmd --reload
+
+  2) 云主机还需在控制台「安全组 → 入方向」放行同一端口
+  ★ 两处都要做，只做一处外部会连不上。
+  ★ 对外只开放这一个业务端口即可，内部没有别的端口需求。
+
+  访问方式：浏览器打开  http://<公网IP>:<端口>/
+  客户端不需要配置任何服务器地址 —— 它会自动连"页面所在的地址"；
+  页面是 https 时自动使用 wss，无需改动代码。
+
+
+七、健康检查与监控
+  GET /health   探活，返回 {"ok":true,"uptimeSec":N}
+  GET /stats    聚合状态：房间数 / 房内玩家数 / 在线连接 / 等待重连 /
+                累计建房·开局·操作·拒绝·刷屏·错误 / 内存占用
+                （只含聚合数字，不含任何房间或玩家内容）
+
+  日志：默认写入 <项目目录>/server/logs/server-YYYY-MM-DD.log
+        （UTF-8，按天分文件，启动时自动创建目录）
+        记录关键事件：建房 / 加入 / 开局 / 对局结束 / 系列比分 /
+        房主转让 / 密码拒绝 / 刷屏 / 未捕获异常
+
+
+八、已内置的安全与稳定性措施
+  · 房间密码：只存服务端、只做等值比对，绝不下发（客户端只拿到 locked 标记）
+  · 限流防刷：令牌桶，超限消息直接丢弃，持续刷屏才断开
+  · 对手手牌脱敏：下发的对局状态里，对手手牌只留张数、不含牌面（防 F12 偷看）
+  · 掉线重连：宽限期内保留席位，重连后按会话 id 恢复并推回对局快照
+  · 观战视角：双方手牌全部脱敏，待决选项不下发
+  · 权威结算：所有操作合法性、随机的先手与种子、多局制比分都由服务端决定
+
+
+九、（可选）nginx 反向代理 —— 要走域名 + HTTPS 时
+  server {
+      listen 443 ssl;
+      server_name play.example.com;
+      ssl_certificate     /path/fullchain.pem;
+      ssl_certificate_key /path/privkey.pem;
+
+      location / {
+          proxy_pass http://127.0.0.1:3000;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+      }
+      location /ws {
+          proxy_pass http://127.0.0.1:3000;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+          proxy_set_header Host $host;
+          proxy_read_timeout 600s;
+      }
+  }
+
+
+十、（可选）systemd 常驻
+  /etc/systemd/system/dungeon-duel.service
+
+  [Unit]
+  Description=Dungeon Duel Server
+  After=network.target
+
+  [Service]
+  Type=simple
+  WorkingDirectory=/opt/dungeon-duel/server
+  ExecStart=/usr/bin/node server.js
+  Environment=PORT=3000
+  Restart=always
+  RestartSec=3
+
+  [Install]
+  WantedBy=multi-user.target
+
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now dungeon-duel
+  sudo systemctl status dungeon-duel
+
+
+十一、故障排查
+  · 本机 curl /health 通、外部不通 → 安全组或系统防火墙没放行
+  · 启动报 EADDRINUSE → 端口被占用，换个 PORT
+  · 页面能开但一直提示"连接服务器失败" → 检查 /ws 是否被反代正确转发
+  · 页面直接 404 → server/ 没有和 js/、index.html 放在同一层
+  · 需要看实时状态 → curl http://127.0.0.1:PORT/stats
+========================================================================
