@@ -2795,7 +2795,7 @@ var UI = (function () {
     var unlockOnce = function () {
       Sfx.unlock();
       if (Sfx.isEnabled()) Sfx.bgmStart();
-      tryAutoFullscreen();          // 手机端：借第一次操作进全屏（浏览器只允许这样）
+      //tryAutoFullscreen();          // 手机端：借第一次操作进全屏（浏览器只允许这样）
       document.removeEventListener('pointerdown', unlockOnce);
     };
     document.addEventListener('pointerdown', unlockOnce);
