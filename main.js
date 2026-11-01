@@ -1,146 +1,79 @@
-'use strict';
-const { app, BrowserWindow, Menu, dialog } = require('electron');
-const { autoUpdater } = require('electron-updater');
+const { app, BrowserWindow } = require('electron');
 const http = require('http');
-const net  = require('net');
+const fs = require('fs');
 const path = require('path');
+const url = require('url');
 
-// 强制关闭服务端日志落盘，防止在玩家电脑上乱写文件
-process.env.LOG_TO_FILE = '0';
+let mainWindow;
 
-let win = null, splash = null;
+// MIME 类型映射
+const MIME_TYPES = {
+  '.html': 'text/html',
+  '.js': 'text/javascript',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.svg': 'image/svg+xml',
+  '.woff2': 'font/woff2',
+  '.ico': 'image/x-icon'
+};
 
-// ---------- 单实例锁 ----------
-if (!app.requestSingleInstanceLock()) {
-  app.quit();
-} else {
-  app.on('second-instance', () => {
-    if (win) {
-      if (win.isMinimized()) win.restore();
-      win.focus();
-    }
-  });
-}
-
-// 自动寻找可用端口（防端口冲突）
-function findPort(start) {
+// 启动本地静态服务器
+function startLocalServer() {
   return new Promise((resolve) => {
-    const tryPort = (p) => {
-      const s = net.createServer();
-      s.once('error', () => tryPort(p + 1));
-      s.once('listening', () => s.close(() => resolve(p)));
-      s.listen(p, '127.0.0.1');
-    };
-    tryPort(start);
-  });
-}
+    const server = http.createServer((req, res) => {
+      let pathname = decodeURIComponent(url.parse(req.url).pathname);
+      if (pathname === '/') pathname = '/index.html';
 
-// 轮询等待本地服务启动完毕
-function waitForServer(port) {
-  return new Promise((resolve) => {
-    const ping = () => {
-      const req = http.get('http://127.0.0.1:' + port + '/health', (res) => {
-        if (res.statusCode === 200) resolve(); else setTimeout(ping, 200);
+      // 防止路径穿越
+      const safePath = pathname.replace(/^(\.\.[\/\\])+/, '');
+      const filePath = path.join(__dirname, safePath);
+
+      fs.readFile(filePath, (err, data) => {
+        if (err) {
+          res.writeHead(404);
+          res.end('Not Found');
+        } else {
+          const ext = path.extname(filePath).toLowerCase();
+          res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] || 'application/octet-stream' });
+          res.end(data);
+        }
       });
-      req.on('error', () => setTimeout(ping, 200));
-      req.setTimeout(1000, () => { req.destroy(); setTimeout(ping, 200); });
-    };
-    ping();
-  });
-}
+    });
 
-// 启动画面
-function createSplash() {
-  splash = new BrowserWindow({
-    width: 420, height: 280, frame: false, resizable: false,
-    alwaysOnTop: true, transparent: false, backgroundColor: '#0a0a0a',
-    webPreferences: { nodeIntegration: false }
-  });
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:'Microsoft YaHei',sans-serif;color:#e0c080}
-    .title{font-size:22px;font-weight:bold;margin-bottom:24px;letter-spacing:2px}
-    .bar{width:280px;height:6px;background:#222;border-radius:3px;overflow:hidden}
-    .fill{width:0%;height:100%;background:linear-gradient(90deg,#c8963e,#f0d080);border-radius:3px;animation:load 1.8s ease-in-out infinite}
-    @keyframes load{0%{width:10%}50%{width:85%}100%{width:10%}}
-    .tip{margin-top:16px;font-size:13px;color:#888}
-  </style></head><body>
-    <div class="title">⚔ 地牢决斗师 ⚔</div>
-    <div class="bar"><div class="fill"></div></div>
-    <div class="tip">正在部署游戏，请稍候...</div>
-  </body></html>`;
-  splash.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
-  splash.center();
-}
-
-// ---------- 自动更新 ----------
-function setupAutoUpdater() {
-  // 自动下载，但不自动安装：等用户点"立即重启"才装
-  autoUpdater.autoDownload = true;
-  autoUpdater.autoInstallOnAppQuit = false;
-
-  autoUpdater.on('error', (err) => {
-    console.error('[updater] 出错:', err);
-  });
-
-  autoUpdater.on('update-available', (info) => {
-    console.log('[updater] 发现新版本:', info.version);
-  });
-
-  autoUpdater.on('update-not-available', () => {
-    console.log('[updater] 已是最新版本');
-  });
-
-  autoUpdater.on('download-progress', (p) => {
-    console.log('[updater] 下载 ' + p.percent.toFixed(1) + '%');
-  });
-
-  autoUpdater.on('update-downloaded', (info) => {
-    dialog.showMessageBox(win, {
-      type: 'info',
-      title: '更新就绪',
-      message: `新版本 ${info.version} 已下载完成，是否立即重启安装？`,
-      buttons: ['立即重启', '稍后'],
-      defaultId: 0,
-      cancelId: 1,
-    }).then((r) => {
-      if (r.response === 0) autoUpdater.quitAndInstall();
+    server.listen(0, '127.0.0.1', () => {
+      const port = server.address().port;
+      resolve(port); // 随机分配一个空闲端口，防止冲突
     });
   });
-
-  autoUpdater.checkForUpdates();
 }
 
-async function bootstrap() {
-  createSplash();
-  const port = await findPort(3000);
-  process.env.PORT = String(port);
-  
-  // 启动你项目里的后端（极简 server.js 或完整版 server.js 都可以）
-  require('./server/server.js');
-  
-  await waitForServer(port);
-  
-  win = new BrowserWindow({
-    width: 1280, height: 800, minWidth: 960, minHeight: 600,
-    autoHideMenuBar: true, backgroundColor: '#0a0a0a', show: false,
-    title: '地牢决斗师：踏上征途',
-    icon: path.join(__dirname, 'app.ico'),
-    webPreferences: { nodeIntegration: false, contextIsolation: true }
-  });
-  Menu.setApplicationMenu(null);
-  
-  // 加载本地服务
-  win.loadURL('http://localhost:' + port + '/');
-  
-  win.webContents.once('did-finish-load', () => {
-    if (splash) { splash.close(); splash = null; }
-    win.show();
-    setupAutoUpdater();
-  });
-  
-  win.on('closed', () => { win = null; app.quit(); });
-}
+app.whenReady().then(async () => {
+  // 1. 启动静态服务器拿到端口
+  const port = await startLocalServer();
 
-app.whenReady().then(bootstrap);
-app.on('window-all-closed', () => app.quit());
+  // 2. 创建窗口
+  mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 720,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+
+  // 3. 加载本地服务
+  mainWindow.loadURL(`http://127.0.0.1:${port}/`);
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
+});
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
