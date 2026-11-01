@@ -15,12 +15,18 @@
       "**/*",
       "!**/*.log",
       "!**/.github/**",
-      "!**/server/**",
       "!**/build-exe.ps1",
       "!**/_worker.js",
       "!**/_headers",
       "!**/gen-icon.js",
       "!dist/**"
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "luckylemonade24",
+        "repo": "dms"
+      }
     ],
     "win": {
       "target": ["nsis", "portable"],
@@ -42,6 +48,9 @@
     },
     "asar": true,
     "compression": "maximum"
+  },
+  "dependencies": {
+    "electron-updater": "latest"
   },
   "devDependencies": {
     "electron": "latest",

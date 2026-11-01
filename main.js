@@ -1,5 +1,6 @@
 'use strict';
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, dialog } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const http = require('http');
 const net  = require('net');
 const path = require('path');
@@ -8,6 +9,18 @@ const path = require('path');
 process.env.LOG_TO_FILE = '0';
 
 let win = null, splash = null;
+
+// ---------- 单实例锁 ----------
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (win) {
+      if (win.isMinimized()) win.restore();
+      win.focus();
+    }
+  });
+}
 
 // 自动寻找可用端口（防端口冲突）
 function findPort(start) {
@@ -60,6 +73,44 @@ function createSplash() {
   splash.center();
 }
 
+// ---------- 自动更新 ----------
+function setupAutoUpdater() {
+  // 自动下载，但不自动安装：等用户点"立即重启"才装
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = false;
+
+  autoUpdater.on('error', (err) => {
+    console.error('[updater] 出错:', err);
+  });
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('[updater] 发现新版本:', info.version);
+  });
+
+  autoUpdater.on('update-not-available', () => {
+    console.log('[updater] 已是最新版本');
+  });
+
+  autoUpdater.on('download-progress', (p) => {
+    console.log('[updater] 下载 ' + p.percent.toFixed(1) + '%');
+  });
+
+  autoUpdater.on('update-downloaded', (info) => {
+    dialog.showMessageBox(win, {
+      type: 'info',
+      title: '更新就绪',
+      message: `新版本 ${info.version} 已下载完成，是否立即重启安装？`,
+      buttons: ['立即重启', '稍后'],
+      defaultId: 0,
+      cancelId: 1,
+    }).then((r) => {
+      if (r.response === 0) autoUpdater.quitAndInstall();
+    });
+  });
+
+  autoUpdater.checkForUpdates();
+}
+
 async function bootstrap() {
   createSplash();
   const port = await findPort(3000);
@@ -85,6 +136,7 @@ async function bootstrap() {
   win.webContents.once('did-finish-load', () => {
     if (splash) { splash.close(); splash = null; }
     win.show();
+    setupAutoUpdater();
   });
   
   win.on('closed', () => { win = null; app.quit(); });
