@@ -57,7 +57,7 @@ jobs:
           # 精准拷贝你要求保留的文件和文件夹
           # ==========================
           cp manifest.webmanifest sw.js dist/
-          rsync -av 背景/ 卡牌/ 图标/ 字体/ dist/
+          rsync -av 背景 卡牌 图标 字体 dist/
 
       - name: 上传前端打包产物
         uses: actions/upload-artifact@v4
