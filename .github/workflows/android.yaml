@@ -43,13 +43,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 自动整理目录（防止包名不对导致闪退）
-      - name: 自动修正 MainActivity 路径
+      # ==========================================
+      # 【核心修复】：动态读取 namespace，自动建文件夹，解决改包名的烦恼
+      # ==========================================
+      - name: 自动根据包名整理代码目录
         run: |
-          mkdir -p android/app/src/main/java/com/ddm/jn
+          # 从 gradle 文件中抓取 namespace = "xxx.xxx.xxx"
+          PKG_NAME=$(grep 'namespace = ' android/app/build.gradle.kts | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+          echo "检测到包名为: $PKG_NAME"
+          
+          # 将点替换为斜杠 (如 com.ddm.jn -> com/ddm/jn)
+          PKG_DIR=$(echo $PKG_NAME | tr '.' '/')
+          echo "生成自动目录为: java/$PKG_DIR"
+          
+          # 自动创建对应的深层文件夹
+          mkdir -p android/app/src/main/java/$PKG_DIR
+          
+          # 将位于扁平 java/ 目录下的文件自动归位
           if [ -f "android/app/src/main/java/MainActivity.kt" ]; then
-            mv android/app/src/main/java/MainActivity.kt android/app/src/main/java/com/ddm/jn/MainActivity.kt
+            mv android/app/src/main/java/MainActivity.kt android/app/src/main/java/$PKG_DIR/MainActivity.kt
           fi
+          echo "MainActivity.kt 已自动归位！"
 
       - name: 准备本地前端资源到 assets
         run: |
