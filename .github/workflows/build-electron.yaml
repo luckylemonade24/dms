@@ -13,11 +13,11 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v5
 
-      # 1. 先清理：留下 e 骨架和源码自带的 server 文件夹
+      # 1. 先清理：只留下 e 骨架，不再保留 server！
       - name: 清理仓库，只保留必需文件
         shell: pwsh
         run: |
-          $keep = @("main.js", "package.json", "gen-icon.js", "图标", "server")
+          $keep = @("main.js", "package.json", "gen-icon.js")
           Get-ChildItem -Force | Where-Object { $keep -notcontains $_.Name } | Remove-Item -Recurse -Force
 
       # 2. 拉取前端产物到根目录
