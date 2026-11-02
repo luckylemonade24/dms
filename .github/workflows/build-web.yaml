@@ -12,7 +12,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 安装压缩工具
-        run: npm install -g terser lightningcss-cli critical
+        run: |
+          echo "PUPPETEER_SKIP_DOWNLOAD=true" >> $GITHUB_ENV
+          echo "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true" >> $GITHUB_ENV
+          npm install -g terser lightningcss-cli
+          npm install critical --no-save
 
       - name: 合并压缩并生成纯净导出
         run: |
@@ -46,11 +50,35 @@ jobs:
           cp manifest.webmanifest sw.js dist/
           rsync -av 背景 卡牌 图标 字体 dist/
 
-      - name: 提取并内联关键 CSS
+      - name: 提取并内联关键 CSS（Node API + ignore）
         run: |
-          cd dist
-          critical index.html --inline --write --engine static \
-            --ignore "^#battle|^#deck|^#map|^#tour|^#master|^#academy|^#boss|^#runpanel|^#modal|^#toast|^body:has"
+          cat > critical-run.js <<'EOF'
+          const critical = require('critical');
+
+          critical.generate({
+            inline: true,
+            base: 'dist/',
+            src: 'index.html',
+            target: 'index.html',
+            engine: 'static',
+            ignore: [
+              /^#battle/,
+              /^#deck/,
+              /^#map/,
+              /^#tour/,
+              /^#master/,
+              /^#academy/,
+              /^#boss/,
+              /^#runpanel/,
+              /^#modal/,
+              /^#toast/,
+              /^body:has/
+            ]
+          })
+          .then(() => console.log('critical done'))
+          .catch((e) => { console.error(e); process.exit(1); });
+          EOF
+          node critical-run.js
 
       - name: 非关键 CSS 改为异步加载
         run: |
