@@ -16,14 +16,12 @@ jobs:
           echo "PUPPETEER_SKIP_DOWNLOAD=true" >> $GITHUB_ENV
           echo "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true" >> $GITHUB_ENV
           npm install -g terser lightningcss-cli
-          # 安装最新版 critical
           npm install critical --no-save
 
       - name: 合并压缩并生成纯净导出
         run: |
           mkdir -p dist
 
-          # 处理 CSS
           grep -oP '(?<=<link rel="stylesheet" href=")[^"]+' index.html | sed 's/?[^ ]*//g' | grep -E '^(css/|add/)' > css_list.txt
           if [ -s css_list.txt ]; then
             mkdir -p dist/css
@@ -33,7 +31,6 @@ jobs:
           fi
           rm -f css_list.txt
 
-          # 处理 JS
           grep -oP '(?<=<script src=")[^"]+' index.html | sed 's/?[^ ]*//g' | grep -E '^(js/|add/)' > js_list.txt
           if [ -s js_list.txt ]; then
             mkdir -p dist/js
@@ -42,32 +39,26 @@ jobs:
           fi
           rm -f js_list.txt
 
-          # 修改 index.html
           cp index.html dist/index.html
+
           sed -i -E 's#<link rel="stylesheet" href="(css/|add/)[^"]*">##g' dist/index.html
           sed -i 's#</head>#<link rel="stylesheet" href="css/all.css">\n</head>#' dist/index.html
+
           sed -i -E 's#<script src="(js/|add/)[^"]*"[^>]*></script>##g' dist/index.html
           sed -i 's#</body>#<script src="js/all.js" defer></script>\n</body>#' dist/index.html
 
           cp manifest.webmanifest sw.js dist/
           rsync -av 背景 卡牌 图标 字体 dist/
 
-      - name: 提取并内联关键 CSS
+      - name: 提取并内联关键 CSS（官方 Node API）
         run: |
           cat > critical-run.mjs <<'EOF'
-          import * as criticalModule from 'critical';
-          const generate = criticalModule.generate || criticalModule.default?.generate;
-
-          if (typeof generate !== 'function') {
-            console.error('critical.generate 不可用，模块导出键：', Object.keys(criticalModule));
-            process.exit(1);
-          }
+          const { generate } = await import('critical');
 
           generate({
             inline: true,
             base: 'dist/',
             src: 'index.html',
-            target: 'index.html',
             engine: 'static',
             ignore: {
               rule: [
