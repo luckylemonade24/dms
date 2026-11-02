@@ -11,11 +11,14 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 安装官方压缩工具
+      - name: 缓存 Puppeteer Chromium
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/puppeteer
+          key: ${{ runner.os }}-puppeteer-chromium
+
+      - name: 安装压缩工具
         run: |
-          # critical 依赖 puppeteer，但我们只用 static 引擎，跳过浏览器下载
-          echo "PUPPETEER_SKIP_DOWNLOAD=true" >> $GITHUB_ENV
-          echo "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true" >> $GITHUB_ENV
           npm install -g terser lightningcss-cli critical
 
       - name: 合并压缩并生成纯净导出
@@ -65,10 +68,10 @@ jobs:
           cp manifest.webmanifest sw.js dist/
           rsync -av 背景 卡牌 图标 字体 dist/
 
-      - name: 提取并内联关键 CSS
+      - name: 提取并内联关键 CSS（render 引擎）
         run: |
           cd dist
-          critical index.html --inline --write --engine static
+          critical index.html --inline --write --engine render --dimensions "390x844,1300x900"
 
       - name: 上传前端打包产物
         uses: actions/upload-artifact@v4
