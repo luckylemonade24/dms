@@ -50,7 +50,7 @@ function rgbaToIcoBmp(rgba, size) {
   for (const s of sizes) {
     let buf;
     if (s === 256) {
-      buf = await sharp(src).resize(s, s).png().toBuffer();
+      buf = await sharp(src).resize(s, s).png({ compressionLevel: 9, effort: 10, palette: true }).toBuffer();
     } else {
       const { data } = await sharp(src).resize(s, s).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
       buf = rgbaToIcoBmp(data, s);

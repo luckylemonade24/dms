@@ -25,7 +25,7 @@ const path = require('path');
     // 用 sharp 缩放并转成 png
     await sharp(src)
       .resize(size, size)
-      .png()
+      .png({ compressionLevel: 9, effort: 10, palette: true }) // 极致压缩
       .toFile(path.join(targetDir, 'ic_launcher.png'));
   }
   
