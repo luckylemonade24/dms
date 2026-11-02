@@ -84,8 +84,7 @@ jobs:
           sed -i -E 's#<script src="(js/|add/)[^"]*"[^>]*></script>##g' dist/index.html
           sed -i 's#</body>#<script src="js/all.js" defer></script>\n</body>#' dist/index.html
 
-          # 4. 精准拷贝文件
-          cp manifest.webmanifest sw.js dist/
+          # ★ 这里去掉了 cp manifest.webmanifest sw.js dist/
           rsync -av 背景 卡牌 图标 字体 dist/
 
       - name: 设置 Node.js LTS
