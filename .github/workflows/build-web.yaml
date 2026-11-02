@@ -11,7 +11,7 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v5
 
-      - name: 安装官方压缩工具
+      - name: 安装压缩工具
         run: |
           npm install -g terser lightningcss-cli
 
@@ -84,9 +84,191 @@ jobs:
           sed -i -E 's#<script src="(js/|add/)[^"]*"[^>]*></script>##g' dist/index.html
           sed -i 's#</body>#<script src="js/all.js" defer></script>\n</body>#' dist/index.html
 
-          # ★ 这里去掉了 cp manifest.webmanifest sw.js dist/
+          # ★ 精准拷贝文件
           rsync -av 背景 卡牌 图标 字体 dist/
 
+      # ==========================================
+      # 新增：自动扫描游戏用字，裁剪、改名并写入许可证
+      # ==========================================
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 安装 fonttools
+        run: pip install fonttools brotli
+
+      - name: 字体子集化与 OFL 合规重命名
+        run: |
+          python3 - <<'PY'
+          import os, re, subprocess, sys
+          from fontTools.ttLib import TTFont
+          from fontTools.subset import main as subset_main
+
+          # 1. 扫描 dist 下的 HTML 和 JS 提取中文字符
+          chars = set()
+          pattern = re.compile(r'[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]')
+          for root, _, files in os.walk('dist'):
+              for f in files:
+                  if f.endswith(('.html', '.js')):
+                      try:
+                          text = open(os.path.join(root, f), encoding='utf-8').read()
+                          chars.update(pattern.findall(text))
+                      except Exception:
+                          pass
+
+          # 加上英文字母和常用标点
+          basic = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?;:\'"()[]{}<>-_=+*/\\|@#$%^&`~'
+          chars.update(basic)
+
+          text = ''.join(sorted(chars))
+          open('/tmp/chars.txt', 'w', encoding='utf-8').write(text)
+          print(f'✅ 扫描完成，共提取 {len(chars)} 个字符。')
+
+          # 2. 执行 pyftsubset 裁剪
+          src_font = '字体/fusion-pixel-12px-proportional-zh_hans.otf.woff2'
+          out_font = 'dist/字体/fusion-subset.woff2'
+          os.makedirs('dist/字体', exist_ok=True)
+
+          sys.argv = [
+              'pyftsubset', src_font,
+              '--text-file=/tmp/chars.txt',
+              '--flavor=woff2',
+              '--layout-features=*',
+              f'--output-file={out_font}'
+          ]
+          subset_main()
+
+          # 3. 修改字体内部名称（OFL 合规）+ 注入协议
+          font = TTFont(out_font)
+          name_table = font['name']
+          new_family_name = 'dms-fp' # 修改为你的专属字体名
+          
+          # 标准的 OFL 1.1 许可证文本
+          ofl_text = """Copyright (c) 2022, TakWolf. Subsetted and modified by DMS.
+          This Font Software is licensed under the SIL Open Font License, Version 1.1.
+          This license is available with a FAQ at: https://openfontlicense.org
+          
+          SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+          -----------------------------------------------------------
+          PREAMBLE
+          The goals of the Open Font License (OFL) are to stimulate worldwide
+          development of collaborative font projects, to support the font creation
+          efforts of academic and linguistic communities, and to provide a free and
+          open framework in which fonts may be shared and improved in partnership
+          with others.
+
+          The OFL allows the licensed fonts to be used, studied, modified and
+          redistributed freely as long as they are not sold by themselves. The
+          fonts, including any derivative works, can be bundled, embedded,
+          redistributed and/or sold with any software provided that any reserved
+          names are not used by derivative works. The fonts and derivatives,
+          however, cannot be released under any other type of license. The
+          requirement for fonts to remain under this license does not apply
+          to any document created using the fonts or their derivatives.
+
+          DEFINITIONS
+          "Font Software" refers to the set of files released by the Copyright
+          Holder(s) under this license and clearly marked as such. This may
+          include source files, build scripts and documentation.
+
+          "Reserved Font Name" refers to any names specified as such after the
+          copyright statement(s).
+
+          "Original Version" refers to the collection of Font Software components as
+          distributed by the Copyright Holder(s).
+
+          "Modified Version" refers to any derivative made by adding to, deleting,
+          or substituting -- in part or in whole -- any of the components of the
+          Original Version, by changing formats or by porting the Font Software to a
+          new environment.
+
+          "Author" refers to any designer, engineer, programmer, technical
+          writer or other person who contributed to the Font Software.
+
+          PERMISSION & CONDITIONS
+          Permission is hereby granted, free of charge, to any person obtaining
+          a copy of the Font Software, to use, study, copy, merge, embed, modify,
+          redistribute, and sell modified and unmodified copies of the Font
+          Software, subject to the following conditions:
+
+          1) Neither the Font Software nor any of its individual components,
+          in Original or Modified Versions, may be sold by itself.
+
+          2) Original or Modified Versions of the Font Software may be bundled,
+          redistributed and/or sold with any software, provided that each copy
+          contains the above copyright notice and this license. These can be
+          included either as stand-alone text files, human-readable headers or
+          in the appropriate machine-readable metadata fields within text or
+          binary files as long as those fields can be easily viewed by the user.
+
+          3) No Modified Version of the Font Software may use the Reserved Font
+          Name(s) or PostScript Name(s) of the Original Version, unless explicit
+          written permission is granted by the corresponding Copyright Holder.
+          This restriction only applies to the primary font name as
+          presented to the users.
+
+          4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+          Software shall not be used to promote, endorse or advertise any
+          Modified Version, except to acknowledge the contribution(s) of the
+          Copyright Holder(s) and the Author(s) or with their explicit written
+          permission.
+
+          5) The Font Software, modified or unmodified, in part or in whole,
+          must be distributed entirely under this license, and must not be
+          distributed under any other license. The requirement for fonts to
+          remain under this license does not apply to any document created
+          using the Font Software.
+
+          TERMINATION
+          This license becomes null and void if any of the above conditions are
+          not met.
+
+          DISCLAIMER
+          THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+          EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+          MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+          OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+          COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+          INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+          DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+          FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+          OTHER DEALINGS IN THE FONT SOFTWARE."""
+
+          # 遍历覆盖名字表
+          for record in name_table.names:
+              if record.nameID in (1, 4, 16):
+                  record.string = new_family_name
+              elif record.nameID == 6:
+                  record.string = new_family_name
+              elif record.nameID == 0:
+                  # 0 是版权声明
+                  record.string = 'Copyright (c) 2022, TakWolf. Subsetted by DMS.'
+              elif record.nameID == 13:
+                  # 13 是 License Description
+                  record.string = ofl_text
+              elif record.nameID == 14:
+                  # 14 是 License Info URL
+                  record.string = 'https://openfontlicense.org'
+
+          font.save(out_font)
+          print('✅ 字体子集化、重命名及 License 写入完成！')
+
+          # 4. 替换 dist/css/all.css 里的字体路径和字体名称
+          css_path = 'dist/css/all.css'
+          css = open(css_path, encoding='utf-8').read()
+          
+          css = css.replace('fusion-pixel-12px-proportional-zh_hans.otf.woff2', 'fusion-subset.woff2')
+          css = css.replace('font-family: fusion', 'font-family: dms-fp')
+          css = css.replace('font-family:fusion', 'font-family:dms-fp')
+          
+          open(css_path, 'w', encoding='utf-8').write(css)
+          print('✅ CSS 中的字体引用已更新！')
+          PY
+
+      # ==========================================
+      # 后续步骤：critical 提取
+      # ==========================================
       - name: 设置 Node.js LTS
         uses: actions/setup-node@v6
         with:
