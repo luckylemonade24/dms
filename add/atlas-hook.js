@@ -8,11 +8,15 @@
   ];
 
   const index = {};
+  const indexByName = new Map();   // basename -> path，O(1) 查找
   const atlasImgs = {};
   const pending = [];
+  const pendingUpdate = new Set(); // 待批量更新的 img
+  let rafScheduled = false;
   let ready = false;
   let observerStarted = false;
   let domScanned = false;
+  let warnedOrder = false;
 
   const srcDesc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
 
@@ -62,15 +66,16 @@
     return origSetAttribute.call(this, name, value);
   };
 
-  // ===== 正确尺寸透明图（按帧尺寸缓存）=====
+  // ===== 正确尺寸透明图（SVG 拼接，无同步编码成本）=====
   const transCache = {};
   function getTransparent(w, h) {
     const k = w + 'x' + h;
     if (transCache[k]) return transCache[k];
-    const c = document.createElement('canvas');
-    c.width = w; c.height = h;
-    transCache[k] = c.toDataURL('image/png');
-    return transCache[k];
+    const svg = 'data:image/svg+xml,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '"/>'
+    );
+    transCache[k] = svg;
+    return svg;
   }
 
   // ===== fetch + blob URL 加载图集 =====
@@ -105,6 +110,12 @@
         for (const [path, data] of Object.entries(json.frames)) {
           const f = data.frame;
           index[path] = { atlasUrl: blobUrl, x: f.x, y: f.y, w: f.w, h: f.h, atlasW: aw, atlasH: ah };
+
+          const name = path.slice(path.lastIndexOf('/') + 1);
+          if (indexByName.has(name) && indexByName.get(name) !== path) {
+            console.warn('[atlas-hook] ⚠️ 文件名重复:', name, '旧:', indexByName.get(name), '新:', path);
+          }
+          indexByName.set(name, path);
         }
         console.log('[atlas-hook] loaded', a.image);
       }
@@ -120,56 +131,80 @@
     }
   }
 
+  // O(1)：basename 走 Map
   function findKey(v) {
     if (!v || typeof v !== 'string') return null;
     if (v.indexOf('data:') === 0 || v.indexOf('blob:') === 0) return null;
     let dec;
     try { dec = decodeURIComponent(v); } catch (e) { dec = v; }
-    for (const k in index) if (dec.endsWith(k)) return k;
-    return null;
+    const name = dec.slice(dec.lastIndexOf('/') + 1);
+    return indexByName.get(name) || null;
   }
 
-  // ===== 背景更新 =====
+  // ===== 批量更新：收集 → 一帧内统一读、统一写 =====
   const ro = (typeof ResizeObserver !== 'undefined')
-    ? new ResizeObserver(entries => { for (const e of entries) updateAtlasBackground(e.target); })
+    ? new ResizeObserver(entries => {
+        for (const e of entries) {
+          if (e.target._atlasFrame) scheduleAtlasUpdate(e.target);
+        }
+      })
     : null;
 
   function scheduleAtlasUpdate(img) {
-    updateAtlasBackground(img);
-    if (img._atlasScheduled) return;
-    img._atlasScheduled = true;
-    requestAnimationFrame(() => { img._atlasScheduled = false; updateAtlasBackground(img); });
+    if (!img._atlasFrame) return;
+    pendingUpdate.add(img);
+    if (!rafScheduled) {
+      rafScheduled = true;
+      requestAnimationFrame(flushAtlasUpdates);
+    }
     if (ro && !img._atlasRO) {
       img._atlasRO = true;
       try { ro.observe(img); } catch (e) {}
     }
   }
 
-  // 核心修复：模拟 object-fit 和 object-position
-  function updateAtlasBackground(img) {
-    const f = img._atlasFrame;
-    if (!f) return;
-    let w = img.clientWidth || img.offsetWidth;
-    let h = img.clientHeight || img.offsetHeight;
-    if (!w || !h) { w = f.w; h = f.h; }
+  function flushAtlasUpdates() {
+    rafScheduled = false;
+    const imgs = Array.from(pendingUpdate);
+    pendingUpdate.clear();
+    if (!imgs.length) return;
 
-    const style = window.getComputedStyle(img);
-    const fit = style.objectFit || 'fill'; 
-    
+    // 阶段 1：批量读（一次 layout）
+    const inputs = [];
+    for (const img of imgs) {
+      const f = img._atlasFrame;
+      if (!f) continue;
+      const w = img.clientWidth || img.offsetWidth || f.w;
+      const h = img.clientHeight || img.offsetHeight || f.h;
+      const style = window.getComputedStyle(img);
+      inputs.push({
+        img, f, w, h,
+        fit: style.objectFit || 'fill',
+        posRaw: style.objectPosition,
+      });
+    }
+
+    // 阶段 2：批量写（一次 style recalc）
+    for (const it of inputs) applyBackground(it);
+  }
+
+  function applyBackground({ img, f, w, h, fit, posRaw }) {
+    const key = f.atlasUrl + '|' + f.x + ',' + f.y + ',' + f.w + ',' + f.h + '|' +
+                w + 'x' + h + '|' + fit + '|' + posRaw;
+    if (img._atlasLastKey === key) return;
+    img._atlasLastKey = key;
+
     let sx = w / f.w, sy = h / f.h;
     let offsetX = 0, offsetY = 0;
     let bgW = f.w * sx;
     let bgH = f.h * sy;
 
     if (fit === 'cover') {
-      // 完美模拟 object-fit: cover (保持比例，覆盖容器)
       const s = Math.max(sx, sy);
       sx = sy = s;
       bgW = f.w * s;
       bgH = f.h * s;
-      
-      // 模拟 object-position (默认 center center)
-      let pos = style.objectPosition.split(' ');
+      let pos = posRaw.split(' ');
       let px = 50, py = 50;
       if (pos.length === 2) {
         px = parseFloat(pos[0]) || 50;
@@ -178,13 +213,11 @@
       offsetX = (w - bgW) * (px / 100);
       offsetY = (h - bgH) * (py / 100);
     } else if (fit === 'contain') {
-      // 完美模拟 object-fit: contain (保持比例，完整显示)
       const s = Math.min(sx, sy);
       sx = sy = s;
       bgW = f.w * s;
       bgH = f.h * s;
-      
-      let pos = style.objectPosition.split(' ');
+      let pos = posRaw.split(' ');
       let px = 50, py = 50;
       if (pos.length === 2) {
         px = parseFloat(pos[0]) || 50;
@@ -205,13 +238,15 @@
     img._atlasKey = key;
     img._rawSrc = originalSrc;
     img._atlasFrame = f;
-    srcDesc.set.call(img, getTransparent(f.w, f.h));
-    scheduleAtlasUpdate(img);
+    srcDesc.set.call(img, getTransparent(f.w, f.h)); // 同步设透明图，不回源
+    scheduleAtlasUpdate(img);                        // 背景样式入队，下一帧统一应用
   }
 
   function applyNormal(img, src) {
     img._atlasKey = null;
     delete img._atlasFrame;
+    img._atlasLastKey = null;
+    pendingUpdate.delete(img);
     img._rawSrc = src;
     img.style.backgroundImage = '';
     img.style.backgroundSize = '';
@@ -228,7 +263,8 @@
       pending.push(() => handle(img, img._pendingSrc));
       return;
     }
-    if (typeof src === 'string' && src.indexOf('/缩略卡/') >= 0) {
+    if (!warnedOrder && typeof src === 'string' && src.indexOf('/缩略卡/') >= 0) {
+      warnedOrder = true;
       console.warn('[atlas-hook] ⚠️ 顺序错：atlas-hook 必须在路径重写脚本之前加载！src =', src);
     }
     const k = findKey(src);
@@ -292,6 +328,8 @@
         img._rawSrc = orig;
         img._atlasKey = null;
         delete img._atlasFrame;
+        img._atlasLastKey = null;
+        pendingUpdate.delete(img);
         srcDesc.set.call(img, orig);
       }
       return;
