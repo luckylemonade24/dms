@@ -13,12 +13,15 @@ jobs:
 
       - name: 安装官方压缩工具
         run: |
-          npm install -g terser lightningcss-cli
+          # critical 依赖 puppeteer，但我们只用 static 引擎，跳过浏览器下载
+          echo "PUPPETEER_SKIP_DOWNLOAD=true" >> $GITHUB_ENV
+          echo "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true" >> $GITHUB_ENV
+          npm install -g terser lightningcss-cli critical
 
       - name: 合并压缩并生成纯净导出
         run: |
           mkdir -p dist
-          
+
           # ==========================
           # 处理 CSS（保留在 css 目录中）
           # ==========================
@@ -26,11 +29,10 @@ jobs:
           if [ -s css_list.txt ]; then
             mkdir -p dist/css
             cat $(cat css_list.txt) > dist/css/all.css
-            
-            # ★ 核心修复：把所有的 ../ 路径强行改成绝对根路径 /
-            # 这样 Android 的 WebView 拦截器才能正确识别并加载背景图
+
+            # 把所有的 ../ 路径强行改成绝对根路径 /
             sed -i 's|\.\./|/|g' dist/css/all.css
-            
+
             lightningcss --minify dist/css/all.css -o dist/css/all.css
           fi
           rm -f css_list.txt
@@ -42,7 +44,8 @@ jobs:
           if [ -s js_list.txt ]; then
             mkdir -p dist/js
             cat $(cat js_list.txt) > dist/js/all.js
-            terser dist/js/all.js -c drop_console=true -m -o dist/js/all.js
+            # 只删 console.log / console.debug，保留 warn / error
+            terser dist/js/all.js -c "pure_funcs=['console.log','console.debug']" -m -o dist/js/all.js
           fi
           rm -f js_list.txt
 
@@ -50,17 +53,22 @@ jobs:
           # 修改 index.html 并放入导出目录
           # ==========================
           cp index.html dist/index.html
-          
+
           # 删掉原本的 css 和 js 引入，替换为合并后的路径
           sed -i -E 's#<link rel="stylesheet" href="(css/|add/)[^"]*">##g' dist/index.html
           sed -i 's#</head>#<link rel="stylesheet" href="css/all.css">\n</head>#' dist/index.html
-          
-          sed -i -E 's#<script src="(js/|add/)[^"]*"[^>]*></script>##g' dist/index.html
-          sed -i 's#</body>#<script src="js/all.js"></script>\n</body>#' dist/index.html
 
-          # 4. 精准拷贝文件
+          sed -i -E 's#<script src="(js/|add/)[^"]*"[^>]*></script>##g' dist/index.html
+          sed -i 's#</body>#<script src="js/all.js" defer></script>\n</body>#' dist/index.html
+
+          # 精准拷贝文件
           cp manifest.webmanifest sw.js dist/
           rsync -av 背景 卡牌 图标 字体 dist/
+
+      - name: 提取并内联关键 CSS
+        run: |
+          cd dist
+          critical index.html --inline --write --engine static
 
       - name: 上传前端打包产物
         uses: actions/upload-artifact@v4
