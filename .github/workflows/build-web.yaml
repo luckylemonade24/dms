@@ -11,15 +11,32 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 缓存 Puppeteer Chromium
+      - name: 获取 Playwright 版本
+        id: pw-version
+        run: |
+          PW_VERSION=$(npm view playwright@latest version 2>/dev/null || echo "latest")
+          echo "version=$PW_VERSION" >> $GITHUB_OUTPUT
+          echo "Playwright version: $PW_VERSION"
+
+      - name: 缓存 Playwright Chromium
+        id: playwright-cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/puppeteer
-          key: ${{ runner.os }}-puppeteer-chromium
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.pw-version.outputs.version }}
 
-      - name: 安装压缩工具
+      - name: 安装构建工具与 Playwright
         run: |
           npm install -g terser lightningcss-cli critical
+          npm install -g playwright
+
+      - name: 安装 Playwright Chromium 及系统依赖
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: 安装系统依赖（缓存命中时）
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
 
       - name: 合并压缩并生成纯净导出
         run: |
@@ -32,10 +49,7 @@ jobs:
           if [ -s css_list.txt ]; then
             mkdir -p dist/css
             cat $(cat css_list.txt) > dist/css/all.css
-
-            # 把所有的 ../ 路径强行改成绝对根路径 /
             sed -i 's|\.\./|/|g' dist/css/all.css
-
             lightningcss --minify dist/css/all.css -o dist/css/all.css
           fi
           rm -f css_list.txt
@@ -47,7 +61,6 @@ jobs:
           if [ -s js_list.txt ]; then
             mkdir -p dist/js
             cat $(cat js_list.txt) > dist/js/all.js
-            # 只删 console.log / console.debug，保留 warn / error
             terser dist/js/all.js -c "pure_funcs=['console.log','console.debug']" -m -o dist/js/all.js
           fi
           rm -f js_list.txt
@@ -57,14 +70,12 @@ jobs:
           # ==========================
           cp index.html dist/index.html
 
-          # 删掉原本的 css 和 js 引入，替换为合并后的路径
           sed -i -E 's#<link rel="stylesheet" href="(css/|add/)[^"]*">##g' dist/index.html
           sed -i 's#</head>#<link rel="stylesheet" href="css/all.css">\n</head>#' dist/index.html
 
           sed -i -E 's#<script src="(js/|add/)[^"]*"[^>]*></script>##g' dist/index.html
           sed -i 's#</body>#<script src="js/all.js" defer></script>\n</body>#' dist/index.html
 
-          # 精准拷贝文件
           cp manifest.webmanifest sw.js dist/
           rsync -av 背景 卡牌 图标 字体 dist/
 
