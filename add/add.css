@@ -10,3 +10,10 @@
   max-height: none !important; 
   object-fit: contain !important;
 }
+
+/* ★ 修复头像被平滑插值变糊的问题 */
+img.pf-ava, 
+.pf-cell img,
+#pFAvaImg {
+  image-rendering: pixelated !important;
+}
