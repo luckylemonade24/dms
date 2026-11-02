@@ -183,16 +183,6 @@ var UI = (function () {
     if (!quiet) { try { toast(portraitMode ? '已切换到竖屏模式' : '已切回横屏模式'); } catch (e) { } }
   }
 
-  /* ================= Service Worker =================
-   * 「添加到主屏幕」按钮已下架（已经有 Android APK 安装包），但 SW 仍然注册：
-   * 它是个故意零缓存的 pass-through（见 sw.js），只为让页面具备 PWA 形态，
-   * 不影响任何资源缓存行为。file:// 打开时注册必然失败（浏览器限制），直接跳过。 */
-  try {
-    if (navigator.serviceWorker && location.protocol !== 'file:') {
-      var swp = navigator.serviceWorker.register('sw.js');
-      if (swp && swp.catch) swp.catch(function () { });
-    }
-  } catch (e) { }
   /* ---- 手机横屏「紧凑布局」 ----
    * 屏幕很宽而矮（横屏手机）时，16:9 的舞台只能按高度缩放（0.44 左右），左右两条大黑边白扔。
    * 于是竖屏 ≤620px 时改用紧凑布局：把玩家/对手信息栏与对手手牌挪到左侧独立一列（见 battle.css
