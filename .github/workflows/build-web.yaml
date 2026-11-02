@@ -52,14 +52,8 @@ jobs:
 
       - name: 提取并内联关键 CSS
         run: |
-          cat > critical-run.cjs <<'EOF'
-          const critical = require('critical');
-          const generate = critical.generate || critical.default?.generate;
-
-          if (typeof generate !== 'function') {
-            console.error('critical.generate 不可用，导出键：', Object.keys(critical));
-            process.exit(1);
-          }
+          cat > critical-run.mjs <<'EOF'
+          import { generate } from 'critical';
 
           generate({
             inline: true,
@@ -69,24 +63,16 @@ jobs:
             engine: 'static',
             ignore: {
               rule: [
-                /^#battle/,
-                /^#deck/,
-                /^#map/,
-                /^#tour/,
-                /^#master/,
-                /^#academy/,
-                /^#boss/,
-                /^#runpanel/,
-                /^#modal/,
-                /^#toast/,
-                /^body:has/
+                /^#battle/, /^#deck/, /^#map/, /^#tour/,
+                /^#master/, /^#academy/, /^#boss/, /^#runpanel/,
+                /^#modal/, /^#toast/, /^body:has/
               ]
             }
           })
           .then(() => console.log('critical done'))
           .catch((e) => { console.error(e); process.exit(1); });
           EOF
-          node critical-run.cjs
+          node critical-run.mjs
 
       - name: 非关键 CSS 改为异步加载
         run: |
