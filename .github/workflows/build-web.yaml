@@ -50,35 +50,37 @@ jobs:
           cp manifest.webmanifest sw.js dist/
           rsync -av 背景 卡牌 图标 字体 dist/
 
-      - name: 提取并内联关键 CSS（Node API + ignore）
+      - name: 提取并内联关键 CSS（Node API + ESM）
         run: |
-          cat > critical-run.js <<'EOF'
-          const critical = require('critical');
+          cat > critical-run.mjs <<'EOF'
+          import { generate } from 'critical';
 
-          critical.generate({
+          generate({
             inline: true,
             base: 'dist/',
             src: 'index.html',
             target: 'index.html',
             engine: 'static',
-            ignore: [
-              /^#battle/,
-              /^#deck/,
-              /^#map/,
-              /^#tour/,
-              /^#master/,
-              /^#academy/,
-              /^#boss/,
-              /^#runpanel/,
-              /^#modal/,
-              /^#toast/,
-              /^body:has/
-            ]
+            ignore: {
+              rule: [
+                /^#battle/,
+                /^#deck/,
+                /^#map/,
+                /^#tour/,
+                /^#master/,
+                /^#academy/,
+                /^#boss/,
+                /^#runpanel/,
+                /^#modal/,
+                /^#toast/,
+                /^body:has/
+              ]
+            }
           })
           .then(() => console.log('critical done'))
           .catch((e) => { console.error(e); process.exit(1); });
           EOF
-          node critical-run.js
+          node critical-run.mjs
 
       - name: 非关键 CSS 改为异步加载
         run: |
