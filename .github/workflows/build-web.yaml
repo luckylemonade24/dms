@@ -144,6 +144,12 @@ jobs:
           css = css.replace('font-family: fusion', 'font-family: dms-fp')
           css = css.replace('font-family:fusion', 'font-family:dms-fp')
           open(css_path, 'w', encoding='utf-8').write(css)
+
+          # ★ 清理 dist 里的旧字体，防止白占体积
+          old_font_in_dist = 'dist/字体/fusion-pixel-12px-proportional-zh_hans.otf.woff2'
+          if os.path.exists(old_font_in_dist):
+              os.remove(old_font_in_dist)
+              print('✅ 已清理旧的原始字体')
           PY
 
       - name: 设置 Node.js LTS
