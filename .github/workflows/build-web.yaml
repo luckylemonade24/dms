@@ -11,80 +11,75 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 安装压缩工具
+      - name: 安装官方压缩工具
         run: |
-          echo "PUPPETEER_SKIP_DOWNLOAD=true" >> $GITHUB_ENV
-          echo "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true" >> $GITHUB_ENV
           npm install -g terser lightningcss-cli
-          npm install critical --no-save
 
       - name: 合并压缩并生成纯净导出
         run: |
           mkdir -p dist
-
+          
+          # ==========================
+          # 处理 CSS（保留在 css 目录中）
+          # ==========================
           grep -oP '(?<=<link rel="stylesheet" href=")[^"]+' index.html | sed 's/?[^ ]*//g' | grep -E '^(css/|add/)' > css_list.txt
           if [ -s css_list.txt ]; then
             mkdir -p dist/css
             cat $(cat css_list.txt) > dist/css/all.css
+            
+            # ★ 核心修复：把所有的 ../ 路径强行改成绝对根路径 /
+            # 这样 Android 的 WebView 拦截器才能正确识别并加载背景图
             sed -i 's|\.\./|/|g' dist/css/all.css
+            
             lightningcss --minify dist/css/all.css -o dist/css/all.css
           fi
           rm -f css_list.txt
 
+          # ==========================
+          # 处理 JS（保留在 js 目录中）
+          # ==========================
           grep -oP '(?<=<script src=")[^"]+' index.html | sed 's/?[^ ]*//g' | grep -E '^(js/|add/)' > js_list.txt
           if [ -s js_list.txt ]; then
             mkdir -p dist/js
             cat $(cat js_list.txt) > dist/js/all.js
-            terser dist/js/all.js -c "pure_funcs=['console.log','console.debug']" -m -o dist/js/all.js
+            terser dist/js/all.js -c drop_console=true -m -o dist/js/all.js
           fi
           rm -f js_list.txt
 
+          # ==========================
+          # 修改 index.html 并放入导出目录
+          # ==========================
           cp index.html dist/index.html
-
+          
+          # 删掉原本的 css 和 js 引入，替换为合并后的路径
           sed -i -E 's#<link rel="stylesheet" href="(css/|add/)[^"]*">##g' dist/index.html
           sed -i 's#</head>#<link rel="stylesheet" href="css/all.css">\n</head>#' dist/index.html
-
+          
           sed -i -E 's#<script src="(js/|add/)[^"]*"[^>]*></script>##g' dist/index.html
-          sed -i 's#</body>#<script src="js/all.js" defer></script>\n</body>#' dist/index.html
+          sed -i 's#</body>#<script src="js/all.js"></script>\n</body>#' dist/index.html
 
+          # 4. 精准拷贝文件
           cp manifest.webmanifest sw.js dist/
           rsync -av 背景 卡牌 图标 字体 dist/
 
-      - name: 提取并内联关键 CSS（官方 Node API）
-        run: |
-          cat > critical-run.mjs <<'EOF'
-          const { generate } = await import('critical');
+      # ===== 新增：Node 使用当前 LTS（critical v9 要求 ≥22.13） =====
+      - name: 设置 Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
 
-          generate({
-            inline: true,
-            base: 'dist/',
-            src: 'index.html',
-            engine: 'static',
-            ignore: {
-              rule: [
-                /^#battle/, /^#deck/, /^#map/, /^#tour/,
-                /^#master/, /^#academy/, /^#boss/, /^#runpanel/,
-                /^#modal/, /^#toast/, /^body:has/
-              ]
-            }
-          })
-          .then(() => console.log('critical done'))
-          .catch((e) => { console.error(e); process.exit(1); });
-          EOF
-          node critical-run.mjs
+      # ===== 新增：安装 critical v9 =====
+      - name: 安装 critical v9
+        run: npm install critical@9 --no-save
 
-      - name: 非关键 CSS 改为异步加载
+      # ===== 新增：加 data-critical-fold 后内联关键 CSS =====
+      - name: 内联关键 CSS（只提取 #menu 子树）
         run: |
-          node -e "
-            const fs = require('fs');
-            const p = 'dist/index.html';
-            let s = fs.readFileSync(p, 'utf8');
-            s = s.replace(/<link[^>]*href=[\"']css\/all\.css[\"'][^>]*>\s*/gi, '');
-            const asyncLink = '<link rel=\"preload\" href=\"css/all.css\" as=\"style\" onload=\"this.onload=null;this.rel=\\'stylesheet\\'\"><noscript><link rel=\"stylesheet\" href=\"css/all.css\"></noscript>';
-            s = s.replace('</head>', asyncLink + '</head>');
-            fs.writeFileSync(p, s);
-            console.log('all.css 已统一为异步加载');
-          "
+          cd dist
+          sed -i 's#<div id="menu">#<div id="menu" data-critical-fold>#' index.html
+          grep -q 'data-critical-fold' index.html || { echo 'data-critical-fold 未加上'; exit 1; }
+          npx critical index.html --inline --write --engine static
+          npx critical index.html --engine static --explain 2>&1 | tail -8
 
       - name: 上传前端打包产物
         uses: actions/upload-artifact@v4
