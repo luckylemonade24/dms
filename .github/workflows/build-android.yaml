@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: 检出代码
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       # 1. 先清理：只留安卓工程和必要脚本
       - name: 清理仓库，只保留必需文件
@@ -20,7 +20,7 @@ jobs:
 
       # 2. 拉取前端产物到 assets/www
       - name: 下载最新的前端构建产物
-        uses: dawidd6/action-download-artifact@v6
+        uses: dawidd6/action-download-artifact@v28
         with:
           workflow: build-web.yaml
           name: Web-Production-Build
@@ -28,7 +28,7 @@ jobs:
           if_no_artifact_found: fail
 
       - name: 设置 Node.js (用于 sharp 生成图标)
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
 
@@ -39,18 +39,18 @@ jobs:
         run: node gen-android-icon.js
 
       - name: 设置 JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: '17'
 
       - name: 设置 Gradle 9.8.2
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: 9.8.2
 
       - name: 设置 Gradle 缓存
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.gradle/caches
