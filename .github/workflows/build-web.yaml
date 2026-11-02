@@ -11,40 +11,13 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 获取 Playwright 版本
-        id: pw-version
-        run: |
-          PW_VERSION=$(npm view playwright@latest version 2>/dev/null || echo "latest")
-          echo "version=$PW_VERSION" >> $GITHUB_OUTPUT
-          echo "Playwright version: $PW_VERSION"
-
-      - name: 缓存 Playwright Chromium
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ steps.pw-version.outputs.version }}
-
-      - name: 安装构建工具与 Playwright
-        run: |
-          npm install -g terser lightningcss-cli critical
-          npm install -g playwright
-
-      - name: 安装 Playwright Chromium 及系统依赖
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-
-      - name: 安装系统依赖（缓存命中时）
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+      - name: 安装压缩工具
+        run: npm install -g terser lightningcss-cli critical
 
       - name: 合并压缩并生成纯净导出
         run: |
           mkdir -p dist
 
-          # ==========================
-          # 处理 CSS（保留在 css 目录中）
-          # ==========================
           grep -oP '(?<=<link rel="stylesheet" href=")[^"]+' index.html | sed 's/?[^ ]*//g' | grep -E '^(css/|add/)' > css_list.txt
           if [ -s css_list.txt ]; then
             mkdir -p dist/css
@@ -54,9 +27,6 @@ jobs:
           fi
           rm -f css_list.txt
 
-          # ==========================
-          # 处理 JS（保留在 js 目录中）
-          # ==========================
           grep -oP '(?<=<script src=")[^"]+' index.html | sed 's/?[^ ]*//g' | grep -E '^(js/|add/)' > js_list.txt
           if [ -s js_list.txt ]; then
             mkdir -p dist/js
@@ -65,9 +35,6 @@ jobs:
           fi
           rm -f js_list.txt
 
-          # ==========================
-          # 修改 index.html 并放入导出目录
-          # ==========================
           cp index.html dist/index.html
 
           sed -i -E 's#<link rel="stylesheet" href="(css/|add/)[^"]*">##g' dist/index.html
@@ -79,10 +46,24 @@ jobs:
           cp manifest.webmanifest sw.js dist/
           rsync -av 背景 卡牌 图标 字体 dist/
 
-      - name: 提取并内联关键 CSS（render 引擎）
+      - name: 提取并内联关键 CSS
         run: |
           cd dist
-          critical index.html --inline --write --engine render --dimensions "390x844,1300x900"
+          critical index.html --inline --write --engine static \
+            --ignore "^#battle|^#deck|^#map|^#tour|^#master|^#academy|^#boss|^#runpanel|^#modal|^#toast|^body:has"
+
+      - name: 非关键 CSS 改为异步加载
+        run: |
+          node -e "
+            const fs = require('fs');
+            const p = 'dist/index.html';
+            let s = fs.readFileSync(p, 'utf8');
+            s = s.replace(/<link[^>]*href=[\"']css\/all\.css[\"'][^>]*>\s*/gi, '');
+            const asyncLink = '<link rel=\"preload\" href=\"css/all.css\" as=\"style\" onload=\"this.onload=null;this.rel=\\'stylesheet\\'\"><noscript><link rel=\"stylesheet\" href=\"css/all.css\"></noscript>';
+            s = s.replace('</head>', asyncLink + '</head>');
+            fs.writeFileSync(p, s);
+            console.log('all.css 已统一为异步加载');
+          "
 
       - name: 上传前端打包产物
         uses: actions/upload-artifact@v4
