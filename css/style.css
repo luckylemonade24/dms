@@ -4,6 +4,7 @@
 @font-face {
   font-family: 'fusion';
   src: url('../字体/fusion-pixel-12px-proportional-zh_hans.otf.woff2') format('woff2');
+  font-display: swap;
 }
 :root {
   --bg: #141414; --panel: #232323; --panel2: #2c2c2c; --line: #3d3d3d;
