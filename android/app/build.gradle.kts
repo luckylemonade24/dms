@@ -14,10 +14,23 @@ android {
         minSdk = 24
         targetSdk = 37
         versionCode = 1
-        versionName = appVersionName // ★ 2. 使用变量
+        versionName = appVersionName
 
         ndk {
             abiFilters.add("arm64-v8a")
+        }
+    }
+
+    // ★ 新增：读取 GitHub 环境变量里的签名信息
+    signingConfigs {
+        create("release") {
+            storeFile = file("release.p12")
+            storePassword = System.getenv("KEY_STORE_PASSWORD")
+            keyAlias = System.getenv("ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
+            enableV1Signing = false
+            enableV2Signing = true
+            enableV3Signing = true
         }
     }
 
@@ -25,7 +38,8 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("debug")
+            // ★ 换成 release 签名，不再用 debug
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
