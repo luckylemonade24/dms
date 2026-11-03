@@ -23,6 +23,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
+            // ★ 必须加这一行，你的 proguard-rules.pro 才会生效
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -34,5 +35,5 @@ android {
 }
 
 dependencies {
-    // 空空如也，彻底干掉 androidx 和 Kotlin
+    implementation("androidx.webkit:webkit:1.12.1")
 }
