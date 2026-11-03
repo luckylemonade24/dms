@@ -55,16 +55,21 @@ jobs:
             mv android/app/src/main/java/MainActivity.java android/app/src/main/java/$PKG_DIR/MainActivity.java
           fi
 
+      # ★ 新增：解码签名文件并构建
       - name: 构建 Android 项目
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS: ${{ secrets.ALIAS }}
         run: |
           cd android
+          echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > app/release.p12
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
           gradle assembleRelease
 
       - name: 读取版本名（打 Tag 用）
         id: ver
         run: |
-          # 抓取 build.gradle.kts 顶部的变量
           V=$(grep -oP 'val appVersionName\s*=\s*"\K[^"]+' android/app/build.gradle.kts)
           echo "version=$V" >> $GITHUB_OUTPUT
 
