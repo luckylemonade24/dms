@@ -33,17 +33,12 @@ android {
     }
 }
 
-// ★ 纯正 AGP 9 重命名：不写默认值，只拼游戏名和真实版本号
+// ★ AGP 9 终极纯净版：没有 if 判断，直接筛选 release 变体修改名字
 androidComponents {
-    onVariants { variant ->
-        if (variant.buildType == "release") {
-            val vName = variant.versionName.get()
-            
-            variant.outputs.forEach { output ->
-                if (output is com.android.build.api.variant.impl.VariantOutputImpl) {
-                    output.outputFileName.set("DungeonDuelist-${vName}.apk")
-                }
-            }
+    onVariants(selector().withBuildType("release")) { variant ->
+        variant.outputs.forEach { output ->
+            val vName = output.versionName
+            (output as com.android.build.api.variant.impl.VariantOutputImpl).outputFileName.set("DungeonDuelist-${vName}.apk")
         }
     }
 }
