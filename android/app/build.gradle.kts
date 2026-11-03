@@ -23,7 +23,6 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
-            // ★ 必须加这一行，你的 proguard-rules.pro 才会生效
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -31,6 +30,21 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+// ★ 纯正 AGP 9 重命名：不写默认值，只拼游戏名和真实版本号
+androidComponents {
+    onVariants { variant ->
+        if (variant.buildType == "release") {
+            val vName = variant.versionName.get()
+            
+            variant.outputs.forEach { output ->
+                if (output is com.android.build.api.variant.impl.VariantOutputImpl) {
+                    output.outputFileName.set("DungeonDuelist-${vName}.apk")
+                }
+            }
+        }
     }
 }
 
