@@ -22,11 +22,11 @@ import android.webkit.*;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.webkit.WebViewAssetLoader;
-
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLDecoder;
 
 public class MainActivity extends Activity {
     private WebView webView;
@@ -103,24 +103,49 @@ public class MainActivity extends Activity {
                 }
             }, "AndroidScreen");
 
-            final WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
-                    .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
-                    .build();
-
             webView.setWebViewClient(new WebViewClient() {
                 @Override
                 public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     Uri url = request.getUrl();
                     if (url == null) return null;
                     String urlStr = url.toString();
-                    if (urlStr.startsWith("https://appassets.androidplatform.net/") && !urlStr.contains("/assets/")) {
-                        String newUrlStr = urlStr.replace(
-                                "https://appassets.androidplatform.net/",
-                                "https://appassets.androidplatform.net/assets/www/"
-                        );
-                        return assetLoader.shouldInterceptRequest(Uri.parse(newUrlStr));
+
+                    // ★ 核心：复刻原版的虚拟域名拦截
+                    if (urlStr.startsWith("https://appassets.androidplatform.net/")) {
+                        String path = urlStr.replace("https://appassets.androidplatform.net/", "");
+
+                        // 原代码逻辑：如果不包含 /assets/，强行加上 /assets/www/
+                        if (!path.contains("/assets/")) {
+                            path = "assets/www/" + path;
+                        }
+
+                        // 去掉可能带的 ?v=123 参数
+                        if (path.contains("?")) {
+                            path = path.substring(0, path.indexOf("?"));
+                        }
+
+                        // 默认返回 index.html
+                        if (path.isEmpty() || path.endsWith("/")) {
+                            path += "index.html";
+                        }
+
+                        try {
+                            // 去掉开头的 assets/
+                            if (path.startsWith("assets/")) {
+                                path = path.substring(7);
+                            }
+                            // 进行 URL 解码，防止中文路径（如 /卡牌/xxx.png）找不到
+                            path = URLDecoder.decode(path, "UTF-8");
+
+                            InputStream is = getAssets().open(path);
+                            String mimeType = getMimeType(path);
+                            return new WebResourceResponse(mimeType, "UTF-8", is);
+                        } catch (Exception e) {
+                            // 文件不存在，返回空交由系统处理或抛出 404
+                            return null;
+                        }
                     }
-                    return assetLoader.shouldInterceptRequest(url);
+                    return null; // 其他请求走正常网络
                 }
 
                 @Override
@@ -132,9 +157,8 @@ public class MainActivity extends Activity {
                 public void onPageFinished(WebView view, String url) {
                     super.onPageFinished(view, url);
                     
-                    // 3. 注入 JS：拦截全屏 API，防止 WebView 黑屏
+                    // 3. 注入 JS：拦截全屏 API，防止 WebView 黑屏 (和你原来一模一样)
                     String js = "(function() {" +
-                            // 拦截 Blob 导出
                             "  const originalClick = HTMLAnchorElement.prototype.click;" +
                             "  HTMLAnchorElement.prototype.click = function() {" +
                             "    if (this.download && this.href && this.href.startsWith('blob:')) {" +
@@ -151,8 +175,6 @@ public class MainActivity extends Activity {
                             "    }" +
                             "    return originalClick.apply(this, arguments);" +
                             "  };" +
-                            
-                            // ★ 核心修复：劫持 requestFullscreen 避免原生全屏黑屏
                             "  var isFakeFullscreen = false;" +
                             "  Object.defineProperty(document, 'fullscreenElement', {" +
                             "    get: function() { return isFakeFullscreen ? document.documentElement : null; }," +
@@ -242,6 +264,22 @@ public class MainActivity extends Activity {
             tv.setPadding(50, 100, 50, 50);
             setContentView(tv);
         }
+    }
+
+    // ★ 补全：手动判断文件 MIME 类型
+    private String getMimeType(String url) {
+        if (url.endsWith(".html")) return "text/html";
+        if (url.endsWith(".js")) return "application/javascript";
+        if (url.endsWith(".css")) return "text/css";
+        if (url.endsWith(".png")) return "image/png";
+        if (url.endsWith(".jpg") || url.endsWith(".jpeg")) return "image/jpeg";
+        if (url.endsWith(".webp")) return "image/webp";
+        if (url.endsWith(".svg")) return "image/svg+xml";
+        if (url.endsWith(".woff2")) return "font/woff2";
+        if (url.endsWith(".json")) return "application/json";
+        if (url.endsWith(".mp3")) return "audio/mpeg";
+        if (url.endsWith(".mp4")) return "video/mp4";
+        return "application/octet-stream";
     }
 
     @Override
