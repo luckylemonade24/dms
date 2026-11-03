@@ -7,18 +7,16 @@ jobs:
   build-android:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # 必须加，否则无法发布 Release
+      contents: write
 
     steps:
       - name: 检出代码
         uses: actions/checkout@v6
 
-      # 1. 先清理：只留安卓工程和必要脚本
-      - name: 清理仓库，只保留必需文件
+      - name: 清理仓库，只保留安卓工程
         run: |
-          find . -maxdepth 1 -mindepth 1 ! -name 'android' ! -name 'gen-android-icon.js' ! -name 'package.json' ! -name '图标' -exec rm -rf {} +
+          find . -maxdepth 1 -mindepth 1 ! -name 'android' -exec rm -rf {} +
 
-      # 2. 拉取前端产物到 assets/www
       - name: 下载最新的前端构建产物
         uses: dawidd6/action-download-artifact@v28
         with:
@@ -26,17 +24,6 @@ jobs:
           name: Web-Production-Build
           path: android/app/src/main/assets/www
           if_no_artifact_found: fail
-
-      - name: 设置 Node.js (用于 sharp 生成图标)
-        uses: actions/setup-node@v7
-        with:
-          node-version: 'lts/*'
-
-      - name: 安装依赖 (sharp)
-        run: npm install
-
-      - name: 生成安卓图标
-        run: node gen-android-icon.js
 
       - name: 设置 JDK 17
         uses: actions/setup-java@v6
@@ -74,30 +61,14 @@ jobs:
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
           gradle assembleRelease
 
-      # ==========================================
-      # 3. 读取版本号并统一重命名 APK
-      # ==========================================
-      - name: 读取版本号
-        id: ver
-        run: |
-          V=$(jq -r '.version' package.json)
-          echo "version=$V" >> $GITHUB_OUTPUT
-
-      - name: 重命名 APK
-        run: |
-          # 把默认的 app-release.apk 改名为 DungeonDuelist-版本号.apk
-          mv android/app/build/outputs/apk/release/app-release.apk android/app/build/outputs/apk/release/DungeonDuelist-${{ steps.ver.outputs.version }}.apk
-
-      # ==========================================
-      # 4. 直接发布到 Release 草稿
-      # ==========================================
       - name: 发布 Release 草稿
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: v${{ steps.ver.outputs.version }}
-          name: v${{ steps.ver.outputs.version }}
+          # Tag 直接去抓产物里的版本号，不瞎编
+          tag_name: v${{ env.APP_VERSION }}
+          name: v${{ env.APP_VERSION }}
           draft: true
           files: |
-            android/app/build/outputs/apk/release/DungeonDuelist-${{ steps.ver.outputs.version }}.apk
+            android/app/build/outputs/apk/release/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
