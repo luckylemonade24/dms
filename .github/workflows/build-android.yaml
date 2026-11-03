@@ -61,12 +61,18 @@ jobs:
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
           gradle assembleRelease
 
+      - name: 读取版本名（打 Tag 用）
+        id: ver
+        run: |
+          # 抓取 build.gradle.kts 顶部的变量
+          V=$(grep -oP 'val appVersionName\s*=\s*"\K[^"]+' android/app/build.gradle.kts)
+          echo "version=$V" >> $GITHUB_OUTPUT
+
       - name: 发布 Release 草稿
         uses: softprops/action-gh-release@v3
         with:
-          # Tag 直接去抓产物里的版本号，不瞎编
-          tag_name: v${{ env.APP_VERSION }}
-          name: v${{ env.APP_VERSION }}
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: v${{ steps.ver.outputs.version }}
           draft: true
           files: |
             android/app/build/outputs/apk/release/*.apk
