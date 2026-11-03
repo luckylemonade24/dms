@@ -7,11 +7,10 @@
     { json: '卡牌/texture-1.json', image: '卡牌/texture-1.webp' },
   ];
 
-  const index = {};
-  const indexByName = new Map();   // basename -> path，O(1) 查找
+  const index = {}; // 现在直接以纯名字为 key，例如 { "飞刀": {...}, "卡背2": {...} }
   const atlasImgs = {};
   const pending = [];
-  const pendingUpdate = new Set(); // 待批量更新的 img
+  const pendingUpdate = new Set();
   let rafScheduled = false;
   let ready = false;
   let observerStarted = false;
@@ -20,7 +19,6 @@
 
   const srcDesc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
 
-  // ===== 透明占位图（SVG 264x375，字符串短）=====
   const TRANSPARENT_CARD =
     'data:image/svg+xml,' +
     encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="264" height="375"></svg>');
@@ -30,7 +28,6 @@
     return typeof s === 'string' && ATLAS_PATH_RE.test(s);
   }
 
-  // ===== HTML 字符串改写：把卡牌 img 的 src 提前换成透明图 =====
   const IMG_SRC_RE =
     /(<img\b[^>]*?\ssrc\s*=\s*)(["'])([^"']*?卡牌\/高清卡\/[^"']*?详情\.png)\2/gi;
   function rewriteHTML(html) {
@@ -40,7 +37,6 @@
     });
   }
 
-  // ===== hook innerHTML =====
   const origInnerHTMLDesc = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
   if (origInnerHTMLDesc && origInnerHTMLDesc.set) {
     Object.defineProperty(Element.prototype, 'innerHTML', {
@@ -50,13 +46,11 @@
     });
   }
 
-  // ===== hook insertAdjacentHTML =====
   const origInsertAdjacentHTML = Element.prototype.insertAdjacentHTML;
   Element.prototype.insertAdjacentHTML = function (pos, html) {
     return origInsertAdjacentHTML.call(this, pos, rewriteHTML(html));
   };
 
-  // ===== hook setAttribute =====
   const origSetAttribute = Element.prototype.setAttribute;
   Element.prototype.setAttribute = function (name, value) {
     if (this.tagName === 'IMG' && String(name).toLowerCase() === 'src' && isAtlasPath(value)) {
@@ -66,7 +60,6 @@
     return origSetAttribute.call(this, name, value);
   };
 
-  // ===== 正确尺寸透明图（SVG 拼接，无同步编码成本）=====
   const transCache = {};
   function getTransparent(w, h) {
     const k = w + 'x' + h;
@@ -78,7 +71,6 @@
     return svg;
   }
 
-  // ===== fetch + blob URL 加载图集 =====
   async function loadAtlasImage(url) {
     const r = await fetch(url, { cache: 'no-cache' });
     if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + url);
@@ -105,17 +97,17 @@
       }));
 
       for (const { a, json, img, blobUrl } of results) {
-        const aw = json.meta.size.w, ah = json.meta.size.h;
+        const aw = json.m[0], ah = json.m[1];
+        const dw = json.d[0], dh = json.d[1];
         atlasImgs[blobUrl] = img;
-        for (const [path, data] of Object.entries(json.frames)) {
-          const f = data.frame;
-          index[path] = { atlasUrl: blobUrl, x: f.x, y: f.y, w: f.w, h: f.h, atlasW: aw, atlasH: ah };
 
-          const name = path.slice(path.lastIndexOf('/') + 1);
-          if (indexByName.has(name) && indexByName.get(name) !== path) {
-            console.warn('[atlas-hook] ⚠️ 文件名重复:', name, '旧:', indexByName.get(name), '新:', path);
-          }
-          indexByName.set(name, path);
+        for (const item of json.f) {
+          const name = item[0];
+          const x = item[1], y = item[2];
+          const w = item.length > 3 ? item[3] : dw;
+          const h = item.length > 3 ? item[4] : dh;
+          
+          index[name] = { atlasUrl: blobUrl, x, y, w, h, atlasW: aw, atlasH: ah };
         }
         console.log('[atlas-hook] loaded', a.image);
       }
@@ -131,17 +123,18 @@
     }
   }
 
-  // O(1)：basename 走 Map
   function findKey(v) {
     if (!v || typeof v !== 'string') return null;
     if (v.indexOf('data:') === 0 || v.indexOf('blob:') === 0) return null;
     let dec;
     try { dec = decodeURIComponent(v); } catch (e) { dec = v; }
-    const name = dec.slice(dec.lastIndexOf('/') + 1);
-    return indexByName.get(name) || null;
+    
+    // 剥离路径和 query 参数，提取纯名字
+    dec = dec.split('?')[0];
+    const name = dec.split('/').pop().replace(/详情\.png$/i, '');
+    return index[name] ? name : null;
   }
 
-  // ===== 批量更新：收集 → 一帧内统一读、统一写 =====
   const ro = (typeof ResizeObserver !== 'undefined')
     ? new ResizeObserver(entries => {
         for (const e of entries) {
@@ -169,7 +162,6 @@
     pendingUpdate.clear();
     if (!imgs.length) return;
 
-    // 阶段 1：批量读（一次 layout）
     const inputs = [];
     for (const img of imgs) {
       const f = img._atlasFrame;
@@ -184,7 +176,6 @@
       });
     }
 
-    // 阶段 2：批量写（一次 style recalc）
     for (const it of inputs) applyBackground(it);
   }
 
@@ -238,8 +229,8 @@
     img._atlasKey = key;
     img._rawSrc = originalSrc;
     img._atlasFrame = f;
-    srcDesc.set.call(img, getTransparent(f.w, f.h)); // 同步设透明图，不回源
-    scheduleAtlasUpdate(img);                        // 背景样式入队，下一帧统一应用
+    srcDesc.set.call(img, getTransparent(f.w, f.h));
+    scheduleAtlasUpdate(img);
   }
 
   function applyNormal(img, src) {
