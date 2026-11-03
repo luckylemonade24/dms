@@ -2,6 +2,9 @@ plugins {
     id("com.android.application")
 }
 
+// ★ 1. 在顶部定义版本变量
+val appVersionName = "0.1.0"
+
 android {
     namespace = "com.ddm.jn1"
     compileSdk = 37
@@ -9,9 +12,9 @@ android {
     defaultConfig {
         applicationId = "com.ddm.jn1"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 37
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = appVersionName // ★ 2. 使用变量
 
         ndk {
             abiFilters.add("arm64-v8a")
@@ -33,12 +36,10 @@ android {
     }
 }
 
-// ★ AGP 9 终极纯净版：没有 if 判断，直接筛选 release 变体修改名字
 androidComponents {
     onVariants(selector().withBuildType("release")) { variant ->
         variant.outputs.forEach { output ->
-            val vName = output.versionName
-            (output as com.android.build.api.variant.impl.VariantOutputImpl).outputFileName.set("DungeonDuelist-${vName}.apk")
+            (output as com.android.build.api.variant.impl.VariantOutputImpl).outputFileName.set("DungeonDuelist-${appVersionName}.apk")
         }
     }
 }
