@@ -207,6 +207,29 @@ jobs:
           npx critical index.html --inline --write --engine static
           npx critical index.html --engine static --explain 2>&1 | tail -8
 
+      # ★ 新增：压缩 HTML（严格使用你勾选的参数，绝不碰 Minify CSS/JS）
+      - name: 压缩 HTML
+        run: |
+          npm install -g html-minifier-terser
+          
+          html-minifier-terser \
+            --remove-attribute-quotes \
+            --remove-comments \
+            --remove-empty-attributes \
+            --remove-optional-tags \
+            --remove-redundant-attributes \
+            --remove-script-type-attributes \
+            --remove-style-link-type-attributes \
+            --remove-tag-whitespace \
+            --trim-custom-fragments \
+            --use-short-doctype \
+            --collapse-whitespace \
+            --decode-entities \
+            --html5 \
+            --process-conditional-comments \
+            --collapse-boolean-attributes \
+            dist/index.html -o dist/index.html
+
       - name: 上传前端打包产物
         uses: actions/upload-artifact@v7
         with:
