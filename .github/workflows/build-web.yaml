@@ -11,6 +11,20 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v7
 
+      - name: 设置 Node.js LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+
+      # ★ 新增：缓存 NPM 的下载包，加速全局安装
+      - name: 缓存 NPM
+        uses: actions/cache@v6
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json', '**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
       - name: 安装官方压缩工具
         run: |
           npm install -g terser lightningcss-cli
@@ -133,6 +147,15 @@ jobs:
         with:
           python-version: '3.13'
 
+      # ★ 新增：缓存 Pip 的下载包
+      - name: 缓存 pip
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: 安装 fonttools
         run: pip install fonttools brotli
 
@@ -191,11 +214,6 @@ jobs:
               print('✅ 已清理旧的原始字体')
           PY
 
-      - name: 设置 Node.js LTS
-        uses: actions/setup-node@v7
-        with:
-          node-version: 'lts/*'
-
       - name: 安装 critical v9
         run: npm install critical@9 --no-save
 
@@ -207,20 +225,15 @@ jobs:
           npx critical index.html --inline --write --engine static
           npx critical index.html --engine static --explain 2>&1 | tail -8
 
-      # ★ 新增：彻底消除 CSS 渲染阻塞（魔法就在这里）
+      # ★ 彻底消除 CSS 渲染阻塞
       - name: 将 all.css 改为异步加载
         run: |
           node -e "
             const fs = require('fs');
             let html = fs.readFileSync('dist/index.html', 'utf8');
             
-            // 匹配 critical 生成的那个阻塞版 link，替换为异步版
-            // 兼容属性带不带引号、顺序如何
             html = html.replace(/<link[^>]*href=[\"']?css\/all\.css[\"']?[^>]*>/gi, (match) => {
-              // 如果已经是 preload，就放过它（让浏览器提前下）
               if (match.includes('preload')) return match;
-              
-              // 把阻塞的 stylesheet 替换为异步加载代码
               return '<link rel=\"stylesheet\" href=\"css/all.css\" media=\"print\" onload=\"this.media=\\'all\\'\"><noscript><link rel=\"stylesheet\" href=\"css/all.css\"></noscript>';
             });
             
@@ -228,7 +241,6 @@ jobs:
             console.log('✅ 已将 all.css 改为异步加载，彻底消除渲染阻塞');
           "
 
-      # ★ 压缩 HTML（严格使用你勾选的参数，绝不碰 Minify CSS/JS）
       - name: 压缩 HTML
         run: |
           npm install -g html-minifier-terser
