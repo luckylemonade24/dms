@@ -14,14 +14,12 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v7
 
-      # 1. 先清理：只留下 e 骨架，不再保留 server！
       - name: 清理仓库，只保留必需文件
         shell: pwsh
         run: |
           $keep = @("main.js", "package.json", "gen-icon.js")
           Get-ChildItem -Force | Where-Object { $keep -notcontains $_.Name } | Remove-Item -Recurse -Force
 
-      # 2. 拉取前端产物到根目录
       - name: 下载最新的前端构建产物
         uses: dawidd6/action-download-artifact@v28
         with:
@@ -30,44 +28,44 @@ jobs:
           path: .
           if_no_artifact_found: fail
 
-      # ==========================================
-      # ★ 修改区：真正独立分离的缓存
-      # ==========================================
+      # ★ 1. 查版本（HTTP 请求，1秒内完成）
       - name: 获取 Electron 实际版本
         id: ev
         shell: pwsh
         run: |
-          # 动态去 NPM 查 latest 对应的真实版本号（例如 35.2.0）
-          $v = npm view electron version
-          if ([string]::IsNullOrWhiteSpace($v)) { $v = "latest" }
+          try {
+            $response = Invoke-RestMethod -Uri "https://registry.npmjs.org/electron/latest" -UseBasicParsing
+            $v = $response.version
+            if ([string]::IsNullOrWhiteSpace($v)) { throw "empty" }
+          } catch {
+            $v = "latest"
+          }
           echo "ver=$v" >> $env:GITHUB_OUTPUT
 
+      # ★ 2. 缓存 Electron
       - name: 缓存 Electron 依赖
         uses: actions/cache@v6
         with:
           path: |
-            ~\AppData\Local\electron\Cache
-            ~\AppData\Local\electron-builder\Cache
-          # Electron 专属缓存：只认查出来的真实版本号
+            C:\Users\runneradmin\AppData\Local\electron\Cache
+            C:\Users\runneradmin\AppData\Local\electron-builder\Cache
           key: ${{ runner.os }}-electron-cache-${{ steps.ev.outputs.ver }}
           restore-keys: |
             ${{ runner.os }}-electron-cache-
 
+      # ★ 3. 缓存 NPM（修正了真实路径 C:\npm\cache）
       - name: 缓存 NPM 依赖
         uses: actions/cache@v6
         with:
-          path: ~\AppData\Local\npm-cache
-          # NPM 专属缓存：认 package.json 的 hash
+          path: C:\npm\cache
           key: ${{ runner.os }}-npm-cache-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-cache-
-      # ==========================================
 
       - name: 设置 Node.js
         uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
-          # ★ 彻底删掉了 cache: 'npm'，防止因为找不到 lock 文件报错
 
       - name: 安装依赖
         run: npm install
