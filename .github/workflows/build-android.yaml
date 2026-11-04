@@ -55,7 +55,12 @@ jobs:
             mv android/app/src/main/java/MainActivity.java android/app/src/main/java/$PKG_DIR/MainActivity.java
           fi
 
-      # ★ 新增：解码签名文件并构建
+      # ★ 唯一新增：打印依赖树
+      - name: 打印依赖树
+        run: |
+          cd android
+          gradle app:dependencies --configuration releaseRuntimeClasspath
+
       - name: 构建 Android 项目
         env:
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
