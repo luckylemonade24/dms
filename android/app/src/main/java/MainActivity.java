@@ -16,17 +16,16 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.*;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.webkit.WebViewAssetLoader;
-
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLDecoder;
 
 public class MainActivity extends Activity {
     private WebView webView;
@@ -37,8 +36,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // ★ 移除原本强制隐藏状态栏的代码，让状态栏正常显示
+        // requestWindowFeature(Window.FEATURE_NO_TITLE);
+        // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, ...);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         try {
@@ -91,7 +91,7 @@ public class MainActivity extends Activity {
                 }
             }, "AndroidSaver");
 
-            // 2. 屏幕旋转接口
+            // 2. 屏幕旋转与全屏接口
             webView.addJavascriptInterface(new Object() {
                 @android.webkit.JavascriptInterface
                 public void setLandscape() {
@@ -101,26 +101,65 @@ public class MainActivity extends Activity {
                 public void setPortrait() {
                     runOnUiThread(() -> setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
                 }
+                // ★ 新增：控制状态栏显示隐藏
+                @android.webkit.JavascriptInterface
+                public void setFullscreen(boolean isFullscreen) {
+                    runOnUiThread(() -> {
+                        if (isFullscreen) {
+                            // 隐藏状态栏和导航栏，进入沉浸式全屏
+                            getWindow().getDecorView().setSystemUiVisibility(
+                                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            );
+                        } else {
+                            // 恢复显示状态栏
+                            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+                        }
+                    });
+                }
             }, "AndroidScreen");
 
-            final WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
-                    .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
-                    .build();
-
             webView.setWebViewClient(new WebViewClient() {
+                // ★ 纯原生拦截器替换 WebViewAssetLoader
                 @Override
                 public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     Uri url = request.getUrl();
                     if (url == null) return null;
                     String urlStr = url.toString();
-                    if (urlStr.startsWith("https://appassets.androidplatform.net/") && !urlStr.contains("/assets/")) {
-                        String newUrlStr = urlStr.replace(
-                                "https://appassets.androidplatform.net/",
-                                "https://appassets.androidplatform.net/assets/www/"
-                        );
-                        return assetLoader.shouldInterceptRequest(Uri.parse(newUrlStr));
+
+                    if (urlStr.startsWith("https://appassets.androidplatform.net/")) {
+                        String path = urlStr.replace("https://appassets.androidplatform.net/", "");
+
+                        // 路径补全
+                        if (!path.contains("/assets/")) {
+                            path = "assets/www/" + path;
+                        }
+                        // 去参数
+                        if (path.contains("?")) {
+                            path = path.substring(0, path.indexOf("?"));
+                        }
+                        // 默认首页
+                        if (path.isEmpty() || path.endsWith("/")) {
+                            path += "index.html";
+                        }
+
+                        try {
+                            // 去掉前缀
+                            if (path.startsWith("assets/")) {
+                                path = path.substring(7);
+                            }
+                            // ★ 核心修复：中文解码
+                            path = URLDecoder.decode(path, "UTF-8");
+
+                            InputStream is = getAssets().open(path);
+                            // ★ 核心修复：返回正确的 MIME 类型
+                            return new WebResourceResponse(getMimeType(path), null, is);
+                        } catch (Exception e) {
+                            return null; // 找不到返回 null，交给 WebView 处理
+                        }
                     }
-                    return assetLoader.shouldInterceptRequest(url);
+                    return null;
                 }
 
                 @Override
@@ -134,7 +173,6 @@ public class MainActivity extends Activity {
                     
                     // 3. 注入 JS：拦截全屏 API，防止 WebView 黑屏
                     String js = "(function() {" +
-                            // 拦截 Blob 导出
                             "  const originalClick = HTMLAnchorElement.prototype.click;" +
                             "  HTMLAnchorElement.prototype.click = function() {" +
                             "    if (this.download && this.href && this.href.startsWith('blob:')) {" +
@@ -151,8 +189,6 @@ public class MainActivity extends Activity {
                             "    }" +
                             "    return originalClick.apply(this, arguments);" +
                             "  };" +
-                            
-                            // ★ 核心修复：劫持 requestFullscreen 避免原生全屏黑屏
                             "  var isFakeFullscreen = false;" +
                             "  Object.defineProperty(document, 'fullscreenElement', {" +
                             "    get: function() { return isFakeFullscreen ? document.documentElement : null; }," +
@@ -164,7 +200,10 @@ public class MainActivity extends Activity {
                             "  });" +
                             "  Element.prototype.requestFullscreen = function() {" +
                             "    isFakeFullscreen = true;" +
-                            "    if (window.AndroidScreen) window.AndroidScreen.setLandscape();" +
+                            "    if (window.AndroidScreen) {" +
+                            "        window.AndroidScreen.setLandscape();" +
+                            "        window.AndroidScreen.setFullscreen(true);" + // 进入全屏隐藏状态栏
+                            "    }" +
                             "    document.dispatchEvent(new Event('fullscreenchange'));" +
                             "    document.dispatchEvent(new Event('webkitfullscreenchange'));" +
                             "    return Promise.resolve();" +
@@ -172,7 +211,10 @@ public class MainActivity extends Activity {
                             "  Element.prototype.webkitRequestFullscreen = Element.prototype.requestFullscreen;" +
                             "  document.exitFullscreen = function() {" +
                             "    isFakeFullscreen = false;" +
-                            "    if (window.AndroidScreen) window.AndroidScreen.setPortrait();" +
+                            "    if (window.AndroidScreen) {" +
+                            "        window.AndroidScreen.setPortrait();" +
+                            "        window.AndroidScreen.setFullscreen(false);" + // 退出全屏显示状态栏
+                            "    }" +
                             "    document.dispatchEvent(new Event('fullscreenchange'));" +
                             "    document.dispatchEvent(new Event('webkitfullscreenchange'));" +
                             "    return Promise.resolve();" +
@@ -242,6 +284,20 @@ public class MainActivity extends Activity {
             tv.setPadding(50, 100, 50, 50);
             setContentView(tv);
         }
+    }
+
+    // ★ 补全 MIME 类型判断，防止白屏
+    private String getMimeType(String url) {
+        if (url.endsWith(".html")) return "text/html";
+        if (url.endsWith(".js")) return "application/javascript";
+        if (url.endsWith(".css")) return "text/css";
+        if (url.endsWith(".png")) return "image/png";
+        if (url.endsWith(".jpg") || url.endsWith(".jpeg")) return "image/jpeg";
+        if (url.endsWith(".webp")) return "image/webp";
+        if (url.endsWith(".svg")) return "image/svg+xml";
+        if (url.endsWith(".woff2")) return "font/woff2";
+        if (url.endsWith(".json")) return "application/json";
+        return "application/octet-stream";
     }
 
     @Override
