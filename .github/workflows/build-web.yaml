@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: 检出代码
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: 安装官方压缩工具
         run: |
@@ -129,9 +129,9 @@ jobs:
           "
 
       - name: 设置 Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
-          python-version: '3.10'
+          python-version: '3.13'
 
       - name: 安装 fonttools
         run: pip install fonttools brotli
@@ -192,7 +192,7 @@ jobs:
           PY
 
       - name: 设置 Node.js LTS
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
 

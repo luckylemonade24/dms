@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: 检出代码
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # 1. 先清理：只留下 e 骨架，不再保留 server！
       - name: 清理仓库，只保留必需文件
@@ -29,10 +29,22 @@ jobs:
           path: .
           if_no_artifact_found: fail
 
+      # ★ 新增：缓存 Electron 二进制包，避免每次重新下载几百 MB
+      - name: 缓存 Electron 依赖
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~\AppData\Local\electron\Cache
+            ~\AppData\Local\electron-builder\Cache
+          key: ${{ runner.os }}-electron-cache-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-cache-
+
       - name: 设置 Node.js
         uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
+          cache: 'npm' # ★ 新增：自动缓存 npm 依赖，不用再手动写 cache 了
 
       - name: 安装依赖
         run: npm install
