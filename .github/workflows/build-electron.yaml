@@ -30,22 +30,44 @@ jobs:
           path: .
           if_no_artifact_found: fail
 
-      # ★ 新增：缓存 Electron 二进制包，避免每次重新下载几百 MB
+      # ==========================================
+      # ★ 修改区：真正独立分离的缓存
+      # ==========================================
+      - name: 获取 Electron 实际版本
+        id: ev
+        shell: pwsh
+        run: |
+          # 动态去 NPM 查 latest 对应的真实版本号（例如 35.2.0）
+          $v = npm view electron version
+          if ([string]::IsNullOrWhiteSpace($v)) { $v = "latest" }
+          echo "ver=$v" >> $env:GITHUB_OUTPUT
+
       - name: 缓存 Electron 依赖
         uses: actions/cache@v6
         with:
           path: |
             ~\AppData\Local\electron\Cache
             ~\AppData\Local\electron-builder\Cache
-          key: ${{ runner.os }}-electron-cache-${{ hashFiles('package.json') }}
+          # Electron 专属缓存：只认查出来的真实版本号
+          key: ${{ runner.os }}-electron-cache-${{ steps.ev.outputs.ver }}
           restore-keys: |
             ${{ runner.os }}-electron-cache-
+
+      - name: 缓存 NPM 依赖
+        uses: actions/cache@v6
+        with:
+          path: ~\AppData\Local\npm-cache
+          # NPM 专属缓存：认 package.json 的 hash
+          key: ${{ runner.os }}-npm-cache-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-cache-
+      # ==========================================
 
       - name: 设置 Node.js
         uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
-          cache: 'npm' # ★ 新增：自动缓存 npm 依赖，不用再手动写 cache 了
+          # ★ 彻底删掉了 cache: 'npm'，防止因为找不到 lock 文件报错
 
       - name: 安装依赖
         run: npm install

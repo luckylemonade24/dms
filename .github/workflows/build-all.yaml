@@ -9,6 +9,7 @@ jobs:
   android:
     needs: web
     uses: ./.github/workflows/build-android.yaml
+    secrets: inherit
   electron:
     needs: web
     uses: ./.github/workflows/build-electron.yaml
