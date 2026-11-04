@@ -1,0 +1,16 @@
+name: Build All Platforms
+
+on:
+  workflow_dispatch:   # 只有手动点它才会跑，全自动绝不擅自触发
+
+jobs:
+  web:
+    uses: ./.github/workflows/build-web.yaml
+
+  android:
+    needs: web         # ★ Web 跑完才跑安卓
+    uses: ./.github/workflows/build-android.yaml
+
+  electron:
+    needs: web         # ★ Web 跑完才跑 E
+    uses: ./.github/workflows/build-electron.yaml
