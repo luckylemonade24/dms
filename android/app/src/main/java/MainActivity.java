@@ -36,9 +36,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ★ 移除原本强制隐藏状态栏的代码，让状态栏正常显示
-        // requestWindowFeature(Window.FEATURE_NO_TITLE);
-        // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, ...);
+        // 正常显示状态栏，不强制全屏
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         try {
@@ -71,11 +69,8 @@ public class MainActivity extends Activity {
                             Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
                             if (uri != null) {
                                 OutputStream os = getContentResolver().openOutputStream(uri);
-                                if (os != null) {
-                                    os.write(bytes);
-                                    os.close();
-                                }
-                                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "存档已存至手机 Download 文件夹: " + fileName, Toast.LENGTH_LONG).show());
+                                if (os != null) { os.write(bytes); os.close(); }
+                                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "存档已存至 Download 文件夹: " + fileName, Toast.LENGTH_LONG).show());
                             }
                         } else {
                             File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
@@ -83,7 +78,7 @@ public class MainActivity extends Activity {
                             FileOutputStream fos = new FileOutputStream(file);
                             fos.write(bytes);
                             fos.close();
-                            runOnUiThread(() -> Toast.makeText(getApplicationContext(), "存档已存至手机 Download 文件夹: " + fileName, Toast.LENGTH_LONG).show());
+                            runOnUiThread(() -> Toast.makeText(getApplicationContext(), "存档已存至 Download 文件夹: " + fileName, Toast.LENGTH_LONG).show());
                         }
                     } catch (Exception e) {
                         runOnUiThread(() -> Toast.makeText(getApplicationContext(), "保存失败: " + e.getMessage(), Toast.LENGTH_SHORT).show());
@@ -101,19 +96,14 @@ public class MainActivity extends Activity {
                 public void setPortrait() {
                     runOnUiThread(() -> setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
                 }
-                // ★ 新增：控制状态栏显示隐藏
                 @android.webkit.JavascriptInterface
                 public void setFullscreen(boolean isFullscreen) {
                     runOnUiThread(() -> {
                         if (isFullscreen) {
-                            // 隐藏状态栏和导航栏，进入沉浸式全屏
                             getWindow().getDecorView().setSystemUiVisibility(
-                                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             );
                         } else {
-                            // 恢复显示状态栏
                             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
                         }
                     });
@@ -121,42 +111,52 @@ public class MainActivity extends Activity {
             }, "AndroidScreen");
 
             webView.setWebViewClient(new WebViewClient() {
-                // ★ 纯原生拦截器替换 WebViewAssetLoader
+                // ★ 核心修复：纯原生完美路径提取
                 @Override
                 public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     Uri url = request.getUrl();
                     if (url == null) return null;
-                    String urlStr = url.toString();
+                    
+                    String scheme = url.getScheme();
+                    String host = url.getHost();
 
-                    if (urlStr.startsWith("https://appassets.androidplatform.net/")) {
-                        String path = urlStr.replace("https://appassets.androidplatform.net/", "");
-
-                        // 路径补全
-                        if (!path.contains("/assets/")) {
-                            path = "assets/www/" + path;
-                        }
-                        // 去参数
-                        if (path.contains("?")) {
-                            path = path.substring(0, path.indexOf("?"));
-                        }
-                        // 默认首页
-                        if (path.isEmpty() || path.endsWith("/")) {
-                            path += "index.html";
-                        }
-
-                        try {
-                            // 去掉前缀
-                            if (path.startsWith("assets/")) {
-                                path = path.substring(7);
+                    // 完美拦截本地虚拟域名
+                    if ("https".equals(scheme) && "appassets.androidplatform.net".equals(host)) {
+                        String path = url.getPath(); // 例如 /assets/www/index.html 或 /背景/xxx.png
+                        
+                        if (path != null) {
+                            // 复刻原版逻辑：强行补全不带 /assets/ 的路径
+                            if (!path.startsWith("/assets/")) {
+                                path = "/assets/www" + path;
                             }
-                            // ★ 核心修复：中文解码
-                            path = URLDecoder.decode(path, "UTF-8");
+                            
+                            // 处理末尾是 / 的情况
+                            if (path.endsWith("/")) {
+                                path += "index.html";
+                            }
 
-                            InputStream is = getAssets().open(path);
-                            // ★ 核心修复：返回正确的 MIME 类型
-                            return new WebResourceResponse(getMimeType(path), null, is);
-                        } catch (Exception e) {
-                            return null; // 找不到返回 null，交给 WebView 处理
+                            // 截掉 /assets/ (长度为8)，剩下 www/xxx
+                            String assetPath = path.substring(8); 
+
+                            try {
+                                // 中文解码
+                                assetPath = URLDecoder.decode(assetPath, "UTF-8");
+                                InputStream is = getAssets().open(assetPath);
+                                
+                                // ★ 核心修复：正确区分文本和二进制文件，防止乱码/白屏
+                                String mime = getMimeType(assetPath);
+                                String encoding = null;
+                                if (mime.startsWith("text/") || mime.equals("application/javascript") || mime.equals("application/json")) {
+                                    encoding = "UTF-8";
+                                }
+                                
+                                // 成功读取，直接返回
+                                return new WebResourceResponse(mime, encoding, is);
+                            } catch (Exception e) {
+                                // 如果代码逻辑绝对正确，绝不可能走到这里。
+                                // 为了防崩溃返回一个空响应，不再触发公网 DNS 解析。
+                                return new WebResourceResponse("text/plain", "UTF-8", new java.io.ByteArrayInputStream("".getBytes()));
+                            }
                         }
                     }
                     return null;
@@ -170,7 +170,6 @@ public class MainActivity extends Activity {
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     super.onPageFinished(view, url);
-                    
                     // 3. 注入 JS：拦截全屏 API，防止 WebView 黑屏
                     String js = "(function() {" +
                             "  const originalClick = HTMLAnchorElement.prototype.click;" +
@@ -200,10 +199,7 @@ public class MainActivity extends Activity {
                             "  });" +
                             "  Element.prototype.requestFullscreen = function() {" +
                             "    isFakeFullscreen = true;" +
-                            "    if (window.AndroidScreen) {" +
-                            "        window.AndroidScreen.setLandscape();" +
-                            "        window.AndroidScreen.setFullscreen(true);" + // 进入全屏隐藏状态栏
-                            "    }" +
+                            "    if (window.AndroidScreen) { window.AndroidScreen.setLandscape(); window.AndroidScreen.setFullscreen(true); }" +
                             "    document.dispatchEvent(new Event('fullscreenchange'));" +
                             "    document.dispatchEvent(new Event('webkitfullscreenchange'));" +
                             "    return Promise.resolve();" +
@@ -211,10 +207,7 @@ public class MainActivity extends Activity {
                             "  Element.prototype.webkitRequestFullscreen = Element.prototype.requestFullscreen;" +
                             "  document.exitFullscreen = function() {" +
                             "    isFakeFullscreen = false;" +
-                            "    if (window.AndroidScreen) {" +
-                            "        window.AndroidScreen.setPortrait();" +
-                            "        window.AndroidScreen.setFullscreen(false);" + // 退出全屏显示状态栏
-                            "    }" +
+                            "    if (window.AndroidScreen) { window.AndroidScreen.setPortrait(); window.AndroidScreen.setFullscreen(false); }" +
                             "    document.dispatchEvent(new Event('fullscreenchange'));" +
                             "    document.dispatchEvent(new Event('webkitfullscreenchange'));" +
                             "    return Promise.resolve();" +
@@ -229,9 +222,7 @@ public class MainActivity extends Activity {
             webView.setWebChromeClient(new WebChromeClient() {
                 @Override
                 public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> newFilePathCallback, FileChooserParams fileChooserParams) {
-                    if (filePathCallback != null) {
-                        filePathCallback.onReceiveValue(null);
-                    }
+                    if (filePathCallback != null) filePathCallback.onReceiveValue(null);
                     filePathCallback = newFilePathCallback;
                     try {
                         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -273,6 +264,7 @@ public class MainActivity extends Activity {
                 } catch (Exception ignored) {}
             });
 
+            // 启动页面加载
             webView.loadUrl("https://appassets.androidplatform.net/assets/www/index.html");
 
         } catch (Exception e) {
@@ -286,7 +278,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    // ★ 补全 MIME 类型判断，防止白屏
+    // 完整的 MIME 映射表
     private String getMimeType(String url) {
         if (url.endsWith(".html")) return "text/html";
         if (url.endsWith(".js")) return "application/javascript";
@@ -297,6 +289,8 @@ public class MainActivity extends Activity {
         if (url.endsWith(".svg")) return "image/svg+xml";
         if (url.endsWith(".woff2")) return "font/woff2";
         if (url.endsWith(".json")) return "application/json";
+        if (url.endsWith(".mp3")) return "audio/mpeg";
+        if (url.endsWith(".mp4")) return "video/mp4";
         return "application/octet-stream";
     }
 

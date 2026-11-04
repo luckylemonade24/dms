@@ -9,7 +9,7 @@
         android:label="地牢决斗师"
         android:hardwareAccelerated="true"
         android:usesCleartextTraffic="true"
-        android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+        android:theme="@android:style/Theme.NoTitleBar">  <!-- ★ 去掉了 .Fullscreen -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
