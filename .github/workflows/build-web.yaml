@@ -225,7 +225,6 @@ jobs:
             --use-short-doctype \
             --collapse-whitespace \
             --decode-entities \
-            --html5 \
             --process-conditional-comments \
             --collapse-boolean-attributes \
             dist/index.html -o dist/index.html
