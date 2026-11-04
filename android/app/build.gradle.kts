@@ -8,9 +8,6 @@ val appVersionName = "0.1.0"
 android {
     namespace = "com.ddm.jn1"
     compileSdk = 37
-    
-    // ★ 新增：关闭 AGP 9.0 默认开启的内置 Kotlin，阻止自动引入 kotlin-stdlib
-    builtInKotlin = false
 
     defaultConfig {
         applicationId = "com.ddm.jn1"
@@ -24,7 +21,7 @@ android {
         }
     }
 
-    // ★ 新增：读取 GitHub 环境变量里的签名信息
+    // ★ 签名配置
     signingConfigs {
         create("release") {
             storeFile = file("release.p12")
@@ -41,7 +38,6 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            // ★ 换成 release 签名，不再用 debug
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
