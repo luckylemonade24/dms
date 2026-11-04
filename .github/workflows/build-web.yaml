@@ -207,7 +207,28 @@ jobs:
           npx critical index.html --inline --write --engine static
           npx critical index.html --engine static --explain 2>&1 | tail -8
 
-      # ★ 新增：压缩 HTML（严格使用你勾选的参数，绝不碰 Minify CSS/JS）
+      # ★ 新增：彻底消除 CSS 渲染阻塞（魔法就在这里）
+      - name: 将 all.css 改为异步加载
+        run: |
+          node -e "
+            const fs = require('fs');
+            let html = fs.readFileSync('dist/index.html', 'utf8');
+            
+            // 匹配 critical 生成的那个阻塞版 link，替换为异步版
+            // 兼容属性带不带引号、顺序如何
+            html = html.replace(/<link[^>]*href=[\"']?css\/all\.css[\"']?[^>]*>/gi, (match) => {
+              // 如果已经是 preload，就放过它（让浏览器提前下）
+              if (match.includes('preload')) return match;
+              
+              // 把阻塞的 stylesheet 替换为异步加载代码
+              return '<link rel=\"stylesheet\" href=\"css/all.css\" media=\"print\" onload=\"this.media=\\'all\\'\"><noscript><link rel=\"stylesheet\" href=\"css/all.css\"></noscript>';
+            });
+            
+            fs.writeFileSync('dist/index.html', html);
+            console.log('✅ 已将 all.css 改为异步加载，彻底消除渲染阻塞');
+          "
+
+      # ★ 压缩 HTML（严格使用你勾选的参数，绝不碰 Minify CSS/JS）
       - name: 压缩 HTML
         run: |
           npm install -g html-minifier-terser
