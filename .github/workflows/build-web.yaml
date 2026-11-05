@@ -242,6 +242,58 @@ jobs:
             console.log('✅ 已将 all.css 改为异步加载，彻底消除渲染阻塞');
           "
 
+      # ★ 新增：注入 preload / dns-prefetch（放在异步 CSS 之后、HTML 压缩之前）
+      - name: 注入 preload 与 DNS 预解析
+        run: |
+          cat > /tmp/inject-head.cjs <<'EOF'
+          const fs = require('fs');
+
+          const path = 'dist/index.html';
+          let html = fs.readFileSync(path, 'utf8');
+
+          // 幂等：已存在同名 preload / dns-prefetch 就跳过，避免重复注入
+          const hasDns    = /<link[^>]*rel=["']dns-prefetch["'][^>]*dms\.spldream\.com/.test(html);
+          const hasJsPre  = /<link[^>]*rel=["']preload["'][^>]*href=["'][^"']*js\/all\.js["']/.test(html);
+          const hasCssPre = /<link[^>]*rel=["']preload["'][^>]*href=["'][^"']*css\/all\.css["']/.test(html);
+
+          let inject = '';
+          // ① DNS 预解析（最便宜，最早触发）：dms.spldream.com 是联机服务器 + 下载页
+          //    href 用 // 协议相对，浏览器只取 host 做 DNS，协议部分会被忽略
+          if (!hasDns) {
+            inject += '<link rel="dns-prefetch" href="//dms.spldream.com">';
+          }
+          // ② all.js：preload 抢在 HTML 解析到 <body> 末尾的 <script defer> 之前开始下载
+          //    同源资源，不需要 crossorigin（只有字体才需要）
+          if (!hasJsPre) {
+            inject += '<link rel="preload" href="js/all.js" as="script">';
+          }
+          // ③ all.css：配合前面的 media="print" 异步加载方案，把下载优先级从"最低"提到"正常"
+          if (!hasCssPre) {
+            inject += '<link rel="preload" href="css/all.css" as="style">';
+          }
+
+          if (!inject) {
+            console.log('ℹ 已存在 dns-prefetch / preload，无需注入');
+            process.exit(0);
+          }
+
+          // 插入到 </head> 之前。用 indexOf + slice 而不是 replace，
+          // 避免 </head> 里的特殊字符被 replace 当成模式解释
+          const idx = html.indexOf('</head>');
+          if (idx < 0) {
+            console.error('✗ 未找到 </head>，无法注入');
+            process.exit(1);
+          }
+          html = html.slice(0, idx) + inject + html.slice(idx);
+          fs.writeFileSync(path, html);
+
+          console.log('✅ 已注入：');
+          if (!hasDns)    console.log('   · dns-prefetch  //dms.spldream.com');
+          if (!hasJsPre)  console.log('   · preload       js/all.js     (as=script)');
+          if (!hasCssPre) console.log('   · preload       css/all.css   (as=style)');
+          EOF
+          node /tmp/inject-head.cjs
+
       - name: 压缩 HTML
         run: |
           npm install -g html-minifier-terser
