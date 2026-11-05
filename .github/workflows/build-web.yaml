@@ -17,7 +17,6 @@ jobs:
         with:
           node-version: 'lts/*'
 
-      # ★ 新增：缓存 NPM 的下载包，加速全局安装
       - name: 缓存 NPM
         uses: actions/cache@v6
         with:
@@ -42,10 +41,8 @@ jobs:
             mkdir -p dist/css
             cat $(cat css_list.txt) > dist/css/all.css
             
-            # ★ 核心修复：把所有的 ../ 路径强行改成绝对根路径 /
             sed -i 's|\.\./|/|g' dist/css/all.css
 
-            # ★ 构建时替换全局 :has()，并记录出现过的 id
             cat > /tmp/replace-has.cjs <<'EOF'
           const fs = require('fs');
           let css = fs.readFileSync('dist/css/all.css', 'utf8');
@@ -71,7 +68,6 @@ jobs:
           if [ -s js_list.txt ]; then
             mkdir -p dist/js
 
-            # ★ 生成同步脚本（读 CSS 阶段记录的 id 列表）
             cat > /tmp/gen-sync.cjs <<'EOF'
           const fs = require('fs');
           let ids = [];
@@ -98,7 +94,6 @@ jobs:
           sed -i -E 's#<script src="(js/|add/)[^"]*"[^>]*></script>##g' dist/index.html
           sed -i 's#</body>#<script src="js/all.js" defer></script>\n</body>#' dist/index.html
 
-          # 4. 精准拷贝文件
           rsync -av 背景 卡牌 图标 字体 dist/
 
       - name: 极简 JSON 清洗（去重尺寸）
@@ -148,7 +143,6 @@ jobs:
         with:
           python-version: '3.13'
 
-      # ★ 新增：缓存 Pip 的下载包
       - name: 缓存 pip
         uses: actions/cache@v6
         with:
@@ -226,7 +220,6 @@ jobs:
           npx critical index.html --inline --write --engine static
           npx critical index.html --engine static --explain 2>&1 | tail -8
 
-      # ★ 彻底消除 CSS 渲染阻塞
       - name: 将 all.css 改为异步加载
         run: |
           node -e "
@@ -242,57 +235,19 @@ jobs:
             console.log('✅ 已将 all.css 改为异步加载，彻底消除渲染阻塞');
           "
 
-      # ★ 新增：注入 preload / dns-prefetch（放在异步 CSS 之后、HTML 压缩之前）
-      - name: 注入 preload 与 DNS 预解析
+      - name: 注入 dns-prefetch 与 all.js preload
         run: |
-          cat > /tmp/inject-head.cjs <<'EOF'
-          const fs = require('fs');
-
-          const path = 'dist/index.html';
-          let html = fs.readFileSync(path, 'utf8');
-
-          // 幂等：已存在同名 preload / dns-prefetch 就跳过，避免重复注入
-          const hasDns    = /<link[^>]*rel=["']dns-prefetch["'][^>]*dms\.spldream\.com/.test(html);
-          const hasJsPre  = /<link[^>]*rel=["']preload["'][^>]*href=["'][^"']*js\/all\.js["']/.test(html);
-          const hasCssPre = /<link[^>]*rel=["']preload["'][^>]*href=["'][^"']*css\/all\.css["']/.test(html);
-
-          let inject = '';
-          // ① DNS 预解析（最便宜，最早触发）：dms.spldream.com 是联机服务器 + 下载页
-          //    href 用 // 协议相对，浏览器只取 host 做 DNS，协议部分会被忽略
-          if (!hasDns) {
-            inject += '<link rel="dns-prefetch" href="//dms.spldream.com">';
-          }
-          // ② all.js：preload 抢在 HTML 解析到 <body> 末尾的 <script defer> 之前开始下载
-          //    同源资源，不需要 crossorigin（只有字体才需要）
-          if (!hasJsPre) {
-            inject += '<link rel="preload" href="js/all.js" as="script">';
-          }
-          // ③ all.css：配合前面的 media="print" 异步加载方案，把下载优先级从"最低"提到"正常"
-          if (!hasCssPre) {
-            inject += '<link rel="preload" href="css/all.css" as="style">';
-          }
-
-          if (!inject) {
-            console.log('ℹ 已存在 dns-prefetch / preload，无需注入');
-            process.exit(0);
-          }
-
-          // 插入到 </head> 之前。用 indexOf + slice 而不是 replace，
-          // 避免 </head> 里的特殊字符被 replace 当成模式解释
-          const idx = html.indexOf('</head>');
-          if (idx < 0) {
-            console.error('✗ 未找到 </head>，无法注入');
-            process.exit(1);
-          }
-          html = html.slice(0, idx) + inject + html.slice(idx);
-          fs.writeFileSync(path, html);
-
-          console.log('✅ 已注入：');
-          if (!hasDns)    console.log('   · dns-prefetch  //dms.spldream.com');
-          if (!hasJsPre)  console.log('   · preload       js/all.js     (as=script)');
-          if (!hasCssPre) console.log('   · preload       css/all.css   (as=style)');
-          EOF
-          node /tmp/inject-head.cjs
+          node -e "
+            const fs = require('fs');
+            const p = 'dist/index.html';
+            let html = fs.readFileSync(p, 'utf8');
+            const inject = '<link rel=\"dns-prefetch\" href=\"//dms.spldream.com\">' +
+                           '<link rel=\"preload\" href=\"js/all.js\" as=\"script\">';
+            const idx = html.indexOf('</head>');
+            html = html.slice(0, idx) + inject + html.slice(idx);
+            fs.writeFileSync(p, html);
+            console.log('✅ 注入 dns-prefetch + all.js preload');
+          "
 
       - name: 压缩 HTML
         run: |
