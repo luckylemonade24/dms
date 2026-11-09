@@ -1,4 +1,4 @@
-/* atlas-hook.js —— 回退 snap，全局 pixelated，逐 frame scale */
+/* atlas-hook.js —— 回退 snap，全局 pixelated，逐 frame scale + 支持混合模式 */
 (function () {
   'use strict';
 
@@ -7,8 +7,18 @@
   const DATA_URL  = '卡牌/data.json';
   const CARD_W    = 264;
   const CARD_H    = 375;
-  const LAYERS_N  = 11;
+  
+  // 图层总数（跟 extract.py 输出的层数保持一致）
+  const LAYERS_N  = 19; 
   const KEY_CACHE_MAX = 1000;
+
+  // 整数混合模式映射回 CSS
+  const BLEND_CSS = [
+    '', 'multiply', 'screen', 'overlay',
+    'darken', 'lighten', 'color-dodge', 'color-burn',
+    'hard-light', 'soft-light', 'difference', 'exclusion',
+    'hue', 'saturation', 'color', 'luminosity'
+  ];
 
   const index      = Object.create(null);
   const layerIndex = Object.create(null);
@@ -118,13 +128,14 @@
         if (u[i + 1] >= 0) index[u[i]] = buildFrame(u[i + 1]);
       }
 
-      const stride = 1 + LAYERS_N * 3;
+      // 步长：1个卡名 + N层 * 4个参数(fid, dx, dy, blend)
+      const stride = 1 + LAYERS_N * 4;
       for (let i = 0; i < c.length; i += stride) {
         const arr = new Array(LAYERS_N);
         for (let j = 0; j < LAYERS_N; j++) {
-          const p = i + 1 + j * 3;
+          const p = i + 1 + j * 4;
           const fid = c[p];
-          arr[j] = { fid, dx: c[p + 1], dy: c[p + 2] };
+          arr[j] = { fid, dx: c[p + 1], dy: c[p + 2], blend: c[p + 3] };
           if (fid >= 0) buildFrame(fid);
         }
         layerIndex[c[i]] = arr;
@@ -313,11 +324,16 @@
     return r;
   }
 
-  function layerDiv(left, top, fw, fh, bx, by, as) {
+  function layerDiv(left, top, fw, fh, bx, by, as, blend) {
     const scaleX = as;
     const scaleY = as;
     let s = '<div class="__atl_layer" style="left:' + left + 'px;top:' + top + 'px;' +
             'width:' + (fw * scaleX) + 'px;height:' + (fh * scaleY) + 'px;';
+            
+    if (blend && blend !== 0) {
+      s += 'mix-blend-mode:' + BLEND_CSS[blend] + ';';
+    }
+    
     if (as !== 1) {
       s += 'background-size:' + (atlasW * scaleX) + 'px ' + (atlasH * scaleY) + 'px;';
     }
@@ -329,8 +345,8 @@
     let html = '';
     const all = index['all'];
     if (all) {
-      // 强制 1:1 整数绘制
-      html += layerDiv(0, 0, CARD_W, CARD_H, all.x, all.y, all.scale);
+      // 底图没有混合模式，传 0
+      html += layerDiv(0, 0, CARD_W, CARD_H, all.x, all.y, all.scale, 0);
     }
 
     const layers = layerIndex[name];
@@ -339,8 +355,7 @@
       if (L.fid < 0) continue;
       const f = frameCache[L.fid];
       if (!f) continue;
-      // 强制 1:1 整数绘制
-      html += layerDiv(L.dx, L.dy, f.w, f.h, f.x, f.y, f.scale);
+      html += layerDiv(L.dx, L.dy, f.w, f.h, f.x, f.y, f.scale, L.blend);
     }
 
     // 创建 264x375 的虚拟画布，再整体缩放适配 193px 的容器
@@ -353,7 +368,6 @@
     let wrapper = overlay.firstChild;
     if (!wrapper) return;
 
-    // 只更新包裹层的缩放比例
     wrapper.style.left = offsetX + 'px';
     wrapper.style.top = offsetY + 'px';
     wrapper.style.transform = `scale(${sx}, ${sy})`;
@@ -371,6 +385,7 @@
       st.height = (CARD_H * as) + 'px';
       if (as !== 1) st.backgroundSize = (atlasW * as) + 'px ' + (atlasH * as) + 'px';
       st.backgroundPosition = (-all.x * as) + 'px ' + (-all.y * as) + 'px';
+      st.mixBlendMode = '';
       child = child.nextSibling;
     }
 
@@ -389,6 +404,10 @@
       st.height = (f.h * as) + 'px';
       if (as !== 1) st.backgroundSize = (atlasW * as) + 'px ' + (atlasH * as) + 'px';
       st.backgroundPosition = (-f.x * as) + 'px ' + (-f.y * as) + 'px';
+      
+      // 动态更新混合模式
+      st.mixBlendMode = (L.blend && L.blend !== 0) ? BLEND_CSS[L.blend] : '';
+      
       child = child.nextSibling;
     }
   }
@@ -470,7 +489,6 @@
       offsetY = (elemH - CARD_H * s) * (pp[1] / 100);
     }
 
-    // 图集背景尺寸恒定，不随 sx 缩小，由外层 wrapper 统一缩放
     const bgSize = atlasW + 'px ' + atlasH + 'px';
     const cssStr =
       'position:absolute;pointer-events:none;overflow:hidden;z-index:-1;' +
