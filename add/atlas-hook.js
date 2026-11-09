@@ -1,4 +1,4 @@
-/* atlas-hook.js —— 回退 snap，全局 pixelated，逐 frame scale + 支持混合模式 */
+/* atlas-hook.js —— Bitmask 极速解析 + 按层级渲染 + 混合模式 */
 (function () {
   'use strict';
 
@@ -8,11 +8,10 @@
   const CARD_W    = 264;
   const CARD_H    = 375;
   
-  // 图层总数（跟 extract.py 输出的层数保持一致）
+  // 必须和 extract.py 提取的层数一致
   const LAYERS_N  = 19; 
   const KEY_CACHE_MAX = 1000;
 
-  // 整数混合模式映射回 CSS
   const BLEND_CSS = [
     '', 'multiply', 'screen', 'overlay',
     'darken', 'lighten', 'color-dodge', 'color-burn',
@@ -31,22 +30,12 @@
 
   const _valid = [];
   const _needsOverlay = [];
-  const _sizesW = [];
-  const _sizesH = [];
-  const _sizesOl = [];
-  const _sizesOt = [];
-  const _sizesOw = [];
-  const _sizesOh = [];
+  const _sizesW = [], _sizesH = [], _sizesOl = [], _sizesOt = [], _sizesOw = [], _sizesOh = [];
   const _newParents = [];
   const _seenParents = new Set();
 
-  let ready = false;
-  let rafScheduled = false;
-  let observerStarted = false;
-  let domScanned = false;
-  let warnedOrder = false;
-  let atlasW = 0;
-  let atlasH = 0;
+  let ready = false, rafScheduled = false, observerStarted = false;
+  let domScanned = false, warnedOrder = false, atlasW = 0, atlasH = 0;
 
   const srcDesc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
   const nwDesc  = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'naturalWidth');
@@ -117,10 +106,12 @@
     preloadTextureAsync();
     try {
       const data = await fetch(DATA_URL, { cache: 'default' }).then(r => r.json());
-      const f = data.f, c = data.c, u = data.u;
+      
+      // 解析无键名数组
+      const a = data[0], f = data[1], c = data[2], u = data[3];
 
-      atlasW = data.a[0][1];
-      atlasH = data.a[0][2];
+      atlasW = a[0][1];
+      atlasH = a[0][2];
 
       for (let i = 0; i < f.length; i++) frames.push(f[i]);
 
@@ -128,17 +119,28 @@
         if (u[i + 1] >= 0) index[u[i]] = buildFrame(u[i + 1]);
       }
 
-      // 步长：1个卡名 + N层 * 4个参数(fid, dx, dy, blend)
-      const stride = 1 + LAYERS_N * 4;
-      for (let i = 0; i < c.length; i += stride) {
+      // ====== Bitmask 极速解析 ======
+      let i = 0;
+      while (i < c.length) {
+        const cardName = c[i];
+        const mask = c[i + 1];
+        let p = i + 2;
         const arr = new Array(LAYERS_N);
+
         for (let j = 0; j < LAYERS_N; j++) {
-          const p = i + 1 + j * 4;
-          const fid = c[p];
-          arr[j] = { fid, dx: c[p + 1], dy: c[p + 2], blend: c[p + 3] };
-          if (fid >= 0) buildFrame(fid);
+          // 位运算判断第 j 层是否存在
+          if (mask & (1 << j)) {
+            const fid = c[p];
+            arr[j] = { fid, dx: c[p + 1], dy: c[p + 2], blend: c[p + 3] };
+            if (fid >= 0) buildFrame(fid);
+            p += 4;
+          } else {
+            arr[j] = null; // 空层直接记 null
+          }
         }
-        layerIndex[c[i]] = arr;
+        
+        layerIndex[cardName] = arr;
+        i = p; // 指针跳到下一张卡
       }
     } catch (e) {
       console.error('[atlas-hook] init failed:', e);
@@ -168,8 +170,7 @@
 
     let result = null;
     const c0 = v.charCodeAt(0);
-    if (!(c0 === 100 && v.charCodeAt(1) === 97) &&
-        !(c0 === 98  && v.charCodeAt(1) === 108)) {
+    if (!(c0 === 100 && v.charCodeAt(1) === 97) && !(c0 === 98  && v.charCodeAt(1) === 108)) {
       let dec = v;
       if (v.indexOf('%') >= 0) { try { dec = decodeURIComponent(v); } catch (e) { dec = v; } }
       const q = dec.indexOf('?');
@@ -237,12 +238,7 @@
       p._atlas_checked = true;
     }
 
-    _sizesW.length = 0;
-    _sizesH.length = 0;
-    _sizesOl.length = 0;
-    _sizesOt.length = 0;
-    _sizesOw.length = 0;
-    _sizesOh.length = 0;
+    _sizesW.length = 0; _sizesH.length = 0; _sizesOl.length = 0; _sizesOt.length = 0; _sizesOw.length = 0; _sizesOh.length = 0;
     for (let i = 0; i < _valid.length; i++) {
       const img = _valid[i];
       const hasLayer = !!layerIndex[img._atlasKey];
@@ -345,20 +341,18 @@
     let html = '';
     const all = index['all'];
     if (all) {
-      // 底图没有混合模式，传 0
       html += layerDiv(0, 0, CARD_W, CARD_H, all.x, all.y, all.scale, 0);
     }
 
     const layers = layerIndex[name];
     for (let i = 0; i < layers.length; i++) {
       const L = layers[i];
-      if (L.fid < 0) continue;
+      if (!L) continue; // 跳过空层
       const f = frameCache[L.fid];
       if (!f) continue;
       html += layerDiv(L.dx, L.dy, f.w, f.h, f.x, f.y, f.scale, L.blend);
     }
 
-    // 创建 264x375 的虚拟画布，再整体缩放适配 193px 的容器
     const wrapperStyle = `position:absolute;left:${offsetX}px;top:${offsetY}px;width:${CARD_W}px;height:${CARD_H}px;transform-origin:0 0;transform:scale(${sx}, ${sy});`;
     overlay.innerHTML = `<div class="atl-wrapper" style="${wrapperStyle}">${html}</div>`;
     overlay._lastName = name;
@@ -392,7 +386,7 @@
     const layers = layerIndex[name];
     for (let i = 0; i < layers.length; i++) {
       const L = layers[i];
-      if (L.fid < 0) continue;
+      if (!L) continue; // 跳过空层
       const f = frameCache[L.fid];
       if (!f) continue;
       if (!child) return;
@@ -405,7 +399,6 @@
       if (as !== 1) st.backgroundSize = (atlasW * as) + 'px ' + (atlasH * as) + 'px';
       st.backgroundPosition = (-f.x * as) + 'px ' + (-f.y * as) + 'px';
       
-      // 动态更新混合模式
       st.mixBlendMode = (L.blend && L.blend !== 0) ? BLEND_CSS[L.blend] : '';
       
       child = child.nextSibling;
@@ -413,22 +406,12 @@
   }
 
   function applyCard(img, name, elemW, elemH, ol, ot, ow, oh, fit, posRaw) {
-    if (img._atlasName === name &&
-        img._atlasW === elemW &&
-        img._atlasH === elemH &&
-        img._atlasOl === ol &&
-        img._atlasOt === ot &&
-        img._atlasOw === ow &&
-        img._atlasOh === oh) {
+    if (img._atlasName === name && img._atlasW === elemW && img._atlasH === elemH &&
+        img._atlasOl === ol && img._atlasOt === ot && img._atlasOw === ow && img._atlasOh === oh) {
       return;
     }
-    img._atlasName = name;
-    img._atlasW = elemW;
-    img._atlasH = elemH;
-    img._atlasOl = ol;
-    img._atlasOt = ot;
-    img._atlasOw = ow;
-    img._atlasOh = oh;
+    img._atlasName = name; img._atlasW = elemW; img._atlasH = elemH;
+    img._atlasOl = ol; img._atlasOt = ot; img._atlasOw = ow; img._atlasOh = oh;
 
     const fr = index[name];
     if (fr) {
