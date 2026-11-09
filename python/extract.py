@@ -2,19 +2,17 @@ import os, json, hashlib
 from PIL import Image
 from aseprite import Sprite
 
-# 【修改点】：严格按 Aseprite 的从底到顶顺序排列
-# 数组越靠前，前端渲染越靠底层
+# 完全按你的要求，从底到顶排好，红眼在卡图之后
 DEFAULT_LAYER_ORDER = [
-    # 1. 底层光效与背景
-    '背光', '发光', '强光', '微光', '特别典藏', '红眼',
-    # 2. 主体
-    '卡框', '卡框-魔绫', '卡图', '卡图text',
-    # 3. 图标
-    '伤害图标', '伤害图标text', '血量图标', '血量text', '卡类', '卡编号', '护符',
-    # 4. 文字
-    '描述', '描述text', '卡名', '卡名-魔绫', '卡名text', '卡等级text',
-    # 5. 顶层覆盖特效
-    '何意味', '滤镜'
+    '发光', '背光', '强光', '微光', '特别典藏',
+    '描述text',
+    '伤害图标', '伤害图标text', '血量图标', '血量text',
+    '卡图', 
+    '红眼',        # <--- 在卡图后面，覆盖卡图
+    '何意味', 
+    '卡图text', 
+    '卡等级text', '卡名text', '卡类', '卡编号',
+    '滤镜'
 ]
 
 FIXED_LAYERS = {'背景1', '背景2', '卡框', '卡名', '描述', '护符', '护符 复制'}
@@ -22,7 +20,6 @@ FULL_DIR     = 'full_cards'
 MAX_AUTO_SCALE = 8
 MIN_OUT_SIZE   = 2
 
-# Aseprite blend_mode 整数 → CSS 名称
 BLEND_MAP = {
     0: 'normal', 1: 'multiply', 2: 'screen', 3: 'overlay',
     4: 'darken', 5: 'lighten', 6: 'color-dodge', 7: 'color-burn',
@@ -116,6 +113,7 @@ def main():
     frames, fid_map, cards, full, reports = [], {}, {}, {}, []
     files = sorted(f for f in os.listdir('.') if f.lower().endswith(('.aseprite', '.ase')))
 
+    # 只收集存在的可见层
     global_layers_set = set()
     for fn in files:
         sp = Sprite.open(fn)
@@ -124,13 +122,15 @@ def main():
                 if l.name not in FIXED_LAYERS:
                     global_layers_set.add(l.name)
 
-    # 按 DEFAULT_LAYER_ORDER 排序，确保层级正确
+    # 严格按照我们手写的 DEFAULT_LAYER_ORDER 排序，没有任何自动推导干扰
     final_layers = [name for name in DEFAULT_LAYER_ORDER if name in global_layers_set]
+    
+    # 如果还有没写在列表里的可见层，加到最后
     for name in sorted(global_layers_set):
         if name not in final_layers: 
             final_layers.append(name)
             
-    print(f'== 已扫描所有文件，识别到全局图层（共 {len(final_layers)} 层） ==')
+    print(f'== 强制按固定顺序识别（共 {len(final_layers)} 层） ==')
     for i, l in enumerate(final_layers):
         print(f'  {i+1}. {l}')
     print('=======================================================\n')
@@ -161,7 +161,6 @@ def main():
 
             fid = add_frame(im, layer_name, card, reports)
             blend_code = get_blend_code(target)
-            
             nums.extend([fid, cel.x, cel.y, blend_code])
 
         cards[card] = nums
