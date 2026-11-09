@@ -96,47 +96,7 @@ jobs:
 
           rsync -av 背景 卡牌 图标 字体 dist/
 
-      - name: 极简 JSON 清洗（去重尺寸）
-        run: |
-          node -e "
-            const fs = require('fs');
-            const path = require('path');
-            const dir = './dist/卡牌';
-            if (!fs.existsSync(dir)) process.exit(0);
-            
-            fs.readdirSync(dir).filter(f => f.endsWith('.json')).forEach(file => {
-              const filePath = path.join(dir, file);
-              const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-              if (data.m && data.d && data.f) return;
-              
-              const aw = data.meta.size.w, ah = data.meta.size.h;
-              const frames = [], sizeCounts = {};
-              
-              for (const key in data.frames) {
-                const f = data.frames[key].frame;
-                let name = key.replace(/^高清卡\//, '').replace(/详情\.png$/, '');
-                frames.push({ name, x: f.x, y: f.y, w: f.w, h: f.h });
-                const sizeKey = f.w + 'x' + f.h;
-                sizeCounts[sizeKey] = (sizeCounts[sizeKey] || 0) + 1;
-              }
-              
-              let defaultSize = '264x375', maxCount = 0;
-              for (const size in sizeCounts) {
-                if (sizeCounts[size] > maxCount) {
-                  maxCount = sizeCounts[size];
-                  defaultSize = size;
-                }
-              }
-              const [dw, dh] = defaultSize.split('x').map(Number);
-              const fArr = frames.map(item => {
-                if (item.w === dw && item.h === dh) return [item.name, item.x, item.y];
-                else return [item.name, item.x, item.y, item.w, item.h];
-              });
-              
-              fs.writeFileSync(filePath, JSON.stringify({ m: [aw, ah], d: [dw, dh], f: fArr }));
-              console.log('✅ 已极简清洗:', file);
-            });
-          "
+      # 删除了原来在此处的「极简 JSON 清洗」步骤，因为 data.json 已经由 finalize.py 精简
 
       - name: 设置 Python
         uses: actions/setup-python@v7
