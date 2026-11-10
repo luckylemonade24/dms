@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="AtlasCardViewer.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    Title="卡牌预览器">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="400"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 左侧：ScrollViewer 只做滚动占位，绘制交给 CanvasControl -->
+        <Grid Grid.Column="0">
+            <ScrollViewer x:Name="Scroller"
+                          HorizontalScrollMode="Disabled"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollMode="Enabled"
+                          VerticalScrollBarVisibility="Auto"
+                          ViewChanged="Scroller_ViewChanged"
+                          PointerMoved="Scroller_PointerMoved"
+                          PointerExited="Scroller_PointerExited">
+                <Border x:Name="ScrollSpacer"/>
+            </ScrollViewer>
+
+            <canvas:CanvasControl x:Name="CardsCanvas"
+                                  IsHitTestVisible="False"
+                                  ClearColor="Transparent"
+                                  Draw="CardsCanvas_Draw"
+                                  SizeChanged="CardsCanvas_SizeChanged"/>
+        </Grid>
+
+        <!-- 右侧：悬停预览 -->
+        <Grid Grid.Column="1"
+              Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+              BorderThickness="1,0,0,0"
+              BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <Image x:Name="PreviewImage"
+                   Stretch="Uniform"
+                   Margin="12"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"/>
+        </Grid>
+    </Grid>
+</Window>
