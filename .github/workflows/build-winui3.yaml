@@ -1,4 +1,4 @@
-name: build
+name: build winui3
 
 on:
   workflow_dispatch:
@@ -23,6 +23,7 @@ jobs:
           -p:WindowsPackageType=None
           -p:SelfContained=true
           -p:WindowsAppSDKSelfContained=true
+          -p:UseXamlCompilerExecutable=false
           -o publish
 
       - name: Sanity check
