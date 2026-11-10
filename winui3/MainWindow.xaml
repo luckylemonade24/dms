@@ -12,7 +12,6 @@
             <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
 
-        <!-- 左侧：ScrollViewer 只做滚动占位，绘制交给 CanvasControl -->
         <Grid Grid.Column="0">
             <ScrollViewer x:Name="Scroller"
                           HorizontalScrollMode="Disabled"
@@ -32,15 +31,17 @@
                                   SizeChanged="CardsCanvas_SizeChanged"/>
         </Grid>
 
-        <!-- 右侧：悬停预览 -->
         <Grid Grid.Column="1"
               Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
               BorderThickness="1,0,0,0"
               BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
             <Image x:Name="PreviewImage"
                    Stretch="Uniform"
-                   Margin="12"
-                   RenderOptions.BitmapInterpolationMode="HighQuality"/>
+                   Margin="12">
+                <Image.Resources>
+                    <RenderOptions x:Key="BitmapInterpolationMode">HighQuality</RenderOptions>
+                </Image.Resources>
+            </Image>
         </Grid>
     </Grid>
 </Window>
