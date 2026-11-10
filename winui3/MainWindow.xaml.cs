@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Canvas.UI.Xaml;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Windows.Foundation;
-using Windows.UI;
 
 namespace AtlasCardViewer;
 
@@ -35,12 +35,21 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        Loaded += OnLoaded;
+
+        // Window 没有 Loaded，监听 Content 的 Loaded
+        if (Content is FrameworkElement fe)
+        {
+            fe.Loaded += OnContentLoaded;
+        }
     }
 
-    private async void OnLoaded(object sender, RoutedEventArgs e)
+    private async void OnContentLoaded(object sender, RoutedEventArgs e)
     {
-        Loaded -= OnLoaded;
+        if (sender is FrameworkElement fe)
+        {
+            fe.Loaded -= OnContentLoaded;
+        }
+
         try { await InitializeAsync(); }
         catch (Exception ex) { await ShowErrorAsync(ex); }
     }
@@ -253,7 +262,6 @@ public sealed partial class MainWindow : Window
 
         if (!hasBlend)
         {
-            // 卡背
             if (_allFid >= 0 && _allFid < _frames.Length)
             {
                 var f = _frames[_allFid];
@@ -264,7 +272,6 @@ public sealed partial class MainWindow : Window
                     1.0f, PickInterp(s));
             }
 
-            // 各层：按层自身 scale 选择插值
             foreach (var L in def.Layers)
             {
                 if (L.Fid < 0 || L.Fid >= _frames.Length) continue;
@@ -403,9 +410,6 @@ public sealed partial class MainWindow : Window
 
     private void Scroller_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        // 默认保留最后一张预览，如需清空可取消注释：
-        // PreviewImage.Source = null;
-        // _lastPreview = null;
-        // _lastPreviewCard = null;
+        // 默认保留最后一张预览
     }
 }
