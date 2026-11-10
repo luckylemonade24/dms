@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
 
@@ -14,16 +14,21 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v3
+
       - name: Publish (win-x64, self-contained, unpackaged)
         run: >
-          dotnet publish winui3/AtlasCardViewer.csproj
-          -c Release
-          -r win-x64
-          -p:Platform=x64
-          -p:WindowsPackageType=None
-          -p:SelfContained=true
-          -p:WindowsAppSDKSelfContained=true
-          -o publish
+          msbuild winui3/AtlasCardViewer.csproj
+          /t:Publish
+          /restore
+          /p:Configuration=Release
+          /p:RuntimeIdentifier=win-x64
+          /p:Platform=x64
+          /p:WindowsPackageType=None
+          /p:SelfContained=true
+          /p:WindowsAppSDKSelfContained=true
+          /p:PublishDir=${{ github.workspace }}/publish/
 
       - name: Sanity check
         shell: pwsh
