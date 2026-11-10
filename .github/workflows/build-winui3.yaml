@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v7
 
@@ -23,7 +23,6 @@ jobs:
           -p:WindowsPackageType=None
           -p:SelfContained=true
           -p:WindowsAppSDKSelfContained=true
-          -p:UseXamlCompilerExecutable=false
           -o publish
 
       - name: Sanity check
