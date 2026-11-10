@@ -37,8 +37,7 @@
               BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
             <Image x:Name="PreviewImage"
                    Stretch="Uniform"
-                   Margin="12"
-                   RenderOptions.BitmapInterpolationMode="HighQuality"/>
+                   Margin="12"/>
         </Grid>
     </Grid>
 </Window>

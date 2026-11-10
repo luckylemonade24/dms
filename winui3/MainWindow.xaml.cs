@@ -75,7 +75,6 @@ public sealed partial class MainWindow : Window
         using var doc = JsonDocument.Parse(json);
         JsonElement root = doc.RootElement;
 
-        // data[1] 帧表：每 6 个一组 x,y,w,h,_,scale
         JsonElement framesArr = root[1];
         int fCount = framesArr.GetArrayLength() / 6;
         _frames = new Frame[fCount];
@@ -92,7 +91,6 @@ public sealed partial class MainWindow : Window
             };
         }
 
-        // data[3] 特殊项
         JsonElement specialArr = root[3];
         for (int i = 0; i + 3 < specialArr.GetArrayLength(); i += 4)
         {
@@ -104,7 +102,6 @@ public sealed partial class MainWindow : Window
             }
         }
 
-        // data[2] 卡牌
         JsonElement cardsArr = root[2];
         int len = cardsArr.GetArrayLength();
         int idx = 0;
@@ -199,6 +196,11 @@ public sealed partial class MainWindow : Window
         _  => BlendEffectMode.Multiply,
     };
 
+    // ================= 插值选择：s>1 的像素图层用最近邻 =================
+    private static CanvasImageInterpolation PickInterp(float scale)
+        => scale > 1f ? CanvasImageInterpolation.NearestNeighbor
+                      : CanvasImageInterpolation.Linear;
+
     // ================= 主绘制 =================
     private void CardsCanvas_Draw(CanvasControl sender, CanvasDrawEventArgs args)
     {
@@ -251,16 +253,18 @@ public sealed partial class MainWindow : Window
 
         if (!hasBlend)
         {
-            // ===== 纯批处理路径：所有层直接 blit 到 ds =====
+            // 卡背
             if (_allFid >= 0 && _allFid < _frames.Length)
             {
                 var f = _frames[_allFid];
                 float s = f.Scale == 0 ? 1f : f.Scale;
                 ds.DrawImage(_atlas,
                     new Rect(x, y, CARD_W * s * sx, CARD_H * s * sy),
-                    new Rect(f.X, f.Y, CARD_W, CARD_H));
+                    new Rect(f.X, f.Y, CARD_W, CARD_H),
+                    1.0f, PickInterp(s));
             }
 
+            // 各层：按层自身 scale 选择插值
             foreach (var L in def.Layers)
             {
                 if (L.Fid < 0 || L.Fid >= _frames.Length) continue;
@@ -271,12 +275,12 @@ public sealed partial class MainWindow : Window
                 ds.DrawImage(_atlas,
                     new Rect(x + L.Dx * sx, y + L.Dy * sy,
                              f.W * s * sx, f.H * s * sy),
-                    new Rect(f.X, f.Y, f.W, f.H));
+                    new Rect(f.X, f.Y, f.W, f.H),
+                    1.0f, PickInterp(s));
             }
         }
         else
         {
-            // ===== 少数混合卡：现场合成到临时 RT，一次 blit =====
             int outW = (int)Math.Round(w);
             int outH = (int)Math.Round(h);
             if (outW <= 0 || outH <= 0) return;
@@ -305,7 +309,8 @@ public sealed partial class MainWindow : Window
                 float s = f.Scale == 0 ? 1f : f.Scale;
                 ds.DrawImage(_atlas,
                     new Rect(0, 0, CARD_W * s * sx, CARD_H * s * sy),
-                    new Rect(f.X, f.Y, CARD_W, CARD_H));
+                    new Rect(f.X, f.Y, CARD_W, CARD_H),
+                    1.0f, PickInterp(s));
             }
         }
 
@@ -319,11 +324,12 @@ public sealed partial class MainWindow : Window
             var dstRect = new Rect(layer.Dx * sx, layer.Dy * sy,
                                    f.W * s * sx, f.H * s * sy);
             var srcRect = new Rect(f.X, f.Y, f.W, f.H);
+            var interp  = PickInterp(s);
 
             if (layer.Blend == 0)
             {
                 using var ds = result.CreateDrawingSession();
-                ds.DrawImage(_atlas, dstRect, srcRect);
+                ds.DrawImage(_atlas, dstRect, srcRect, 1.0f, interp);
             }
             else
             {
@@ -331,7 +337,7 @@ public sealed partial class MainWindow : Window
                 using (var ds = fore.CreateDrawingSession())
                 {
                     ds.Clear(Colors.Transparent);
-                    ds.DrawImage(_atlas, dstRect, srcRect);
+                    ds.DrawImage(_atlas, dstRect, srcRect, 1.0f, interp);
                 }
 
                 var next = new CanvasRenderTarget(_device, outW, outH, 96f);
